@@ -51,6 +51,11 @@ void RenderSystem::Destroy()
 		vkDestroyFence(device, fence, nullptr);
 	}
 
+	//if (settings.overlay) 
+	//{
+	//	UIOverlay.freeResources();
+	//}
+
 	delete vulkanDevice;
 
 	if (validation)
@@ -118,7 +123,8 @@ bool RenderSystem::initVulkan(const RenderSystemCreateInfo& createInfo)
 	uint32_t gpuCount = 0;
 	// Get number of available physical devices
 	VK_CHECK_RESULT(vkEnumeratePhysicalDevices(instance, &gpuCount, nullptr));
-	if (gpuCount == 0) {
+	if (gpuCount == 0)
+	{
 		vks::tools::exitFatal("No device with Vulkan support found", -1);
 		return false;
 	}
@@ -150,8 +156,7 @@ bool RenderSystem::initVulkan(const RenderSystemCreateInfo& createInfo)
 	getEnabledFeatures();
 
 	// Vulkan device creation
-	// This is handled by a separate class that gets a logical device representation
-	// and encapsulates functions related to a device
+	// This is handled by a separate class that gets a logical device representation and encapsulates functions related to a device
 	vulkanDevice = new vks::VulkanDevice(physicalDevice);
 
 	// Derived examples can enable extensions based on the list of supported extensions read from the physical device
@@ -209,13 +214,26 @@ bool RenderSystem::prepare(const RenderSystemCreateInfo& createInfo, void* hInst
 {
 	initSwapchain(hInstance, hwnd);
 	createCommandPool();
-	setupSwapChain(createInfo, width, height, fullscreen);
+	setupSwapChain(createInfo.vsync, width, height, fullscreen);
 	createCommandBuffers();
 	createSynchronizationPrimitives();
 	setupDepthStencil(*width, *height);
 	setupRenderPass();
 	createPipelineCache();
 	setupFrameBuffer(*width, *height);
+
+	//settings.overlay = settings.overlay && (!benchmark.active);
+	//if (settings.overlay)
+	//{
+	//	UIOverlay.device = vulkanDevice;
+	//	UIOverlay.queue = queue;
+	//	UIOverlay.shaders = {
+	//		loadShader(getShadersPath() + "base/uioverlay.vert.spv", VK_SHADER_STAGE_VERTEX_BIT),
+	//		loadShader(getShadersPath() + "base/uioverlay.frag.spv", VK_SHADER_STAGE_FRAGMENT_BIT),
+	//	};
+	//	UIOverlay.prepareResources();
+	//	UIOverlay.preparePipeline(pipelineCache, renderPass, swapChain.colorFormat, depthFormat);
+	//}
 
 	return true;
 }
@@ -232,24 +250,6 @@ VkResult RenderSystem::createInstance(bool enableValidation)
 	// Enable surface extensions depending on os
 #if defined(_WIN32)
 	instanceExtensions.push_back(VK_KHR_WIN32_SURFACE_EXTENSION_NAME);
-#elif defined(VK_USE_PLATFORM_ANDROID_KHR)
-	instanceExtensions.push_back(VK_KHR_ANDROID_SURFACE_EXTENSION_NAME);
-#elif defined(_DIRECT2DISPLAY)
-	instanceExtensions.push_back(VK_KHR_DISPLAY_EXTENSION_NAME);
-#elif defined(VK_USE_PLATFORM_DIRECTFB_EXT)
-	instanceExtensions.push_back(VK_EXT_DIRECTFB_SURFACE_EXTENSION_NAME);
-#elif defined(VK_USE_PLATFORM_WAYLAND_KHR)
-	instanceExtensions.push_back(VK_KHR_WAYLAND_SURFACE_EXTENSION_NAME);
-#elif defined(VK_USE_PLATFORM_XCB_KHR)
-	instanceExtensions.push_back(VK_KHR_XCB_SURFACE_EXTENSION_NAME);
-#elif defined(VK_USE_PLATFORM_IOS_MVK)
-	instanceExtensions.push_back(VK_MVK_IOS_SURFACE_EXTENSION_NAME);
-#elif defined(VK_USE_PLATFORM_MACOS_MVK)
-	instanceExtensions.push_back(VK_MVK_MACOS_SURFACE_EXTENSION_NAME);
-#elif defined(VK_USE_PLATFORM_HEADLESS_EXT)
-	instanceExtensions.push_back(VK_EXT_HEADLESS_SURFACE_EXTENSION_NAME);
-#elif defined(VK_USE_PLATFORM_SCREEN_QNX)
-	instanceExtensions.push_back(VK_QNX_SCREEN_SURFACE_EXTENSION_NAME);
 #endif
 
 	// Get extensions supported by the instance and store for later use
@@ -357,9 +357,11 @@ void RenderSystem::createCommandPool()
 	VK_CHECK_RESULT(vkCreateCommandPool(device, &cmdPoolInfo, nullptr, &cmdPool));
 }
 //-----------------------------------------------------------------------------
-void RenderSystem::setupSwapChain(const RenderSystemCreateInfo& createInfo, uint32_t* width, uint32_t* height, bool fullscreen)
+void RenderSystem::setupSwapChain(bool vsync, uint32_t* width, uint32_t* height, bool fullscreen)
 {
-	swapChain.create(width, height, createInfo.vsync, fullscreen);
+	m_vsync = vsync;
+	m_fullscreen = fullscreen;
+	swapChain.create(width, height, m_vsync, m_fullscreen);
 }
 //-----------------------------------------------------------------------------
 void RenderSystem::createCommandBuffers()
@@ -378,13 +380,14 @@ void RenderSystem::createCommandBuffers()
 //-----------------------------------------------------------------------------
 void RenderSystem::createSynchronizationPrimitives()
 {
-	// Wait fences to sync command buffer access
-	VkFenceCreateInfo fenceCreateInfo = vks::initializers::fenceCreateInfo(VK_FENCE_CREATE_SIGNALED_BIT);
-	waitFences.resize(drawCmdBuffers.size());
-	for (auto& fence : waitFences) 
-	{
-		VK_CHECK_RESULT(vkCreateFence(device, &fenceCreateInfo, nullptr, &fence));
-	}
+	// TODO: нужно ли - сейчас создается в GameApp но может позже понадобится
+	//// Wait fences to sync command buffer access
+	//VkFenceCreateInfo fenceCreateInfo = vks::initializers::fenceCreateInfo(VK_FENCE_CREATE_SIGNALED_BIT);
+	//waitFences.resize(drawCmdBuffers.size());
+	//for (auto& fence : waitFences) 
+	//{
+	//	VK_CHECK_RESULT(vkCreateFence(device, &fenceCreateInfo, nullptr, &fence));
+	//}
 }
 //-----------------------------------------------------------------------------
 void RenderSystem::setupDepthStencil(uint32_t width, uint32_t height)
@@ -544,5 +547,69 @@ void RenderSystem::setupFrameBuffer(uint32_t width, uint32_t height)
 void RenderSystem::destroyCommandBuffers()
 {
 	vkFreeCommandBuffers(device, cmdPool, static_cast<uint32_t>(drawCmdBuffers.size()), drawCmdBuffers.data());
+}
+//-----------------------------------------------------------------------------
+VkPipelineShaderStageCreateInfo RenderSystem::loadShader(std::string fileName, VkShaderStageFlagBits stage)
+{
+	VkPipelineShaderStageCreateInfo shaderStage = {};
+	shaderStage.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+	shaderStage.stage = stage;
+#if defined(VK_USE_PLATFORM_ANDROID_KHR)
+	shaderStage.module = vks::tools::loadShader(androidApp->activity->assetManager, fileName.c_str(), device);
+#else
+	shaderStage.module = vks::tools::loadShader(fileName.c_str(), device);
+#endif
+	shaderStage.pName = "main";
+	assert(shaderStage.module != VK_NULL_HANDLE);
+	shaderModules.push_back(shaderStage.module);
+	return shaderStage;
+}
+//-----------------------------------------------------------------------------
+void RenderSystem::windowResize(uint32_t destWidth, uint32_t destHeight)
+{
+	if (!prepared)
+	{
+		return;
+	}
+	prepared = false;
+	resized = true;
+
+	// Ensure all operations on the device have been finished before destroying resources
+	vkDeviceWaitIdle(device);
+
+	// Recreate swap chain
+	setupSwapChain(m_vsync, &destWidth, &destHeight, m_fullscreen);
+
+	// Recreate the frame buffers
+	vkDestroyImageView(device, depthStencil.view, nullptr);
+	vkDestroyImage(device, depthStencil.image, nullptr);
+	vkFreeMemory(device, depthStencil.memory, nullptr);
+	setupDepthStencil(destWidth, destHeight);
+	for (uint32_t i = 0; i < frameBuffers.size(); i++) {
+		vkDestroyFramebuffer(device, frameBuffers[i], nullptr);
+	}
+	setupFrameBuffer(destWidth, destHeight);
+
+	if ((destWidth > 0.0f) && (destHeight > 0.0f))
+	{
+		//if (settings.overlay) {
+		//	UIOverlay.resize(width, height);
+		//}
+	}
+
+	// Command buffers need to be recreated as they may store
+	// references to the recreated frame buffer
+	destroyCommandBuffers();
+	createCommandBuffers();
+
+	// SRS - Recreate fences in case number of swapchain images has changed on resize
+	for (auto& fence : waitFences) {
+		vkDestroyFence(device, fence, nullptr);
+	}
+	createSynchronizationPrimitives();
+
+	vkDeviceWaitIdle(device);
+
+	prepared = true;
 }
 //-----------------------------------------------------------------------------

@@ -1,5 +1,6 @@
 ﻿#include "stdafx.h"
 #include "GameApp.h"
+#include "01_TriangleApp.h"
 //-----------------------------------------------------------------------------
 #if defined(_MSC_VER)
 #	pragma comment( lib, "3rdparty.lib" )

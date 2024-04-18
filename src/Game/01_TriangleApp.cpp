@@ -1,7 +1,7 @@
 #include "stdafx.h"
-#include "GameApp.h"
+#include "01_TriangleApp.h"
 //-----------------------------------------------------------------------------
-bool GameApp::OnCreate()
+bool TriangleApp::OnCreate()
 {
 	// Setup a default look-at camera
 	camera.type = Camera::CameraType::lookat;
@@ -21,7 +21,7 @@ bool GameApp::OnCreate()
 	return true;
 }
 //-----------------------------------------------------------------------------
-void GameApp::OnDestroy()
+void TriangleApp::OnDestroy()
 {
 	VkDevice& device = GetRenderSystem()->GetDevice();
 
@@ -50,7 +50,7 @@ void GameApp::OnDestroy()
 	}
 }
 //-----------------------------------------------------------------------------
-void GameApp::OnUpdate(float deltaTime)
+void TriangleApp::OnUpdate(float deltaTime)
 {
 	camera.update(deltaTime);
 	if (camera.moving())
@@ -59,7 +59,7 @@ void GameApp::OnUpdate(float deltaTime)
 	}
 }
 //-----------------------------------------------------------------------------
-void GameApp::OnFrame()
+void TriangleApp::OnFrame()
 {
 	VkDevice& device = GetRenderSystem()->GetDevice();
 	VulkanSwapChain& swapChain = GetRenderSystem()->GetSwapChain();
@@ -72,12 +72,12 @@ void GameApp::OnFrame()
 	// Note that the implementation is free to return the images in any order, so we must use the acquire function and can't just cycle through the images/imageIndex on our own
 	uint32_t imageIndex;
 	VkResult result = vkAcquireNextImageKHR(device, swapChain.swapChain, UINT64_MAX, presentCompleteSemaphores[currentFrame], VK_NULL_HANDLE, &imageIndex);
-	if (result == VK_ERROR_OUT_OF_DATE_KHR) 
+	if (result == VK_ERROR_OUT_OF_DATE_KHR)
 	{
 		OnWindowResize();
 		return;
 	}
-	else if ((result != VK_SUCCESS) && (result != VK_SUBOPTIMAL_KHR)) 
+	else if ((result != VK_SUCCESS) && (result != VK_SUBOPTIMAL_KHR))
 	{
 		throw "Could not acquire the next swap chain image!";
 	}
@@ -191,7 +191,7 @@ void GameApp::OnFrame()
 	presentInfo.pImageIndices = &imageIndex;
 	result = vkQueuePresentKHR(GetRenderSystem()->GetQueue(), &presentInfo);
 
-	if ((result == VK_ERROR_OUT_OF_DATE_KHR) || (result == VK_SUBOPTIMAL_KHR)) 
+	if ((result == VK_ERROR_OUT_OF_DATE_KHR) || (result == VK_SUBOPTIMAL_KHR))
 	{
 		OnWindowResize();
 	}
@@ -204,13 +204,13 @@ void GameApp::OnFrame()
 	currentFrame = (currentFrame + 1) % MAX_CONCURRENT_FRAMES;
 }
 //-----------------------------------------------------------------------------
-void GameApp::OnWindowResize()
+void TriangleApp::OnWindowResize()
 {
 	EngineApp::OnWindowResize();
 }
 //-----------------------------------------------------------------------------
 // Create the per-frame (in flight) sVulkan synchronization primitives used in this example
-void GameApp::createSynchronizationPrimitives()
+void TriangleApp::createSynchronizationPrimitives()
 {
 	VkDevice& device = GetRenderSystem()->GetDevice();
 
@@ -224,7 +224,7 @@ void GameApp::createSynchronizationPrimitives()
 	// Create the fences in signaled state (so we don't wait on first render of each command buffer)
 	fenceCI.flags = VK_FENCE_CREATE_SIGNALED_BIT;
 
-	for (uint32_t i = 0; i < MAX_CONCURRENT_FRAMES; i++) 
+	for (uint32_t i = 0; i < MAX_CONCURRENT_FRAMES; i++)
 	{
 		// Semaphore used to ensure that image presentation is complete before starting to submit again
 		VK_CHECK_RESULT(vkCreateSemaphore(device, &semaphoreCI, nullptr, &presentCompleteSemaphores[i]));
@@ -236,7 +236,7 @@ void GameApp::createSynchronizationPrimitives()
 	}
 }
 //-----------------------------------------------------------------------------
-void GameApp::createCommandBuffers()
+void TriangleApp::createCommandBuffers()
 {
 	// All command buffers are allocated from a command pool
 	VkCommandPoolCreateInfo commandPoolCI{};
@@ -252,7 +252,7 @@ void GameApp::createCommandBuffers()
 //-----------------------------------------------------------------------------
 // Prepare vertex and index buffers for an indexed triangle
 // Also uploads them to device local memory using staging and initializes vertex input and attribute binding to match the vertex shader
-void GameApp::createVertexBuffer()
+void TriangleApp::createVertexBuffer()
 {
 	// A note on memory management in Vulkan in general:
 	//	This is a very complex topic and while it's fine for an example application to small individual memory allocations that is not
@@ -406,7 +406,7 @@ void GameApp::createVertexBuffer()
 	vkFreeMemory(GetRenderSystem()->GetDevice(), stagingBuffers.indices.memory, nullptr);
 }
 //-----------------------------------------------------------------------------
-void GameApp::createUniformBuffers()
+void TriangleApp::createUniformBuffers()
 {
 	// Prepare and initialize the per-frame uniform buffer blocks containing shader uniforms
 		// Single uniforms like in OpenGL are no longer present in Vulkan. All Shader uniforms are passed via uniform buffer blocks
@@ -449,7 +449,7 @@ void GameApp::createUniformBuffers()
 // Descriptor set layouts define the interface between our application and the shader
 // Basically connects the different shader stages to descriptors for binding uniform buffers, image samplers, etc.
 // So every shader binding should map to one descriptor set layout binding
-void GameApp::createDescriptorSetLayout()
+void TriangleApp::createDescriptorSetLayout()
 {
 	// Binding 0: Uniform buffer (Vertex shader)
 	VkDescriptorSetLayoutBinding layoutBinding{};
@@ -476,7 +476,7 @@ void GameApp::createDescriptorSetLayout()
 }
 //-----------------------------------------------------------------------------
 // Descriptors are allocated from a pool, that tells the implementation how many and what types of descriptors we are going to use (at maximum)
-void GameApp::createDescriptorPool()
+void TriangleApp::createDescriptorPool()
 {
 	// We need to tell the API the number of max. requested descriptors per type
 	VkDescriptorPoolSize descriptorTypeCounts[1];
@@ -504,10 +504,10 @@ void GameApp::createDescriptorPool()
 //-----------------------------------------------------------------------------
 // Shaders access data using descriptor sets that "point" at our uniform buffers
 // The descriptor sets make use of the descriptor set layouts created above 
-void GameApp::createDescriptorSets()
+void TriangleApp::createDescriptorSets()
 {
 	// Allocate one descriptor set per frame from the global descriptor pool
-	for (uint32_t i = 0; i < MAX_CONCURRENT_FRAMES; i++) 
+	for (uint32_t i = 0; i < MAX_CONCURRENT_FRAMES; i++)
 	{
 		VkDescriptorSetAllocateInfo allocInfo{};
 		allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
@@ -537,7 +537,7 @@ void GameApp::createDescriptorSets()
 	}
 }
 //-----------------------------------------------------------------------------
-void GameApp::createPipelines()
+void TriangleApp::createPipelines()
 {
 	// Create the graphics pipeline used in this example
 	// Vulkan uses the concept of rendering pipelines to encapsulate fixed states, replacing OpenGL's complex state machine
@@ -701,7 +701,7 @@ void GameApp::createPipelines()
 	vkDestroyShaderModule(GetRenderSystem()->GetDevice(), shaderStages[1].module, nullptr);
 }
 //-----------------------------------------------------------------------------
-VkShaderModule GameApp::loadSPIRVShader(std::string filename)
+VkShaderModule TriangleApp::loadSPIRVShader(std::string filename)
 {
 	size_t shaderSize;
 	char* shaderCode{ nullptr };

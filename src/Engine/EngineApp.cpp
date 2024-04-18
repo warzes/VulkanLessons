@@ -66,6 +66,7 @@ void EngineApp::Run()
 	{
 		if (OnCreate())
 		{
+			m_render->Prepared() = true;
 			while (!IsEnd())
 			{
 				frame();
@@ -227,7 +228,7 @@ void EngineApp::frame()
 		TranslateMessage(&m_data->msg);
 		DispatchMessage(&m_data->msg);
 	}
-	if (!IsIconic(m_data->hwnd)) // TODO: может все таки обрабатывать события даже в свернутом окне?
+	if (m_render->Prepared() && !IsIconic(m_data->hwnd)) // TODO: может все таки обрабатывать события даже в свернутом окне?
 	{
 		nextFrame();
 	}
@@ -241,7 +242,7 @@ bool EngineApp::IsEnd() const
 void EngineApp::setupDPIAwareness()
 {
 	typedef HRESULT* (__stdcall* SetProcessDpiAwarenessFunc)(PROCESS_DPI_AWARENESS);
-	HMODULE shCore = LoadLibraryA("Shcore.dll");
+	HMODULE shCore = LoadLibrary(L"Shcore.dll");
 	if (shCore)
 	{
 		SetProcessDpiAwarenessFunc setProcessDpiAwareness = (SetProcessDpiAwarenessFunc)GetProcAddress(shCore, "SetProcessDpiAwareness");
@@ -256,22 +257,12 @@ void EngineApp::setupDPIAwareness()
 void EngineApp::nextFrame()
 {
 	auto tStart = std::chrono::high_resolution_clock::now();
-	if (viewUpdated)
-	{
-		viewUpdated = false;
-	}
-
 	render();
 	frameCounter++;
 	auto tEnd = std::chrono::high_resolution_clock::now();
 	auto tDiff = std::chrono::duration<double, std::milli>(tEnd - tStart).count();
 
 	frameTimer = (float)tDiff / 1000.0f;
-	//camera.update(frameTimer);
-	//if (camera.moving())
-	{
-	//	viewUpdated = true;
-	}
 	OnUpdate(frameTimer);
 
 	// Convert to clamped timer value

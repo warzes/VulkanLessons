@@ -5,7 +5,7 @@
 // Increasing this number may improve performance but will also introduce additional latency
 #define MAX_CONCURRENT_FRAMES 2
 
-class GameApp final : public EngineApp
+class TriangleApp final : public EngineApp
 {
 public:
 	EngineCreateInfo GetCreateInfo() const final { return {}; }

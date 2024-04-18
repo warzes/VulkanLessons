@@ -6,16 +6,25 @@
     <ClCompile Include="GameApp.cpp">
       <Filter>App</Filter>
     </ClCompile>
+    <ClCompile Include="01_TriangleApp.cpp">
+      <Filter>App\Examples</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="GameApp.h">
       <Filter>App</Filter>
     </ClInclude>
+    <ClInclude Include="01_TriangleApp.h">
+      <Filter>App\Examples</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="App">
       <UniqueIdentifier>{742a5fa7-921d-46f5-961f-0165aa9ee3e0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="App\Examples">
+      <UniqueIdentifier>{23b7cc76-d248-4e34-92aa-6a6e65d9f6f0}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

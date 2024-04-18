@@ -51,8 +51,6 @@ private:
 	EngineAppImpl* m_data = nullptr;
 	RenderSystem* m_render = nullptr;
 
-	bool viewUpdated = false;
-
 	// Frame counter to display fps
 	uint32_t frameCounter = 0;
 	uint32_t lastFPS = 0;
@@ -65,4 +63,14 @@ private:
 	float timer = 0.0f;
 	// Multiplier for speeding up (or slowing down) the global timer
 	float timerSpeed = 0.25f;
+
+	/** @brief State of mouse/touch input */
+	struct {
+		struct {
+			bool left = false;
+			bool right = false;
+			bool middle = false;
+		} buttons;
+		glm::vec2 position;
+	} mouseState;
 };

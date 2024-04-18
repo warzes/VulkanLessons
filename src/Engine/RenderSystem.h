@@ -2,6 +2,7 @@
 
 #include "VulkanSwapChain.h"
 #include "VulkanDevice.h"
+#include "VulkanUIOverlay.h"
 
 struct RenderSystemCreateInfo final
 {
@@ -34,6 +35,8 @@ public:
 	VkPipelineCache& GetPipelineCache() { return pipelineCache; }
 	std::vector<VkFramebuffer>& GetFrameBuffers() { return frameBuffers; }
 
+	bool& Prepared() { return prepared; }
+
 private:
 	bool initVulkan(const RenderSystemCreateInfo& createInfo);
 	bool prepare(const RenderSystemCreateInfo& createInfo, void* hInstance, void* hwnd, uint32_t* width, uint32_t* height, bool fullscreen);
@@ -44,7 +47,7 @@ private:
 
 	void initSwapchain(void* hInstance, void* hwnd);
 	void createCommandPool();
-	void setupSwapChain(const RenderSystemCreateInfo& createInfo, uint32_t* width, uint32_t* height, bool fullscreen);
+	void setupSwapChain(bool vsync, uint32_t* width, uint32_t* height, bool fullscreen);
 	void createCommandBuffers();
 	void createSynchronizationPrimitives();
 	void setupDepthStencil(uint32_t width, uint32_t height);
@@ -53,6 +56,11 @@ private:
 	void setupFrameBuffer(uint32_t width, uint32_t height);
 
 	void destroyCommandBuffers();
+
+	/** @brief Loads a SPIR-V shader file for the given shader stage */
+	VkPipelineShaderStageCreateInfo loadShader(std::string fileName, VkShaderStageFlagBits stage);
+
+	void windowResize(uint32_t destWidth, uint32_t destHeight);
 
 	// Vulkan instance, stores all per-application states
 	VkInstance instance{ VK_NULL_HANDLE };
@@ -125,4 +133,11 @@ private:
 	bool validation = false;
 	bool prepared = false;
 	bool resized = false;
+
+	vks::UIOverlay UIOverlay;
+
+	VkClearColorValue defaultClearColor = { { 0.025f, 0.025f, 0.025f, 1.0f } };
+
+	bool m_vsync = false;
+	bool m_fullscreen = false;
 };
