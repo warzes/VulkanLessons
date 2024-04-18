@@ -7,19 +7,52 @@ struct RenderSystemCreateInfo final
 {
 	std::vector<const char*> enabledInstanceExtensions;
 	bool validation = false;
+	bool vsync = false;
 };
 
 class RenderSystem final
 {
 public:
-	bool Create(const RenderSystemCreateInfo& createInfo);
+	bool Create(const RenderSystemCreateInfo& createInfo, void* hInstance, void* hwnd, uint32_t* width, uint32_t* height, bool fullscreen);
 	void Destroy();
+	void Final();
+
+	std::string GetDeviceName() const;
+	// This function is used to request a device memory type that supports all the property flags we request (e.g. device local, host visible)
+	// Upon success it will return the index of the memory type that fits our requested memory properties
+	// This is necessary as implementations can offer an arbitrary number of memory types with different
+	// memory properties.
+	// You can check https://vulkan.gpuinfo.org/ for details on different memory configurations
+	uint32_t GetMemoryTypeIndex(uint32_t typeBits, VkMemoryPropertyFlags properties);
+
+
+	VkDevice& GetDevice() { return device; }
+	VulkanSwapChain& GetSwapChain() { return swapChain; }
+	VkQueue& GetQueue() { return queue; }
+	VkDescriptorPool& GetDescriptorPool() { return descriptorPool; }
+	VkRenderPass& GetRenderPass() { return renderPass; }
+	VkPipelineCache& GetPipelineCache() { return pipelineCache; }
+	std::vector<VkFramebuffer>& GetFrameBuffers() { return frameBuffers; }
 
 private:
+	bool initVulkan(const RenderSystemCreateInfo& createInfo);
+	bool prepare(const RenderSystemCreateInfo& createInfo, void* hInstance, void* hwnd, uint32_t* width, uint32_t* height, bool fullscreen);
+
 	VkResult createInstance(bool enableValidation);
 	void getEnabledFeatures() {} // TODO: если нужно
 	void getEnabledExtensions() {} // TODO: если нужно
 
+	void initSwapchain(void* hInstance, void* hwnd);
+	void createCommandPool();
+	void setupSwapChain(const RenderSystemCreateInfo& createInfo, uint32_t* width, uint32_t* height, bool fullscreen);
+	void createCommandBuffers();
+	void createSynchronizationPrimitives();
+	void setupDepthStencil(uint32_t width, uint32_t height);
+	void setupRenderPass();
+	void createPipelineCache();
+	void setupFrameBuffer(uint32_t width, uint32_t height);
+
+	void destroyCommandBuffers();
 
 	// Vulkan instance, stores all per-application states
 	VkInstance instance{ VK_NULL_HANDLE };
@@ -46,7 +79,6 @@ private:
 	/** @brief Encapsulated physical and logical vulkan device */
 	vks::VulkanDevice* vulkanDevice;
 
-
 	// Handle to the device graphics queue that command buffers are submitted to
 	VkQueue queue{ VK_NULL_HANDLE };
 	// Depth buffer format (selected during Vulkan initialization)
@@ -62,7 +94,7 @@ private:
 	// Global render pass for frame buffer writes
 	VkRenderPass renderPass{ VK_NULL_HANDLE };
 	// List of available frame buffers (same as number of swap chain images)
-	std::vector<VkFramebuffer>frameBuffers;
+	std::vector<VkFramebuffer> frameBuffers;
 	// Active frame buffer index
 	uint32_t currentBuffer = 0;
 	// Descriptor set pool
@@ -82,4 +114,15 @@ private:
 	} semaphores;
 	std::vector<VkFence> waitFences;
 	bool requiresStencil{ false };
+
+	/** @brief Default depth stencil attachment used by the default render pass */
+	struct {
+		VkImage image;
+		VkDeviceMemory memory;
+		VkImageView view;
+	} depthStencil{};
+
+	bool validation = false;
+	bool prepared = false;
+	bool resized = false;
 };
