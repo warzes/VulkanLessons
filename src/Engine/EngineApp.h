@@ -1,13 +1,18 @@
 #pragma once
 
-struct EngineCreateInfo
+#include "RenderSystem.h"
+
+struct EngineCreateInfo final
 {
 	struct
 	{
 		int width = 1024;
 		int height = 768;
 		const wchar_t* title = L"Game";
+		bool fullscreen = false;
 	} window;
+
+	RenderSystemCreateInfo render;
 };
 
 struct EngineAppImpl;
@@ -29,11 +34,15 @@ public:
 	void Exit();
 	float GetDeltaTime() const;
 
+	RenderSystem* GetRenderSystem() { return m_render; }
+
 private:
 	bool create();
 	void destroy();
 	void frame();
 	bool IsEnd() const;
+	void setupDPIAwareness();
 
-	EngineAppImpl* m_data;
+	EngineAppImpl* m_data = nullptr;
+	RenderSystem* m_render = nullptr;
 };

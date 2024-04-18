@@ -8,6 +8,33 @@
     <ClCompile Include="Log.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="RenderSystem.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="VulkanDebug.cpp">
+      <Filter>Render\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="VulkanTools.cpp">
+      <Filter>Render\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="VulkanBuffer.cpp">
+      <Filter>Render\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="VulkanDevice.cpp">
+      <Filter>Render\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="VulkanSwapChain.cpp">
+      <Filter>Render\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="VulkanTexture.cpp">
+      <Filter>Render\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="VulkanglTFModel.cpp">
+      <Filter>Render\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="VulkanUIOverlay.cpp">
+      <Filter>Render\Vulkan</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -29,6 +56,48 @@
     <ClInclude Include="Log.h">
       <Filter>Core</Filter>
     </ClInclude>
+    <ClInclude Include="RenderSystem.h">
+      <Filter>Render</Filter>
+    </ClInclude>
+    <ClInclude Include="VulkanDebug.h">
+      <Filter>Render\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="VulkanInitializers.h">
+      <Filter>Render\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="VulkanTools.h">
+      <Filter>Render\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="VulkanBuffer.h">
+      <Filter>Render\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="VulkanDevice.h">
+      <Filter>Render\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="VulkanSwapChain.h">
+      <Filter>Render\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="VulkanTexture.h">
+      <Filter>Render\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="VulkanglTFModel.h">
+      <Filter>Render\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="VulkanUIOverlay.h">
+      <Filter>Render\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="VulkanFrameBuffer.h">
+      <Filter>Render\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>Render</Filter>
+    </ClInclude>
+    <ClInclude Include="Frustum.h">
+      <Filter>Render</Filter>
+    </ClInclude>
+    <ClInclude Include="KeyCodes.h">
+      <Filter>Other</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Base">
@@ -42,6 +111,12 @@
     </Filter>
     <Filter Include="Core">
       <UniqueIdentifier>{9783a5ce-ab38-408b-a309-0144d5f6b325}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Render">
+      <UniqueIdentifier>{2c76ae7e-a0d6-4d0b-bfa0-2ae907bc93e1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Render\Vulkan">
+      <UniqueIdentifier>{808cc38a-c647-45cb-adc9-646e99397878}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
