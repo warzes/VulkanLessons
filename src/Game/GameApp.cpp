@@ -23,7 +23,7 @@ bool GameApp::OnCreate()
 //-----------------------------------------------------------------------------
 void GameApp::OnDestroy()
 {
-	VkDevice& device = GetRenderSystem()->GetDevice();
+	VkDevice& device = GetDevice();
 
 	// Clean up used Vulkan resources
 	// Note: Inherited destructor cleans up resources stored in base class
@@ -61,8 +61,8 @@ void GameApp::OnUpdate(float deltaTime)
 //-----------------------------------------------------------------------------
 void GameApp::OnFrame()
 {
-	VkDevice& device = GetRenderSystem()->GetDevice();
-	VulkanSwapChain& swapChain = GetRenderSystem()->GetSwapChain();
+	VkDevice& device = GetDevice();
+	VulkanSwapChain& swapChain = GetSwapChain();
 
 	// Use a fence to wait until the command buffer has finished execution before using it again
 	vkWaitForFences(device, 1, &waitFences[currentFrame], VK_TRUE, UINT64_MAX);
@@ -111,14 +111,14 @@ void GameApp::OnFrame()
 	VkRenderPassBeginInfo renderPassBeginInfo{};
 	renderPassBeginInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
 	renderPassBeginInfo.pNext = nullptr;
-	renderPassBeginInfo.renderPass = GetRenderSystem()->GetRenderPass();
+	renderPassBeginInfo.renderPass = GetRenderPass();
 	renderPassBeginInfo.renderArea.offset.x = 0;
 	renderPassBeginInfo.renderArea.offset.y = 0;
 	renderPassBeginInfo.renderArea.extent.width = 1024; // TODO:
 	renderPassBeginInfo.renderArea.extent.height = 768; // TODO:
 	renderPassBeginInfo.clearValueCount = 2;
 	renderPassBeginInfo.pClearValues = clearValues;
-	renderPassBeginInfo.framebuffer = GetRenderSystem()->GetFrameBuffers()[imageIndex];
+	renderPassBeginInfo.framebuffer = GetFrameBuffers()[imageIndex];
 
 	const VkCommandBuffer commandBuffer = commandBuffers[currentFrame];
 	VK_CHECK_RESULT(vkBeginCommandBuffer(commandBuffer, &cmdBufInfo));
@@ -176,7 +176,7 @@ void GameApp::OnFrame()
 	submitInfo.signalSemaphoreCount = 1;
 
 	// Submit to the graphics queue passing a wait fence
-	VK_CHECK_RESULT(vkQueueSubmit(GetRenderSystem()->GetQueue(), 1, &submitInfo, waitFences[currentFrame]));
+	VK_CHECK_RESULT(vkQueueSubmit(GetQueue(), 1, &submitInfo, waitFences[currentFrame]));
 
 	// Present the current frame buffer to the swap chain
 	// Pass the semaphore signaled by the command buffer submission from the submit info as the wait semaphore for swap chain presentation
@@ -189,7 +189,7 @@ void GameApp::OnFrame()
 	presentInfo.swapchainCount = 1;
 	presentInfo.pSwapchains = &swapChain.swapChain;
 	presentInfo.pImageIndices = &imageIndex;
-	result = vkQueuePresentKHR(GetRenderSystem()->GetQueue(), &presentInfo);
+	result = vkQueuePresentKHR(GetQueue(), &presentInfo);
 
 	if ((result == VK_ERROR_OUT_OF_DATE_KHR) || (result == VK_SUBOPTIMAL_KHR)) 
 	{
@@ -212,7 +212,7 @@ void GameApp::OnWindowResize()
 // Create the per-frame (in flight) sVulkan synchronization primitives used in this example
 void GameApp::createSynchronizationPrimitives()
 {
-	VkDevice& device = GetRenderSystem()->GetDevice();
+	VkDevice& device = GetDevice();
 
 	// Semaphores are used for correct command ordering within a queue
 	VkSemaphoreCreateInfo semaphoreCI{};
@@ -241,13 +241,13 @@ void GameApp::createCommandBuffers()
 	// All command buffers are allocated from a command pool
 	VkCommandPoolCreateInfo commandPoolCI{};
 	commandPoolCI.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
-	commandPoolCI.queueFamilyIndex = GetRenderSystem()->GetSwapChain().queueNodeIndex;
+	commandPoolCI.queueFamilyIndex = GetSwapChain().queueNodeIndex;
 	commandPoolCI.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
-	VK_CHECK_RESULT(vkCreateCommandPool(GetRenderSystem()->GetDevice(), &commandPoolCI, nullptr, &commandPool));
+	VK_CHECK_RESULT(vkCreateCommandPool(GetDevice(), &commandPoolCI, nullptr, &commandPool));
 
 	// Allocate one command buffer per max. concurrent frame from above pool
 	VkCommandBufferAllocateInfo cmdBufAllocateInfo = vks::initializers::commandBufferAllocateInfo(commandPool, VK_COMMAND_BUFFER_LEVEL_PRIMARY, MAX_CONCURRENT_FRAMES);
-	VK_CHECK_RESULT(vkAllocateCommandBuffers(GetRenderSystem()->GetDevice(), &cmdBufAllocateInfo, commandBuffers.data()));
+	VK_CHECK_RESULT(vkAllocateCommandBuffers(GetDevice(), &cmdBufAllocateInfo, commandBuffers.data()));
 }
 //-----------------------------------------------------------------------------
 // Prepare vertex and index buffers for an indexed triangle
@@ -307,27 +307,27 @@ void GameApp::createVertexBuffer()
 	// Buffer is used as the copy source
 	vertexBufferInfoCI.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
 	// Create a host-visible buffer to copy the vertex data to (staging buffer)
-	VK_CHECK_RESULT(vkCreateBuffer(GetRenderSystem()->GetDevice(), &vertexBufferInfoCI, nullptr, &stagingBuffers.vertices.buffer));
-	vkGetBufferMemoryRequirements(GetRenderSystem()->GetDevice(), stagingBuffers.vertices.buffer, &memReqs);
+	VK_CHECK_RESULT(vkCreateBuffer(GetDevice(), &vertexBufferInfoCI, nullptr, &stagingBuffers.vertices.buffer));
+	vkGetBufferMemoryRequirements(GetDevice(), stagingBuffers.vertices.buffer, &memReqs);
 	memAlloc.allocationSize = memReqs.size;
 	// Request a host visible memory type that can be used to copy our data do
 	// Also request it to be coherent, so that writes are visible to the GPU right after unmapping the buffer
-	memAlloc.memoryTypeIndex = GetRenderSystem()->GetMemoryTypeIndex(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
-	VK_CHECK_RESULT(vkAllocateMemory(GetRenderSystem()->GetDevice(), &memAlloc, nullptr, &stagingBuffers.vertices.memory));
+	memAlloc.memoryTypeIndex = GetMemoryTypeIndex(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+	VK_CHECK_RESULT(vkAllocateMemory(GetDevice(), &memAlloc, nullptr, &stagingBuffers.vertices.memory));
 	// Map and copy
-	VK_CHECK_RESULT(vkMapMemory(GetRenderSystem()->GetDevice(), stagingBuffers.vertices.memory, 0, memAlloc.allocationSize, 0, &data));
+	VK_CHECK_RESULT(vkMapMemory(GetDevice(), stagingBuffers.vertices.memory, 0, memAlloc.allocationSize, 0, &data));
 	memcpy(data, vertexBuffer.data(), vertexBufferSize);
-	vkUnmapMemory(GetRenderSystem()->GetDevice(), stagingBuffers.vertices.memory);
-	VK_CHECK_RESULT(vkBindBufferMemory(GetRenderSystem()->GetDevice(), stagingBuffers.vertices.buffer, stagingBuffers.vertices.memory, 0));
+	vkUnmapMemory(GetDevice(), stagingBuffers.vertices.memory);
+	VK_CHECK_RESULT(vkBindBufferMemory(GetDevice(), stagingBuffers.vertices.buffer, stagingBuffers.vertices.memory, 0));
 
 	// Create a device local buffer to which the (host local) vertex data will be copied and which will be used for rendering
 	vertexBufferInfoCI.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT;
-	VK_CHECK_RESULT(vkCreateBuffer(GetRenderSystem()->GetDevice(), &vertexBufferInfoCI, nullptr, &vertices.buffer));
-	vkGetBufferMemoryRequirements(GetRenderSystem()->GetDevice(), vertices.buffer, &memReqs);
+	VK_CHECK_RESULT(vkCreateBuffer(GetDevice(), &vertexBufferInfoCI, nullptr, &vertices.buffer));
+	vkGetBufferMemoryRequirements(GetDevice(), vertices.buffer, &memReqs);
 	memAlloc.allocationSize = memReqs.size;
-	memAlloc.memoryTypeIndex = GetRenderSystem()->GetMemoryTypeIndex(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-	VK_CHECK_RESULT(vkAllocateMemory(GetRenderSystem()->GetDevice(), &memAlloc, nullptr, &vertices.memory));
-	VK_CHECK_RESULT(vkBindBufferMemory(GetRenderSystem()->GetDevice(), vertices.buffer, vertices.memory, 0));
+	memAlloc.memoryTypeIndex = GetMemoryTypeIndex(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+	VK_CHECK_RESULT(vkAllocateMemory(GetDevice(), &memAlloc, nullptr, &vertices.memory));
+	VK_CHECK_RESULT(vkBindBufferMemory(GetDevice(), vertices.buffer, vertices.memory, 0));
 
 	// Index buffer
 	VkBufferCreateInfo indexbufferCI{};
@@ -335,24 +335,24 @@ void GameApp::createVertexBuffer()
 	indexbufferCI.size = indexBufferSize;
 	indexbufferCI.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
 	// Copy index data to a buffer visible to the host (staging buffer)
-	VK_CHECK_RESULT(vkCreateBuffer(GetRenderSystem()->GetDevice(), &indexbufferCI, nullptr, &stagingBuffers.indices.buffer));
-	vkGetBufferMemoryRequirements(GetRenderSystem()->GetDevice(), stagingBuffers.indices.buffer, &memReqs);
+	VK_CHECK_RESULT(vkCreateBuffer(GetDevice(), &indexbufferCI, nullptr, &stagingBuffers.indices.buffer));
+	vkGetBufferMemoryRequirements(GetDevice(), stagingBuffers.indices.buffer, &memReqs);
 	memAlloc.allocationSize = memReqs.size;
-	memAlloc.memoryTypeIndex = GetRenderSystem()->GetMemoryTypeIndex(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
-	VK_CHECK_RESULT(vkAllocateMemory(GetRenderSystem()->GetDevice(), &memAlloc, nullptr, &stagingBuffers.indices.memory));
-	VK_CHECK_RESULT(vkMapMemory(GetRenderSystem()->GetDevice(), stagingBuffers.indices.memory, 0, indexBufferSize, 0, &data));
+	memAlloc.memoryTypeIndex = GetMemoryTypeIndex(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+	VK_CHECK_RESULT(vkAllocateMemory(GetDevice(), &memAlloc, nullptr, &stagingBuffers.indices.memory));
+	VK_CHECK_RESULT(vkMapMemory(GetDevice(), stagingBuffers.indices.memory, 0, indexBufferSize, 0, &data));
 	memcpy(data, indexBuffer.data(), indexBufferSize);
-	vkUnmapMemory(GetRenderSystem()->GetDevice(), stagingBuffers.indices.memory);
-	VK_CHECK_RESULT(vkBindBufferMemory(GetRenderSystem()->GetDevice(), stagingBuffers.indices.buffer, stagingBuffers.indices.memory, 0));
+	vkUnmapMemory(GetDevice(), stagingBuffers.indices.memory);
+	VK_CHECK_RESULT(vkBindBufferMemory(GetDevice(), stagingBuffers.indices.buffer, stagingBuffers.indices.memory, 0));
 
 	// Create destination buffer with device only visibility
 	indexbufferCI.usage = VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT;
-	VK_CHECK_RESULT(vkCreateBuffer(GetRenderSystem()->GetDevice(), &indexbufferCI, nullptr, &indices.buffer));
-	vkGetBufferMemoryRequirements(GetRenderSystem()->GetDevice(), indices.buffer, &memReqs);
+	VK_CHECK_RESULT(vkCreateBuffer(GetDevice(), &indexbufferCI, nullptr, &indices.buffer));
+	vkGetBufferMemoryRequirements(GetDevice(), indices.buffer, &memReqs);
 	memAlloc.allocationSize = memReqs.size;
-	memAlloc.memoryTypeIndex = GetRenderSystem()->GetMemoryTypeIndex(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-	VK_CHECK_RESULT(vkAllocateMemory(GetRenderSystem()->GetDevice(), &memAlloc, nullptr, &indices.memory));
-	VK_CHECK_RESULT(vkBindBufferMemory(GetRenderSystem()->GetDevice(), indices.buffer, indices.memory, 0));
+	memAlloc.memoryTypeIndex = GetMemoryTypeIndex(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+	VK_CHECK_RESULT(vkAllocateMemory(GetDevice(), &memAlloc, nullptr, &indices.memory));
+	VK_CHECK_RESULT(vkBindBufferMemory(GetDevice(), indices.buffer, indices.memory, 0));
 
 	// Buffer copies have to be submitted to a queue, so we need a command buffer for them
 	// Note: Some devices offer a dedicated transfer queue (with only the transfer bit set) that may be faster when doing lots of copies
@@ -363,7 +363,7 @@ void GameApp::createVertexBuffer()
 	cmdBufAllocateInfo.commandPool = commandPool;
 	cmdBufAllocateInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
 	cmdBufAllocateInfo.commandBufferCount = 1;
-	VK_CHECK_RESULT(vkAllocateCommandBuffers(GetRenderSystem()->GetDevice(), &cmdBufAllocateInfo, &copyCmd));
+	VK_CHECK_RESULT(vkAllocateCommandBuffers(GetDevice(), &cmdBufAllocateInfo, &copyCmd));
 
 	VkCommandBufferBeginInfo cmdBufInfo = vks::initializers::commandBufferBeginInfo();
 	VK_CHECK_RESULT(vkBeginCommandBuffer(copyCmd, &cmdBufInfo));
@@ -388,22 +388,22 @@ void GameApp::createVertexBuffer()
 	fenceCI.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
 	fenceCI.flags = 0;
 	VkFence fence;
-	VK_CHECK_RESULT(vkCreateFence(GetRenderSystem()->GetDevice(), &fenceCI, nullptr, &fence));
+	VK_CHECK_RESULT(vkCreateFence(GetDevice(), &fenceCI, nullptr, &fence));
 
 	// Submit to the queue
-	VK_CHECK_RESULT(vkQueueSubmit(GetRenderSystem()->GetQueue(), 1, &submitInfo, fence));
+	VK_CHECK_RESULT(vkQueueSubmit(GetQueue(), 1, &submitInfo, fence));
 	// Wait for the fence to signal that command buffer has finished executing
-	VK_CHECK_RESULT(vkWaitForFences(GetRenderSystem()->GetDevice(), 1, &fence, VK_TRUE, DEFAULT_FENCE_TIMEOUT));
+	VK_CHECK_RESULT(vkWaitForFences(GetDevice(), 1, &fence, VK_TRUE, DEFAULT_FENCE_TIMEOUT));
 
-	vkDestroyFence(GetRenderSystem()->GetDevice(), fence, nullptr);
-	vkFreeCommandBuffers(GetRenderSystem()->GetDevice(), commandPool, 1, &copyCmd);
+	vkDestroyFence(GetDevice(), fence, nullptr);
+	vkFreeCommandBuffers(GetDevice(), commandPool, 1, &copyCmd);
 
 	// Destroy staging buffers
 	// Note: Staging buffer must not be deleted before the copies have been submitted and executed
-	vkDestroyBuffer(GetRenderSystem()->GetDevice(), stagingBuffers.vertices.buffer, nullptr);
-	vkFreeMemory(GetRenderSystem()->GetDevice(), stagingBuffers.vertices.memory, nullptr);
-	vkDestroyBuffer(GetRenderSystem()->GetDevice(), stagingBuffers.indices.buffer, nullptr);
-	vkFreeMemory(GetRenderSystem()->GetDevice(), stagingBuffers.indices.memory, nullptr);
+	vkDestroyBuffer(GetDevice(), stagingBuffers.vertices.buffer, nullptr);
+	vkFreeMemory(GetDevice(), stagingBuffers.vertices.memory, nullptr);
+	vkDestroyBuffer(GetDevice(), stagingBuffers.indices.buffer, nullptr);
+	vkFreeMemory(GetDevice(), stagingBuffers.indices.memory, nullptr);
 }
 //-----------------------------------------------------------------------------
 void GameApp::createUniformBuffers()
@@ -428,21 +428,21 @@ void GameApp::createUniformBuffers()
 	// Create the buffers
 	for (uint32_t i = 0; i < MAX_CONCURRENT_FRAMES; i++)
 	{
-		VK_CHECK_RESULT(vkCreateBuffer(GetRenderSystem()->GetDevice(), &bufferInfo, nullptr, &uniformBuffers[i].buffer));
+		VK_CHECK_RESULT(vkCreateBuffer(GetDevice(), &bufferInfo, nullptr, &uniformBuffers[i].buffer));
 		// Get memory requirements including size, alignment and memory type
-		vkGetBufferMemoryRequirements(GetRenderSystem()->GetDevice(), uniformBuffers[i].buffer, &memReqs);
+		vkGetBufferMemoryRequirements(GetDevice(), uniformBuffers[i].buffer, &memReqs);
 		allocInfo.allocationSize = memReqs.size;
 		// Get the memory type index that supports host visible memory access
 		// Most implementations offer multiple memory types and selecting the correct one to allocate memory from is crucial
 		// We also want the buffer to be host coherent so we don't have to flush (or sync after every update.
 		// Note: This may affect performance so you might not want to do this in a real world application that updates buffers on a regular base
-		allocInfo.memoryTypeIndex = GetRenderSystem()->GetMemoryTypeIndex(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+		allocInfo.memoryTypeIndex = GetMemoryTypeIndex(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 		// Allocate memory for the uniform buffer
-		VK_CHECK_RESULT(vkAllocateMemory(GetRenderSystem()->GetDevice(), &allocInfo, nullptr, &(uniformBuffers[i].memory)));
+		VK_CHECK_RESULT(vkAllocateMemory(GetDevice(), &allocInfo, nullptr, &(uniformBuffers[i].memory)));
 		// Bind memory to buffer
-		VK_CHECK_RESULT(vkBindBufferMemory(GetRenderSystem()->GetDevice(), uniformBuffers[i].buffer, uniformBuffers[i].memory, 0));
+		VK_CHECK_RESULT(vkBindBufferMemory(GetDevice(), uniformBuffers[i].buffer, uniformBuffers[i].memory, 0));
 		// We map the buffer once, so we can update it without having to map it again
-		VK_CHECK_RESULT(vkMapMemory(GetRenderSystem()->GetDevice(), uniformBuffers[i].memory, 0, sizeof(ShaderData), 0, (void**)&uniformBuffers[i].mapped));
+		VK_CHECK_RESULT(vkMapMemory(GetDevice(), uniformBuffers[i].memory, 0, sizeof(ShaderData), 0, (void**)&uniformBuffers[i].mapped));
 	}
 }
 //-----------------------------------------------------------------------------
@@ -463,7 +463,7 @@ void GameApp::createDescriptorSetLayout()
 	descriptorLayoutCI.pNext = nullptr;
 	descriptorLayoutCI.bindingCount = 1;
 	descriptorLayoutCI.pBindings = &layoutBinding;
-	VK_CHECK_RESULT(vkCreateDescriptorSetLayout(GetRenderSystem()->GetDevice(), &descriptorLayoutCI, nullptr, &descriptorSetLayout));
+	VK_CHECK_RESULT(vkCreateDescriptorSetLayout(GetDevice(), &descriptorLayoutCI, nullptr, &descriptorSetLayout));
 
 	// Create the pipeline layout that is used to generate the rendering pipelines that are based on this descriptor set layout
 	// In a more complex scenario you would have different pipeline layouts for different descriptor set layouts that could be reused
@@ -472,7 +472,7 @@ void GameApp::createDescriptorSetLayout()
 	pipelineLayoutCI.pNext = nullptr;
 	pipelineLayoutCI.setLayoutCount = 1;
 	pipelineLayoutCI.pSetLayouts = &descriptorSetLayout;
-	VK_CHECK_RESULT(vkCreatePipelineLayout(GetRenderSystem()->GetDevice(), &pipelineLayoutCI, nullptr, &pipelineLayout));
+	VK_CHECK_RESULT(vkCreatePipelineLayout(GetDevice(), &pipelineLayoutCI, nullptr, &pipelineLayout));
 }
 //-----------------------------------------------------------------------------
 // Descriptors are allocated from a pool, that tells the implementation how many and what types of descriptors we are going to use (at maximum)
@@ -499,7 +499,7 @@ void GameApp::createDescriptorPool()
 	// Set the max. number of descriptor sets that can be requested from this pool (requesting beyond this limit will result in an error)
 	// Our sample will create one set per uniform buffer per frame
 	descriptorPoolCI.maxSets = MAX_CONCURRENT_FRAMES;
-	VK_CHECK_RESULT(vkCreateDescriptorPool(GetRenderSystem()->GetDevice(), &descriptorPoolCI, nullptr, &GetRenderSystem()->GetDescriptorPool()));
+	VK_CHECK_RESULT(vkCreateDescriptorPool(GetDevice(), &descriptorPoolCI, nullptr, &GetDescriptorPool()));
 }
 //-----------------------------------------------------------------------------
 // Shaders access data using descriptor sets that "point" at our uniform buffers
@@ -511,10 +511,10 @@ void GameApp::createDescriptorSets()
 	{
 		VkDescriptorSetAllocateInfo allocInfo{};
 		allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-		allocInfo.descriptorPool = GetRenderSystem()->GetDescriptorPool();
+		allocInfo.descriptorPool = GetDescriptorPool();
 		allocInfo.descriptorSetCount = 1;
 		allocInfo.pSetLayouts = &descriptorSetLayout;
-		VK_CHECK_RESULT(vkAllocateDescriptorSets(GetRenderSystem()->GetDevice(), &allocInfo, &uniformBuffers[i].descriptorSet));
+		VK_CHECK_RESULT(vkAllocateDescriptorSets(GetDevice(), &allocInfo, &uniformBuffers[i].descriptorSet));
 
 		// Update the descriptor set determining the shader binding points
 		// For every binding point used in a shader there needs to be one
@@ -533,7 +533,7 @@ void GameApp::createDescriptorSets()
 		writeDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
 		writeDescriptorSet.pBufferInfo = &bufferInfo;
 		writeDescriptorSet.dstBinding = 0;
-		vkUpdateDescriptorSets(GetRenderSystem()->GetDevice(), 1, &writeDescriptorSet, 0, nullptr);
+		vkUpdateDescriptorSets(GetDevice(), 1, &writeDescriptorSet, 0, nullptr);
 	}
 }
 //-----------------------------------------------------------------------------
@@ -549,7 +549,7 @@ void GameApp::createPipelines()
 	// The layout used for this pipeline (can be shared among multiple pipelines using the same layout)
 	pipelineCI.layout = pipelineLayout;
 	// Renderpass this pipeline is attached to
-	pipelineCI.renderPass = GetRenderSystem()->GetRenderPass();
+	pipelineCI.renderPass = GetRenderPass();
 
 	// Construct the different states making up the pipeline
 
@@ -694,11 +694,11 @@ void GameApp::createPipelines()
 	pipelineCI.pDynamicState = &dynamicStateCI;
 
 	// Create rendering pipeline using the specified states
-	VK_CHECK_RESULT(vkCreateGraphicsPipelines(GetRenderSystem()->GetDevice(), GetRenderSystem()->GetPipelineCache(), 1, &pipelineCI, nullptr, &pipeline));
+	VK_CHECK_RESULT(vkCreateGraphicsPipelines(GetDevice(), GetPipelineCache(), 1, &pipelineCI, nullptr, &pipeline));
 
 	// Shader modules are no longer needed once the graphics pipeline has been created
-	vkDestroyShaderModule(GetRenderSystem()->GetDevice(), shaderStages[0].module, nullptr);
-	vkDestroyShaderModule(GetRenderSystem()->GetDevice(), shaderStages[1].module, nullptr);
+	vkDestroyShaderModule(GetDevice(), shaderStages[0].module, nullptr);
+	vkDestroyShaderModule(GetDevice(), shaderStages[1].module, nullptr);
 }
 //-----------------------------------------------------------------------------
 VkShaderModule GameApp::loadSPIRVShader(std::string filename)
@@ -739,7 +739,7 @@ VkShaderModule GameApp::loadSPIRVShader(std::string filename)
 		shaderModuleCI.pCode = (uint32_t*)shaderCode;
 
 		VkShaderModule shaderModule;
-		VK_CHECK_RESULT(vkCreateShaderModule(GetRenderSystem()->GetDevice(), &shaderModuleCI, nullptr, &shaderModule));
+		VK_CHECK_RESULT(vkCreateShaderModule(GetDevice(), &shaderModuleCI, nullptr, &shaderModule));
 
 		delete[] shaderCode;
 

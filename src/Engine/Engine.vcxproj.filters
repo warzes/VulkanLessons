@@ -8,9 +8,6 @@
     <ClCompile Include="Log.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="RenderSystem.cpp">
-      <Filter>Render</Filter>
-    </ClCompile>
     <ClCompile Include="VulkanDebug.cpp">
       <Filter>Render\Vulkan</Filter>
     </ClCompile>
@@ -55,9 +52,6 @@
     </ClInclude>
     <ClInclude Include="Log.h">
       <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="RenderSystem.h">
-      <Filter>Render</Filter>
     </ClInclude>
     <ClInclude Include="VulkanDebug.h">
       <Filter>Render\Vulkan</Filter>

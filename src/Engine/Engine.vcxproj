@@ -95,7 +95,6 @@
   <ItemGroup>
     <ClCompile Include="EngineApp.cpp" />
     <ClCompile Include="Log.cpp" />
-    <ClCompile Include="RenderSystem.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
@@ -118,7 +117,6 @@
     <ClInclude Include="Frustum.h" />
     <ClInclude Include="KeyCodes.h" />
     <ClInclude Include="Log.h" />
-    <ClInclude Include="RenderSystem.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="VulkanBuffer.h" />
     <ClInclude Include="VulkanDebug.h" />
