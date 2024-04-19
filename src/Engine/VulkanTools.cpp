@@ -12,7 +12,7 @@ const std::string getAssetPath()
 
 #if !(defined(VK_USE_PLATFORM_IOS_MVK) || defined(VK_USE_PLATFORM_MACOS_MVK))
 // iOS & macOS: VulkanExampleBase::getAssetPath() implemented externally to allow access to Objective-C components
-const std::string getShaderBasePath()
+const std::string getShadersPath()
 {
 	return "data/shaders/";
 }

@@ -19,6 +19,11 @@ public:
 private:
 	void buildCommandBuffers() final;
 	void loadAssets();
+	void setupDescriptors();
+	void preparePipelines();
+	void prepareUniformBuffers();
+	void updateUniformBuffers();
+	void draw();
 
 	Camera camera;
 

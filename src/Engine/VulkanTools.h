@@ -31,7 +31,7 @@
 #endif
 
 const std::string getAssetPath();
-const std::string getShaderBasePath();
+const std::string getShadersPath();
 
 namespace vks
 {

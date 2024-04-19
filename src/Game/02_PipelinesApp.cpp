@@ -205,8 +205,8 @@ void PipelinesApp::preparePipelines()
 
 	// Textured pipeline
 	// Phong shading pipeline
-	shaderStages[0] = loadShader(getShaderBasePath() + "pipelines/phong.vert.spv", VK_SHADER_STAGE_VERTEX_BIT);
-	shaderStages[1] = loadShader(getShaderBasePath() + "pipelines/phong.frag.spv", VK_SHADER_STAGE_FRAGMENT_BIT);
+	shaderStages[0] = loadShader(getShadersPath() + "pipelines/phong.vert.spv", VK_SHADER_STAGE_VERTEX_BIT);
+	shaderStages[1] = loadShader(getShadersPath() + "pipelines/phong.frag.spv", VK_SHADER_STAGE_FRAGMENT_BIT);
 	VK_CHECK_RESULT(vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCI, nullptr, &pipelines.phong));
 
 	// All pipelines created after the base pipeline will be derivatives
@@ -218,16 +218,16 @@ void PipelinesApp::preparePipelines()
 	pipelineCI.basePipelineIndex = -1;
 
 	// Toon shading pipeline
-	shaderStages[0] = loadShader(getShaderBasePath() + "pipelines/toon.vert.spv", VK_SHADER_STAGE_VERTEX_BIT);
-	shaderStages[1] = loadShader(getShaderBasePath() + "pipelines/toon.frag.spv", VK_SHADER_STAGE_FRAGMENT_BIT);
+	shaderStages[0] = loadShader(getShadersPath() + "pipelines/toon.vert.spv", VK_SHADER_STAGE_VERTEX_BIT);
+	shaderStages[1] = loadShader(getShadersPath() + "pipelines/toon.frag.spv", VK_SHADER_STAGE_FRAGMENT_BIT);
 	VK_CHECK_RESULT(vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCI, nullptr, &pipelines.toon));
 
 	// Pipeline for wire frame rendering
 	// Non solid rendering is not a mandatory Vulkan feature
 	if (enabledFeatures.fillModeNonSolid) {
 		rasterizationState.polygonMode = VK_POLYGON_MODE_LINE;
-		shaderStages[0] = loadShader(getShaderBasePath() + "pipelines/wireframe.vert.spv", VK_SHADER_STAGE_VERTEX_BIT);
-		shaderStages[1] = loadShader(getShaderBasePath() + "pipelines/wireframe.frag.spv", VK_SHADER_STAGE_FRAGMENT_BIT);
+		shaderStages[0] = loadShader(getShadersPath() + "pipelines/wireframe.vert.spv", VK_SHADER_STAGE_VERTEX_BIT);
+		shaderStages[1] = loadShader(getShadersPath() + "pipelines/wireframe.frag.spv", VK_SHADER_STAGE_FRAGMENT_BIT);
 		VK_CHECK_RESULT(vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCI, nullptr, &pipelines.wireframe));
 	}
 }
