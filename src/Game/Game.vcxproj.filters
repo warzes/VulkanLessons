@@ -24,6 +24,9 @@
     <ClCompile Include="06_SpecializationConstants.cpp">
       <Filter>App\Examples</Filter>
     </ClCompile>
+    <ClCompile Include="07_Texture.cpp">
+      <Filter>App\Examples</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -46,6 +49,9 @@
       <Filter>App\Examples</Filter>
     </ClInclude>
     <ClInclude Include="06_SpecializationConstants.h">
+      <Filter>App\Examples</Filter>
+    </ClInclude>
+    <ClInclude Include="07_Texture.h">
       <Filter>App\Examples</Filter>
     </ClInclude>
   </ItemGroup>

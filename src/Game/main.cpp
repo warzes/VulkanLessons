@@ -6,6 +6,7 @@
 #include "04_DynamicUniformBuffer.h"
 #include "05_PushConstants.h"
 #include "06_SpecializationConstants.h"
+#include "07_Texture.h"
 //-----------------------------------------------------------------------------
 #if defined(_MSC_VER)
 #	pragma comment( lib, "3rdparty.lib" )
@@ -22,7 +23,8 @@ int main(
 	//DescriptorSets app;
 	//DynamicUniformBuffer app;
 	//PushConstants app;
-	SpecializationConstants app;
+	//SpecializationConstants app;
+	TextureApp app;
 
 	app.Run();
 

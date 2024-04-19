@@ -15,11 +15,6 @@
 #define OBJECT_INSTANCES 125
 #define M_PI       3.14159265358979323846   // pi
 
-// Vertex layout for this example
-struct Vertex {
-	float pos[3];
-	float color[3];
-};
 
 // Wrapper functions for aligned memory allocation
 // There is currently no standard for this in C++ that works across all platforms and vendors, so we abstract this
@@ -69,6 +64,12 @@ private:
 	void updateUniformBuffers();
 	void updateDynamicUniformBuffer();
 	void draw();
+
+	// Vertex layout for this example
+	struct Vertex {
+		float pos[3];
+		float color[3];
+	};
 
 	Camera camera;
 
