@@ -3,6 +3,7 @@
 #include "VulkanSwapChain.h"
 #include "VulkanDevice.h"
 #include "VulkanUIOverlay.h"
+#include "Benchmark.h"
 
 struct RenderSystemCreateInfo final
 {
@@ -39,20 +40,23 @@ public:
 	virtual void OnDestroy() = 0;
 	virtual void OnUpdate(float deltaTime) = 0;
 	virtual void OnFrame() = 0;
-	virtual void OnWindowResize();
+	virtual void OnWindowResize(uint32_t destWidth, uint32_t destHeight) {}
+	/** @brief (Virtual) Called after a key was pressed, can be used to do custom key handling */
+	virtual void OnKeyPressed(uint32_t) {}
+	virtual void OnKeyUp(uint32_t) {}
+	/** @brief (Virtual) Called after the mouse cursor moved and before internal events (like camera rotation) is handled */
+	virtual void OnMouseMoved(int32_t x, int32_t y, int32_t dx, int32_t dy) {}
 
 	void Exit();
 	float GetDeltaTime() const;
+	bool& RenderPrepared() { return prepared; }
 
-	//RenderSystem* GetRenderSystem() { return m_render; }
 	std::string GetDeviceName() const;
 	// This function is used to request a device memory type that supports all the property flags we request (e.g. device local, host visible)
 	// Upon success it will return the index of the memory type that fits our requested memory properties
-	// This is necessary as implementations can offer an arbitrary number of memory types with different
-	// memory properties.
+	// This is necessary as implementations can offer an arbitrary number of memory types with different memory properties.
 	// You can check https://vulkan.gpuinfo.org/ for details on different memory configurations
 	uint32_t GetMemoryTypeIndex(uint32_t typeBits, VkMemoryPropertyFlags properties);
-
 
 	VkDevice& GetDevice() { return device; }
 	VulkanSwapChain& GetSwapChain() { return swapChain; }
@@ -62,34 +66,8 @@ public:
 	VkPipelineCache& GetPipelineCache() { return pipelineCache; }
 	std::vector<VkFramebuffer>& GetFrameBuffers() { return frameBuffers; }
 
-	bool& Prepared() { return prepared; }
-
-private:
-	bool create();
-	void destroy();
-	void frame();
-	bool IsEnd() const;
-	void setupDPIAwareness();
-	void nextFrame();
-	std::string getWindowTitle();
-	void updateOverlay();
-	void render();
-
-	EngineAppImpl* m_data = nullptr;
-	//RenderSystem* m_render = nullptr;
-
-	// Frame counter to display fps
-	uint32_t frameCounter = 0;
-	uint32_t lastFPS = 0;
-	std::chrono::time_point<std::chrono::high_resolution_clock> lastTimestamp, tPrevEnd;
-	/** @brief Last frame time measured using a high performance timer (if available) */
-	float frameTimer = 1.0f;
-	bool paused = false;
-	// Defines a frame rate independent timer value clamped from -1.0...1.0
-	// For use in animations, rotations, etc.
-	float timer = 0.0f;
-	// Multiplier for speeding up (or slowing down) the global timer
-	float timerSpeed = 0.25f;
+	bool& Paused() { return paused; }
+	vks::UIOverlay& GetUIOverlay() { return UIOverlay; }
 
 	/** @brief State of mouse/touch input */
 	struct {
@@ -99,33 +77,18 @@ private:
 			bool middle = false;
 		} buttons;
 		glm::vec2 position;
-	} mouseState;
-
-	bool initVulkan(const RenderSystemCreateInfo& createInfo);
-	bool prepare(const RenderSystemCreateInfo& createInfo, void* hInstance, void* hwnd, uint32_t* width, uint32_t* height, bool fullscreen);
-	void renderFinal();
-	void renderDestroy();
-
-	VkResult createInstance(bool enableValidation);
-	void getEnabledFeatures() {} // TODO: если нужно
-	void getEnabledExtensions() {} // TODO: если нужно
-
-	void initSwapchain(void* hInstance, void* hwnd);
-	void createCommandPool();
-	void setupSwapChain(bool vsync, uint32_t* width, uint32_t* height, bool fullscreen);
-	void createCommandBuffers();
-	void createSynchronizationPrimitives();
-	void setupDepthStencil(uint32_t width, uint32_t height);
-	void setupRenderPass();
-	void createPipelineCache();
-	void setupFrameBuffer(uint32_t width, uint32_t height);
-
-	void destroyCommandBuffers();
-
-	/** @brief Loads a SPIR-V shader file for the given shader stage */
-	VkPipelineShaderStageCreateInfo loadShader(std::string fileName, VkShaderStageFlagBits stage);
-
+	} mouseState; // TODO: временно паблик
+	void handleMouseMove(int32_t x, int32_t y);// TODO: временно паблик
+	bool resizing = false;// TODO: временно
+	uint32_t destWidth;// TODO: временно
+	uint32_t destHeight;// TODO: временно
 	void windowResize(uint32_t destWidth, uint32_t destHeight);
+
+protected:
+	// Frame counter to display fps
+	uint32_t frameCounter = 0;
+	uint32_t lastFPS = 0;
+	std::chrono::time_point<std::chrono::high_resolution_clock> lastTimestamp, tPrevEnd;
 
 	// Vulkan instance, stores all per-application states
 	VkInstance instance{ VK_NULL_HANDLE };
@@ -148,10 +111,6 @@ private:
 	void* deviceCreatepNextChain = nullptr;
 	/** @brief Logical device, application's view of the physical device (GPU) */
 	VkDevice device{ VK_NULL_HANDLE };
-
-	/** @brief Encapsulated physical and logical vulkan device */
-	vks::VulkanDevice* vulkanDevice;
-
 	// Handle to the device graphics queue that command buffers are submitted to
 	VkQueue queue{ VK_NULL_HANDLE };
 	// Depth buffer format (selected during Vulkan initialization)
@@ -164,6 +123,7 @@ private:
 	VkSubmitInfo submitInfo;
 	// Command buffers used for rendering
 	std::vector<VkCommandBuffer> drawCmdBuffers;
+
 	// Global render pass for frame buffer writes
 	VkRenderPass renderPass{ VK_NULL_HANDLE };
 	// List of available frame buffers (same as number of swap chain images)
@@ -188,21 +148,82 @@ private:
 	std::vector<VkFence> waitFences;
 	bool requiresStencil{ false };
 
+private:
+	bool create();
+	void setupDPIAwareness();
+	bool initVulkan(const RenderSystemCreateInfo& createInfo);
+	VkResult createInstance(bool enableValidation);
+	/** @brief (Virtual) Called after the physical device features have been read, can be used to set features to enable on the device */
+	virtual void getEnabledFeatures() {} // TODO: если нужно
+	/** @brief (Virtual) Called after the physical device extensions have been read, can be used to enable extensions based on the supported extension listing*/
+	virtual void getEnabledExtensions() {} // TODO: если нужно
+	bool prepareRender(const RenderSystemCreateInfo& createInfo, bool fullscreen);
+	void initSwapchain();
+	void createCommandPool();
+	void setupSwapChain(bool vsync, uint32_t* width, uint32_t* height, bool fullscreen);
+	void createCommandBuffers();
+	void createSynchronizationPrimitives();
+	/** @brief (Virtual) Setup default depth and stencil views */
+	virtual void setupDepthStencil(uint32_t width, uint32_t height);
+	/** @brief (Virtual) Setup a default renderpass */
+	virtual void setupRenderPass();
+	void createPipelineCache();
+	/** @brief (Virtual) Setup default framebuffers for all requested swapchain images */
+	virtual void setupFrameBuffer(uint32_t width, uint32_t height);
+	
+	bool isEnd() const;
+	void frame();
+	void nextFrame();
+	void render();
+	void updateOverlay();
+	/** @brief (Virtual) Called when the UI overlay is updating, can be used to add custom elements to the overlay */
+	virtual void onUpdateUIOverlay(vks::UIOverlay* /*overlay*/) {}
+	/** @brief (Virtual) Called when resources have been recreated that require a rebuild of the command buffers (e.g. frame buffer), to be implemented by the sample application */
+	virtual void buildCommandBuffers() {}
+	void renderFinal();
+	void destroy();
+	void renderDestroy();
+	void destroyCommandBuffers();
+
+	std::string getWindowTitle();
+
+	/** @brief Loads a SPIR-V shader file for the given shader stage */
+	VkPipelineShaderStageCreateInfo loadShader(std::string fileName, VkShaderStageFlagBits stage);
+
+	EngineAppImpl* m_data = nullptr;
+
+
+	bool prepared = false;
+	bool resized = false;
+	bool validation = false;
+	bool overlay = false;
+
+	vks::UIOverlay UIOverlay;
+
+	/** @brief Last frame time measured using a high performance timer (if available) */
+	float frameTimer = 1.0f;
+
+	vks::Benchmark benchmark;
+
+	/** @brief Encapsulated physical and logical vulkan device */
+	vks::VulkanDevice* vulkanDevice;
+
+	bool m_vsync = false;
+	bool m_fullscreen = false;
+
+	VkClearColorValue defaultClearColor = { { 0.025f, 0.025f, 0.025f, 1.0f } };
+
+	// Defines a frame rate independent timer value clamped from -1.0...1.0
+	// For use in animations, rotations, etc.
+	float timer = 0.0f;
+	// Multiplier for speeding up (or slowing down) the global timer
+	float timerSpeed = 0.25f;
+	bool paused = false;
+
 	/** @brief Default depth stencil attachment used by the default render pass */
 	struct {
 		VkImage image;
 		VkDeviceMemory memory;
 		VkImageView view;
 	} depthStencil{};
-
-	bool validation = false;
-	bool prepared = false;
-	bool resized = false;
-
-	vks::UIOverlay UIOverlay;
-
-	VkClearColorValue defaultClearColor = { { 0.025f, 0.025f, 0.025f, 1.0f } };
-
-	bool m_vsync = false;
-	bool m_fullscreen = false;
 };

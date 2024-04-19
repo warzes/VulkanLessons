@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "EngineApp.h"
 #include "Log.h"
+#include "KeyCodes.h"
 //-----------------------------------------------------------------------------
 #if defined(_WIN32)
 constexpr const wchar_t* ClassName = L"EngineApp";
@@ -13,10 +14,15 @@ struct EngineAppImpl
 	HINSTANCE hInstance = nullptr;
 	HWND hwnd = nullptr;
 	MSG msg{};
+	uint32_t frameWidth = 0;
+	uint32_t frameHeight = 0;
 #endif // _WIN32
 
 	float deltaTime = 0.01f;
 };
+//-----------------------------------------------------------------------------
+EngineAppImpl* currentEngineAppImpl; // TODO: временно
+EngineApp* currentEngineApp; // TODO: временно
 //-----------------------------------------------------------------------------
 #if defined(_WIN32)
 LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -25,6 +31,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	{
 	case WM_CLOSE:
 		IsExit = true;
+		currentEngineApp->RenderPrepared() = false;
 		PostQuitMessage(0);
 		break;
 	//case WM_DESTROY:
@@ -33,6 +40,65 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_PAINT:
 		ValidateRect(hwnd, nullptr);
 		break;
+	case WM_KEYDOWN:
+		switch (wParam)
+		{
+		case KEY_P:
+			currentEngineApp->Paused() = !currentEngineApp->Paused();
+			break;
+		case KEY_F1:
+			currentEngineApp->GetUIOverlay().visible = !currentEngineApp->GetUIOverlay().visible;
+			currentEngineApp->GetUIOverlay().updated = true;
+			break;
+		case KEY_ESCAPE:
+			IsExit = true;
+			break;
+		}
+		currentEngineApp->OnKeyPressed((uint32_t)wParam);
+		break;
+	case WM_KEYUP:
+		currentEngineApp->OnKeyUp((uint32_t)wParam);
+		break;
+	case WM_LBUTTONDOWN:
+		currentEngineApp->mouseState.position = glm::vec2((float)LOWORD(lParam), (float)HIWORD(lParam));
+		currentEngineApp->mouseState.buttons.left = true;
+		break;
+	case WM_RBUTTONDOWN:
+		currentEngineApp->mouseState.position = glm::vec2((float)LOWORD(lParam), (float)HIWORD(lParam));
+		currentEngineApp->mouseState.buttons.right = true;
+		break;
+	case WM_MBUTTONDOWN:
+		currentEngineApp->mouseState.position = glm::vec2((float)LOWORD(lParam), (float)HIWORD(lParam));
+		currentEngineApp->mouseState.buttons.middle = true;
+		break;
+	case WM_LBUTTONUP:
+		currentEngineApp->mouseState.buttons.left = false;
+		break;
+	case WM_RBUTTONUP:
+		currentEngineApp->mouseState.buttons.right = false;
+		break;
+	case WM_MBUTTONUP:
+		currentEngineApp->mouseState.buttons.middle = false;
+		break;
+	//case WM_MOUSEWHEEL:
+	//{
+	//	short wheelDelta = GET_WHEEL_DELTA_WPARAM(wParam);
+	//	break;
+	//}
+	case WM_MOUSEMOVE:
+		currentEngineApp->handleMouseMove(LOWORD(lParam), HIWORD(lParam));
+		break;
+	case WM_SIZE:
+		if ((currentEngineApp->RenderPrepared()) && (wParam != SIZE_MINIMIZED))
+		{
+			if ((currentEngineApp->resizing) || ((wParam == SIZE_MAXIMIZED) || (wParam == SIZE_RESTORED)))
+			{
+				currentEngineApp->destWidth = LOWORD(lParam);
+				currentEngineApp->destHeight = HIWORD(lParam);
+				currentEngineApp->windowResize(currentEngineApp->destWidth, currentEngineApp->destHeight);
+			}
+		}
+		break;
 	case WM_GETMINMAXINFO:
 		{
 			LPMINMAXINFO minMaxInfo = (LPMINMAXINFO)lParam;
@@ -40,6 +106,12 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			minMaxInfo->ptMinTrackSize.y = 64;
 			break;
 		}
+	case WM_ENTERSIZEMOVE:
+		currentEngineApp->resizing = true;
+		break;
+	case WM_EXITSIZEMOVE:
+		currentEngineApp->resizing = false;
+		break;
 	default:
 		break;
 	}
@@ -50,10 +122,14 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 EngineApp::EngineApp()
 	: m_data(new EngineAppImpl)
 {
+	currentEngineAppImpl = m_data;
+	currentEngineApp = this;
 }
 //-----------------------------------------------------------------------------
 EngineApp::~EngineApp()
 {
+	currentEngineAppImpl = nullptr;
+	currentEngineApp = nullptr;
 	destroy();
 	delete m_data;
 }
@@ -64,8 +140,8 @@ void EngineApp::Run()
 	{
 		if (OnCreate())
 		{
-			Prepared() = true;
-			while (!IsEnd())
+			RenderPrepared() = true;
+			while (!isEnd())
 			{
 				frame();
 			}
@@ -80,14 +156,32 @@ void EngineApp::Exit()
 	IsExit = true;
 }
 //-----------------------------------------------------------------------------
-void EngineApp::OnWindowResize()
-{
-	// TODO:
-}
-//-----------------------------------------------------------------------------
 float EngineApp::GetDeltaTime() const
 {
 	return m_data->deltaTime;
+}
+//-----------------------------------------------------------------------------
+std::string EngineApp::GetDeviceName() const
+{
+	return deviceProperties.deviceName;
+}
+//-----------------------------------------------------------------------------
+uint32_t EngineApp::GetMemoryTypeIndex(uint32_t typeBits, VkMemoryPropertyFlags properties)
+{
+	// Iterate over all memory types available for the device used in this example
+	for (uint32_t i = 0; i < deviceMemoryProperties.memoryTypeCount; i++)
+	{
+		if ((typeBits & 1) == 1)
+		{
+			if ((deviceMemoryProperties.memoryTypes[i].propertyFlags & properties) == properties)
+			{
+				return i;
+			}
+		}
+		typeBits >>= 1;
+	}
+
+	throw "Could not find a suitable memory type!";
 }
 //-----------------------------------------------------------------------------
 bool EngineApp::create()
@@ -98,13 +192,13 @@ bool EngineApp::create()
 	setupDPIAwareness();
 
 	WNDCLASSEX wndClass{};
-	wndClass.cbSize        = sizeof(WNDCLASSEX);
-	wndClass.style         = CS_HREDRAW | CS_VREDRAW;
-	wndClass.lpfnWndProc   = WndProc;
-	wndClass.hInstance     = m_data->hInstance;
-	wndClass.hIcon         = LoadIcon(nullptr, IDI_APPLICATION);
-	wndClass.hIconSm       = LoadIcon(nullptr, IDI_WINLOGO);
-	wndClass.hCursor       = LoadCursor(nullptr, IDC_ARROW);
+	wndClass.cbSize = sizeof(WNDCLASSEX);
+	wndClass.style = CS_HREDRAW | CS_VREDRAW;
+	wndClass.lpfnWndProc = WndProc;
+	wndClass.hInstance = m_data->hInstance;
+	wndClass.hIcon = LoadIcon(nullptr, IDI_APPLICATION);
+	wndClass.hIconSm = LoadIcon(nullptr, IDI_WINLOGO);
+	wndClass.hCursor = LoadCursor(nullptr, IDC_ARROW);
 	wndClass.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
 	wndClass.lpszClassName = ClassName;
 	if (!RegisterClassEx(&wndClass))
@@ -166,7 +260,7 @@ bool EngineApp::create()
 	AdjustWindowRectEx(&windowRect, dwStyle, FALSE, dwExStyle);
 
 	m_data->hwnd = CreateWindowEx(0, ClassName, createInfo.window.title, dwStyle | WS_CLIPSIBLINGS | WS_CLIPCHILDREN,
-		0, 0,  windowRect.right - windowRect.left, windowRect.bottom - windowRect.top, 
+		0, 0, windowRect.right - windowRect.left, windowRect.bottom - windowRect.top,
 		nullptr, nullptr, m_data->hInstance, nullptr);
 
 	if (!m_data->hwnd)
@@ -188,54 +282,23 @@ bool EngineApp::create()
 	SetFocus(m_data->hwnd);
 
 	// TODO: вычислить реальный размер окна
-	uint32_t width = createInfo.window.width;
-	uint32_t height = createInfo.window.height;
+	m_data->frameWidth = createInfo.window.width;
+	m_data->frameHeight = createInfo.window.height;
 	// TODO: также рендер может менять размер, проверить что там и как это использовать
 
 	if (!initVulkan(createInfo.render) ||
-		!prepare(createInfo.render, m_data->hInstance, m_data->hwnd, &width, &height, createInfo.window.fullscreen))
+		!prepareRender(createInfo.render, createInfo.window.fullscreen))
 	{
 		Fatal("RenderSystem create failed.");
 		return false;
 	}
 
+	destWidth = m_data->frameWidth;
+	destHeight = m_data->frameHeight;
 	lastTimestamp = std::chrono::high_resolution_clock::now();
 	tPrevEnd = lastTimestamp;
 	IsExit = false;
 	return true;
-}
-//-----------------------------------------------------------------------------
-void EngineApp::destroy()
-{
-	renderDestroy();
-	if (m_data->hwnd)
-	{
-		DestroyWindow(m_data->hwnd);
-		m_data->hwnd = nullptr;
-	}
-	if (m_data->hInstance)
-	{
-		UnregisterClass(ClassName, m_data->hInstance);
-		m_data->hInstance = nullptr;
-	}
-}
-//-----------------------------------------------------------------------------
-void EngineApp::frame()
-{
-	while (PeekMessage(&m_data->msg, nullptr, 0, 0, PM_REMOVE))
-	{
-		TranslateMessage(&m_data->msg);
-		DispatchMessage(&m_data->msg);
-	}
-	if (Prepared() && !IsIconic(m_data->hwnd)) // TODO: может все таки обрабатывать события даже в свернутом окне?
-	{
-		nextFrame();
-	}
-}
-//-----------------------------------------------------------------------------
-bool EngineApp::IsEnd() const
-{
-	return IsExit;
 }
 //-----------------------------------------------------------------------------
 void EngineApp::setupDPIAwareness()
@@ -251,187 +314,6 @@ void EngineApp::setupDPIAwareness()
 
 		FreeLibrary(shCore);
 	}
-}
-//-----------------------------------------------------------------------------
-void EngineApp::nextFrame()
-{
-	auto tStart = std::chrono::high_resolution_clock::now();
-	render();
-	frameCounter++;
-	auto tEnd = std::chrono::high_resolution_clock::now();
-	auto tDiff = std::chrono::duration<double, std::milli>(tEnd - tStart).count();
-
-	frameTimer = (float)tDiff / 1000.0f;
-	OnUpdate(frameTimer);
-
-	// Convert to clamped timer value
-	if (!paused)
-	{
-		timer += timerSpeed * frameTimer;
-		if (timer > 1.0)
-		{
-			timer -= 1.0f;
-		}
-	}
-	float fpsTimer = (float)(std::chrono::duration<double, std::milli>(tEnd - lastTimestamp).count());
-	if (fpsTimer > 1000.0f)
-	{
-		lastFPS = static_cast<uint32_t>((float)frameCounter * (1000.0f / fpsTimer));
-#if defined(_WIN32)
-		std::string windowTitle = getWindowTitle();
-		SetWindowTextA(m_data->hwnd, windowTitle.c_str());
-#endif
-		frameCounter = 0;
-		lastTimestamp = tEnd;
-	}
-	tPrevEnd = tEnd;
-
-	// TODO: Cap UI overlay update rates
-	updateOverlay();
-}
-//-----------------------------------------------------------------------------
-std::string EngineApp::getWindowTitle()
-{
-	std::string device(GetDeviceName());
-	std::string windowTitle;
-	windowTitle = "Game - " + device;
-	windowTitle += " - " + std::to_string(frameCounter) + " fps";
-	return windowTitle;
-}
-//-----------------------------------------------------------------------------
-void EngineApp::updateOverlay()
-{
-	/*if (!settings.overlay)
-		return;
-
-	ImGuiIO& io = ImGui::GetIO();
-
-	io.DisplaySize = ImVec2((float)width, (float)height);
-	io.DeltaTime = frameTimer;
-
-	io.MousePos = ImVec2(mouseState.position.x, mouseState.position.y);
-	io.MouseDown[0] = mouseState.buttons.left && UIOverlay.visible;
-	io.MouseDown[1] = mouseState.buttons.right && UIOverlay.visible;
-	io.MouseDown[2] = mouseState.buttons.middle && UIOverlay.visible;
-
-	ImGui::NewFrame();
-
-	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0);
-	ImGui::SetNextWindowPos(ImVec2(10 * UIOverlay.scale, 10 * UIOverlay.scale));
-	ImGui::SetNextWindowSize(ImVec2(0, 0), ImGuiSetCond_FirstUseEver);
-	ImGui::Begin("Vulkan Example", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
-	ImGui::TextUnformatted(title.c_str());
-	ImGui::TextUnformatted(deviceProperties.deviceName);
-	ImGui::Text("%.2f ms/frame (%.1d fps)", (1000.0f / lastFPS), lastFPS);
-
-#if defined(VK_USE_PLATFORM_ANDROID_KHR)
-	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0.0f, 5.0f * UIOverlay.scale));
-#endif
-	ImGui::PushItemWidth(110.0f * UIOverlay.scale);
-	OnUpdateUIOverlay(&UIOverlay);
-	ImGui::PopItemWidth();
-#if defined(VK_USE_PLATFORM_ANDROID_KHR)
-	ImGui::PopStyleVar();
-#endif
-
-	ImGui::End();
-	ImGui::PopStyleVar();
-	ImGui::Render();
-
-	if (UIOverlay.update() || UIOverlay.updated) {
-		buildCommandBuffers();
-		UIOverlay.updated = false;
-	}*/
-}
-//-----------------------------------------------------------------------------
-void EngineApp::render()
-{
-	OnFrame();
-}
-//-----------------------------------------------------------------------------
-
-void EngineApp::renderFinal()
-{
-	// Flush device to make sure all resources can be freed
-	if (device != VK_NULL_HANDLE)
-	{
-		vkDeviceWaitIdle(device);
-	}
-}
-
-void EngineApp::renderDestroy()
-{
-	// Clean up Vulkan resources
-	swapChain.cleanup();
-	if (descriptorPool != VK_NULL_HANDLE)
-	{
-		vkDestroyDescriptorPool(device, descriptorPool, nullptr);
-	}
-	destroyCommandBuffers();
-	if (renderPass != VK_NULL_HANDLE)
-	{
-		vkDestroyRenderPass(device, renderPass, nullptr);
-	}
-	for (uint32_t i = 0; i < frameBuffers.size(); i++)
-	{
-		vkDestroyFramebuffer(device, frameBuffers[i], nullptr);
-	}
-
-	for (auto& shaderModule : shaderModules)
-	{
-		vkDestroyShaderModule(device, shaderModule, nullptr);
-	}
-	vkDestroyImageView(device, depthStencil.view, nullptr);
-	vkDestroyImage(device, depthStencil.image, nullptr);
-	vkFreeMemory(device, depthStencil.memory, nullptr);
-
-	vkDestroyPipelineCache(device, pipelineCache, nullptr);
-
-	vkDestroyCommandPool(device, cmdPool, nullptr);
-
-	vkDestroySemaphore(device, semaphores.presentComplete, nullptr);
-	vkDestroySemaphore(device, semaphores.renderComplete, nullptr);
-	for (auto& fence : waitFences)
-	{
-		vkDestroyFence(device, fence, nullptr);
-	}
-
-	//if (settings.overlay) 
-	//{
-	//	UIOverlay.freeResources();
-	//}
-
-	delete vulkanDevice;
-
-	if (validation)
-	{
-		vks::debug::freeDebugCallback(instance);
-	}
-
-	vkDestroyInstance(instance, nullptr);
-}
-
-std::string EngineApp::GetDeviceName() const
-{
-	return deviceProperties.deviceName;
-}
-//-----------------------------------------------------------------------------
-uint32_t EngineApp::GetMemoryTypeIndex(uint32_t typeBits, VkMemoryPropertyFlags properties)
-{
-	// Iterate over all memory types available for the device used in this example
-	for (uint32_t i = 0; i < deviceMemoryProperties.memoryTypeCount; i++)
-	{
-		if ((typeBits & 1) == 1)
-		{
-			if ((deviceMemoryProperties.memoryTypes[i].propertyFlags & properties) == properties)
-			{
-				return i;
-			}
-		}
-		typeBits >>= 1;
-	}
-
-	throw "Could not find a suitable memory type!";
 }
 //-----------------------------------------------------------------------------
 bool EngineApp::initVulkan(const RenderSystemCreateInfo& createInfo)
@@ -546,34 +428,6 @@ bool EngineApp::initVulkan(const RenderSystemCreateInfo& createInfo)
 	return true;
 }
 //-----------------------------------------------------------------------------
-bool EngineApp::prepare(const RenderSystemCreateInfo& createInfo, void* hInstance, void* hwnd, uint32_t* width, uint32_t* height, bool fullscreen)
-{
-	initSwapchain(hInstance, hwnd);
-	createCommandPool();
-	setupSwapChain(createInfo.vsync, width, height, fullscreen);
-	createCommandBuffers();
-	createSynchronizationPrimitives();
-	setupDepthStencil(*width, *height);
-	setupRenderPass();
-	createPipelineCache();
-	setupFrameBuffer(*width, *height);
-
-	//settings.overlay = settings.overlay && (!benchmark.active);
-	//if (settings.overlay)
-	//{
-	//	UIOverlay.device = vulkanDevice;
-	//	UIOverlay.queue = queue;
-	//	UIOverlay.shaders = {
-	//		loadShader(getShadersPath() + "base/uioverlay.vert.spv", VK_SHADER_STAGE_VERTEX_BIT),
-	//		loadShader(getShadersPath() + "base/uioverlay.frag.spv", VK_SHADER_STAGE_FRAGMENT_BIT),
-	//	};
-	//	UIOverlay.prepareResources();
-	//	UIOverlay.preparePipeline(pipelineCache, renderPass, swapChain.colorFormat, depthFormat);
-	//}
-
-	return true;
-}
-//-----------------------------------------------------------------------------
 VkResult EngineApp::createInstance(bool enableValidation)
 {
 	VkApplicationInfo appInfo = {};
@@ -679,9 +533,36 @@ VkResult EngineApp::createInstance(bool enableValidation)
 	return result;
 }
 //-----------------------------------------------------------------------------
-void EngineApp::initSwapchain(void* hInstance, void* hwnd)
+bool EngineApp::prepareRender(const RenderSystemCreateInfo& createInfo, bool fullscreen)
 {
-	swapChain.initSurface(hInstance, hwnd);
+	initSwapchain();
+	createCommandPool();
+	setupSwapChain(createInfo.vsync, &m_data->frameWidth, &m_data->frameHeight, fullscreen);
+	createCommandBuffers();
+	createSynchronizationPrimitives();
+	setupDepthStencil(m_data->frameWidth, m_data->frameHeight);
+	setupRenderPass();
+	createPipelineCache();
+	setupFrameBuffer(m_data->frameWidth, m_data->frameHeight);
+	overlay = overlay && (!benchmark.active);
+	if (overlay)
+	{
+		UIOverlay.device = vulkanDevice;
+		UIOverlay.queue = queue;
+		UIOverlay.shaders = {
+			loadShader("base/uioverlay.vert.spv", VK_SHADER_STAGE_VERTEX_BIT),
+			loadShader("base/uioverlay.frag.spv", VK_SHADER_STAGE_FRAGMENT_BIT),
+		};
+		UIOverlay.prepareResources();
+		UIOverlay.preparePipeline(pipelineCache, renderPass, swapChain.colorFormat, depthFormat);
+	}
+
+	return true;
+}
+//-----------------------------------------------------------------------------
+void EngineApp::initSwapchain()
+{
+	swapChain.initSurface(m_data->hInstance, m_data->hwnd);
 }
 //-----------------------------------------------------------------------------
 void EngineApp::createCommandPool()
@@ -716,14 +597,13 @@ void EngineApp::createCommandBuffers()
 //-----------------------------------------------------------------------------
 void EngineApp::createSynchronizationPrimitives()
 {
-	// TODO: нужно ли - сейчас создается в GameApp но может позже понадобится
-	//// Wait fences to sync command buffer access
-	//VkFenceCreateInfo fenceCreateInfo = vks::initializers::fenceCreateInfo(VK_FENCE_CREATE_SIGNALED_BIT);
-	//waitFences.resize(drawCmdBuffers.size());
-	//for (auto& fence : waitFences) 
-	//{
-	//	VK_CHECK_RESULT(vkCreateFence(device, &fenceCreateInfo, nullptr, &fence));
-	//}
+	// Wait fences to sync command buffer access
+	VkFenceCreateInfo fenceCreateInfo = vks::initializers::fenceCreateInfo(VK_FENCE_CREATE_SIGNALED_BIT);
+	waitFences.resize(drawCmdBuffers.size());
+	for (auto& fence : waitFences)
+	{
+		VK_CHECK_RESULT(vkCreateFence(device, &fenceCreateInfo, nullptr, &fence));
+	}
 }
 //-----------------------------------------------------------------------------
 void EngineApp::setupDepthStencil(uint32_t width, uint32_t height)
@@ -755,8 +635,8 @@ void EngineApp::setupDepthStencil(uint32_t width, uint32_t height)
 	VK_CHECK_RESULT(vkBindImageMemory(device, depthStencil.image, depthStencil.memory, 0));
 
 	// Create a view for the depth stencil image
-// Images aren't directly accessed in Vulkan, but rather through views described by a subresource range
-// This allows for multiple views of one image with differing ranges (e.g. for different layers)
+	// Images aren't directly accessed in Vulkan, but rather through views described by a subresource range
+	// This allows for multiple views of one image with differing ranges (e.g. for different layers)
 	VkImageViewCreateInfo depthStencilViewCI{};
 	depthStencilViewCI.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
 	depthStencilViewCI.viewType = VK_IMAGE_VIEW_TYPE_2D;
@@ -880,9 +760,265 @@ void EngineApp::setupFrameBuffer(uint32_t width, uint32_t height)
 	}
 }
 //-----------------------------------------------------------------------------
+bool EngineApp::isEnd() const
+{
+	return IsExit;
+}
+//-----------------------------------------------------------------------------
+void EngineApp::frame()
+{
+	while (PeekMessage(&m_data->msg, nullptr, 0, 0, PM_REMOVE))
+	{
+		TranslateMessage(&m_data->msg);
+		DispatchMessage(&m_data->msg);
+		if (m_data->msg.message == WM_QUIT)
+		{
+			IsExit = true;
+			break;
+		}
+	}
+	if (RenderPrepared() && !IsIconic(m_data->hwnd)) // TODO: может все таки обрабатывать события даже в свернутом окне?
+	{
+		nextFrame();
+	}
+}
+//-----------------------------------------------------------------------------
+void EngineApp::nextFrame()
+{
+	auto tStart = std::chrono::high_resolution_clock::now();
+
+	render();
+	frameCounter++;
+	auto tEnd = std::chrono::high_resolution_clock::now();
+	auto tDiff = std::chrono::duration<double, std::milli>(tEnd - tStart).count();
+
+	m_data->deltaTime = frameTimer = (float)tDiff / 1000.0f; // TODO: удалить frameTimer
+	OnUpdate(frameTimer);
+
+	// Convert to clamped timer value
+	if (!paused)
+	{
+		timer += timerSpeed * frameTimer;
+		if (timer > 1.0)
+		{
+			timer -= 1.0f;
+		}
+	}
+	float fpsTimer = (float)(std::chrono::duration<double, std::milli>(tEnd - lastTimestamp).count());
+	if (fpsTimer > 1000.0f)
+	{
+		lastFPS = static_cast<uint32_t>((float)frameCounter * (1000.0f / fpsTimer));
+#if defined(_WIN32)
+		std::string windowTitle = getWindowTitle();
+		SetWindowTextA(m_data->hwnd, windowTitle.c_str());
+#endif
+		frameCounter = 0;
+		lastTimestamp = tEnd;
+	}
+	tPrevEnd = tEnd;
+
+	// TODO: Cap UI overlay update rates
+	updateOverlay();
+}
+//-----------------------------------------------------------------------------
+void EngineApp::render()
+{
+	OnFrame();
+}
+//-----------------------------------------------------------------------------
+void EngineApp::windowResize(uint32_t destWidth, uint32_t destHeight)
+{
+	if (!prepared)
+		return;
+
+	prepared = false;
+	resized = true;
+
+	// Ensure all operations on the device have been finished before destroying resources
+	vkDeviceWaitIdle(device);
+
+	// Recreate swap chain
+	m_data->frameWidth = destWidth;
+	m_data->frameHeight = destHeight;
+	setupSwapChain(m_vsync, &destWidth, &destHeight, m_fullscreen);
+
+	// Recreate the frame buffers
+	vkDestroyImageView(device, depthStencil.view, nullptr);
+	vkDestroyImage(device, depthStencil.image, nullptr);
+	vkFreeMemory(device, depthStencil.memory, nullptr);
+	setupDepthStencil(destWidth, destHeight);
+	for (uint32_t i = 0; i < frameBuffers.size(); i++)
+		vkDestroyFramebuffer(device, frameBuffers[i], nullptr);
+
+	setupFrameBuffer(destWidth, destHeight);
+
+	if ((destWidth > 0.0f) && (destHeight > 0.0f))
+	{
+		if (overlay) 
+		{
+			UIOverlay.resize(destWidth, destHeight);
+		}
+	}
+
+	// Command buffers need to be recreated as they may store references to the recreated frame buffer
+	destroyCommandBuffers();
+	createCommandBuffers();
+	buildCommandBuffers();
+
+	// SRS - Recreate fences in case number of swapchain images has changed on resize
+	for (auto& fence : waitFences)
+		vkDestroyFence(device, fence, nullptr);
+
+	createSynchronizationPrimitives();
+
+	vkDeviceWaitIdle(device);
+
+	OnWindowResize(destWidth, destHeight);
+
+	prepared = true;
+}
+//-----------------------------------------------------------------------------
+void EngineApp::handleMouseMove(int32_t x, int32_t y)
+{
+	int32_t dx = (int32_t)mouseState.position.x - x;
+	int32_t dy = (int32_t)mouseState.position.y - y;
+
+	bool handled = false;
+
+	if (overlay) 
+	{
+		ImGuiIO& io = ImGui::GetIO();
+		handled = io.WantCaptureMouse && UIOverlay.visible;
+	}
+	if (!handled)
+		OnMouseMoved(x, y, dx, dy);
+
+	mouseState.position = glm::vec2((float)x, (float)y);
+}
+//-----------------------------------------------------------------------------
+void EngineApp::updateOverlay()
+{
+	if (!overlay)
+		return;
+
+	ImGuiIO& io = ImGui::GetIO();
+
+	io.DisplaySize = ImVec2((float)m_data->frameWidth, (float)m_data->frameHeight);
+	io.DeltaTime = frameTimer;
+
+	io.MousePos = ImVec2(mouseState.position.x, mouseState.position.y);
+	io.MouseDown[0] = mouseState.buttons.left && UIOverlay.visible;
+	io.MouseDown[1] = mouseState.buttons.right && UIOverlay.visible;
+	io.MouseDown[2] = mouseState.buttons.middle && UIOverlay.visible;
+
+	ImGui::NewFrame();
+
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0);
+	ImGui::SetNextWindowPos(ImVec2(10 * UIOverlay.scale, 10 * UIOverlay.scale));
+	ImGui::SetNextWindowSize(ImVec2(0, 0), ImGuiSetCond_FirstUseEver);
+	ImGui::Begin("Game", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
+	ImGui::TextUnformatted("Game");
+	ImGui::TextUnformatted(deviceProperties.deviceName);
+	ImGui::Text("%.2f ms/frame (%.1d fps)", (1000.0f / lastFPS), lastFPS);
+
+#if defined(VK_USE_PLATFORM_ANDROID_KHR)
+	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0.0f, 5.0f * UIOverlay.scale));
+#endif
+	ImGui::PushItemWidth(110.0f * UIOverlay.scale);
+	onUpdateUIOverlay(&UIOverlay);
+	ImGui::PopItemWidth();
+#if defined(VK_USE_PLATFORM_ANDROID_KHR)
+	ImGui::PopStyleVar();
+#endif
+
+	ImGui::End();
+	ImGui::PopStyleVar();
+	ImGui::Render();
+
+	if (UIOverlay.update() || UIOverlay.updated) 
+	{
+		buildCommandBuffers();
+		UIOverlay.updated = false;
+	}
+}
+//-----------------------------------------------------------------------------
+void EngineApp::renderFinal()
+{
+	// Flush device to make sure all resources can be freed
+	if (device != VK_NULL_HANDLE)
+	{
+		vkDeviceWaitIdle(device);
+	}
+}
+//-----------------------------------------------------------------------------
+void EngineApp::destroy()
+{
+	renderDestroy();
+	if (m_data->hwnd)
+	{
+		DestroyWindow(m_data->hwnd);
+		m_data->hwnd = nullptr;
+	}
+	if (m_data->hInstance)
+	{
+		UnregisterClass(ClassName, m_data->hInstance);
+		m_data->hInstance = nullptr;
+	}
+}
+//-----------------------------------------------------------------------------
+void EngineApp::renderDestroy()
+{
+	// Clean up Vulkan resources
+	swapChain.cleanup();
+	if (descriptorPool != VK_NULL_HANDLE)
+		vkDestroyDescriptorPool(device, descriptorPool, nullptr);
+
+	destroyCommandBuffers();
+	if (renderPass != VK_NULL_HANDLE)
+		vkDestroyRenderPass(device, renderPass, nullptr);
+
+	for (uint32_t i = 0; i < frameBuffers.size(); i++)
+		vkDestroyFramebuffer(device, frameBuffers[i], nullptr);
+
+	for (auto& shaderModule : shaderModules)
+		vkDestroyShaderModule(device, shaderModule, nullptr);
+
+	vkDestroyImageView(device, depthStencil.view, nullptr);
+	vkDestroyImage(device, depthStencil.image, nullptr);
+	vkFreeMemory(device, depthStencil.memory, nullptr);
+
+	vkDestroyPipelineCache(device, pipelineCache, nullptr);
+
+	vkDestroyCommandPool(device, cmdPool, nullptr);
+
+	vkDestroySemaphore(device, semaphores.presentComplete, nullptr);
+	vkDestroySemaphore(device, semaphores.renderComplete, nullptr);
+	for (auto& fence : waitFences)
+		vkDestroyFence(device, fence, nullptr);
+
+	if (overlay)
+		UIOverlay.freeResources();
+
+	delete vulkanDevice;
+
+	if (validation)
+		vks::debug::freeDebugCallback(instance);
+
+	vkDestroyInstance(instance, nullptr);
+}
+//-----------------------------------------------------------------------------
 void EngineApp::destroyCommandBuffers()
 {
 	vkFreeCommandBuffers(device, cmdPool, static_cast<uint32_t>(drawCmdBuffers.size()), drawCmdBuffers.data());
+}
+//-----------------------------------------------------------------------------
+std::string EngineApp::getWindowTitle()
+{
+	std::string device(GetDeviceName());
+	std::string windowTitle;
+	windowTitle = "Game - " + device;
+	windowTitle += " - " + std::to_string(frameCounter) + " fps";
+	return windowTitle;
 }
 //-----------------------------------------------------------------------------
 VkPipelineShaderStageCreateInfo EngineApp::loadShader(std::string fileName, VkShaderStageFlagBits stage)
@@ -899,53 +1035,5 @@ VkPipelineShaderStageCreateInfo EngineApp::loadShader(std::string fileName, VkSh
 	assert(shaderStage.module != VK_NULL_HANDLE);
 	shaderModules.push_back(shaderStage.module);
 	return shaderStage;
-}
-//-----------------------------------------------------------------------------
-void EngineApp::windowResize(uint32_t destWidth, uint32_t destHeight)
-{
-	if (!prepared)
-	{
-		return;
-	}
-	prepared = false;
-	resized = true;
-
-	// Ensure all operations on the device have been finished before destroying resources
-	vkDeviceWaitIdle(device);
-
-	// Recreate swap chain
-	setupSwapChain(m_vsync, &destWidth, &destHeight, m_fullscreen);
-
-	// Recreate the frame buffers
-	vkDestroyImageView(device, depthStencil.view, nullptr);
-	vkDestroyImage(device, depthStencil.image, nullptr);
-	vkFreeMemory(device, depthStencil.memory, nullptr);
-	setupDepthStencil(destWidth, destHeight);
-	for (uint32_t i = 0; i < frameBuffers.size(); i++) {
-		vkDestroyFramebuffer(device, frameBuffers[i], nullptr);
-	}
-	setupFrameBuffer(destWidth, destHeight);
-
-	if ((destWidth > 0.0f) && (destHeight > 0.0f))
-	{
-		//if (settings.overlay) {
-		//	UIOverlay.resize(width, height);
-		//}
-	}
-
-	// Command buffers need to be recreated as they may store
-	// references to the recreated frame buffer
-	destroyCommandBuffers();
-	createCommandBuffers();
-
-	// SRS - Recreate fences in case number of swapchain images has changed on resize
-	for (auto& fence : waitFences) {
-		vkDestroyFence(device, fence, nullptr);
-	}
-	createSynchronizationPrimitives();
-
-	vkDeviceWaitIdle(device);
-
-	prepared = true;
 }
 //-----------------------------------------------------------------------------

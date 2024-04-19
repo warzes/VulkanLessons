@@ -12,7 +12,7 @@ int main(
 	[[maybe_unused]] int   argc,
 	[[maybe_unused]] char* argv[])
 {
-	GameApp app;
+	TriangleApp app;
 	app.Run();
 }
 //-----------------------------------------------------------------------------

@@ -12,6 +12,9 @@
 #include <array>
 #include <chrono>
 #include <fstream>
+#include <iostream>
+#include <algorithm>
+#include <numeric>
 
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
@@ -25,6 +28,7 @@
 #include "Engine/Log.h"
 #include "Engine/EngineApp.h"
 #include "Engine/Camera.h"
+#include "Engine/KeyCodes.h"
 
 
 #if defined(_MSC_VER)

@@ -111,6 +111,7 @@
   <ItemGroup>
     <ClInclude Include="BaseFunc.h" />
     <ClInclude Include="BaseMacros.h" />
+    <ClInclude Include="Benchmark.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="EngineApp.h" />
     <ClInclude Include="ExampleClass.h" />

@@ -33,8 +33,11 @@
 #include <string>
 #include <vector>
 #include <chrono>
+#include <iostream>
 #include <sstream>
 #include <fstream>
+#include <algorithm>
+#include <numeric>
 
 #if defined(_MSC_VER)
 #	pragma warning(pop)

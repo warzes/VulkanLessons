@@ -23,8 +23,6 @@ bool TriangleApp::OnCreate()
 //-----------------------------------------------------------------------------
 void TriangleApp::OnDestroy()
 {
-	VkDevice& device = GetDevice();
-
 	// Clean up used Vulkan resources
 	// Note: Inherited destructor cleans up resources stored in base class
 	vkDestroyPipeline(device, pipeline, nullptr);
@@ -61,8 +59,8 @@ void TriangleApp::OnUpdate(float deltaTime)
 //-----------------------------------------------------------------------------
 void TriangleApp::OnFrame()
 {
-	VkDevice& device = GetDevice();
-	VulkanSwapChain& swapChain = GetSwapChain();
+	if (!RenderPrepared())
+		return;
 
 	// Use a fence to wait until the command buffer has finished execution before using it again
 	vkWaitForFences(device, 1, &waitFences[currentFrame], VK_TRUE, UINT64_MAX);
@@ -74,7 +72,7 @@ void TriangleApp::OnFrame()
 	VkResult result = vkAcquireNextImageKHR(device, swapChain.swapChain, UINT64_MAX, presentCompleteSemaphores[currentFrame], VK_NULL_HANDLE, &imageIndex);
 	if (result == VK_ERROR_OUT_OF_DATE_KHR)
 	{
-		OnWindowResize();
+		windowResize(destWidth, destHeight);
 		return;
 	}
 	else if ((result != VK_SUCCESS) && (result != VK_SUBOPTIMAL_KHR))
@@ -114,8 +112,8 @@ void TriangleApp::OnFrame()
 	renderPassBeginInfo.renderPass = GetRenderPass();
 	renderPassBeginInfo.renderArea.offset.x = 0;
 	renderPassBeginInfo.renderArea.offset.y = 0;
-	renderPassBeginInfo.renderArea.extent.width = 1024; // TODO:
-	renderPassBeginInfo.renderArea.extent.height = 768; // TODO:
+	renderPassBeginInfo.renderArea.extent.width = destWidth;
+	renderPassBeginInfo.renderArea.extent.height = destHeight;
 	renderPassBeginInfo.clearValueCount = 2;
 	renderPassBeginInfo.pClearValues = clearValues;
 	renderPassBeginInfo.framebuffer = GetFrameBuffers()[imageIndex];
@@ -128,15 +126,15 @@ void TriangleApp::OnFrame()
 	vkCmdBeginRenderPass(commandBuffer, &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 	// Update dynamic viewport state
 	VkViewport viewport{};
-	viewport.width = (float)1024; // TODO:
-	viewport.height = (float)768; // TODO:
+	viewport.width = (float)destWidth;
+	viewport.height = (float)destHeight;
 	viewport.minDepth = (float)0.0f;
 	viewport.maxDepth = (float)1.0f;
 	vkCmdSetViewport(commandBuffer, 0, 1, &viewport);
 	// Update dynamic scissor state
 	VkRect2D scissor{};
-	scissor.extent.width = 1024; // TODO:
-	scissor.extent.height = 768; // TODO:
+	scissor.extent.width = destWidth;
+	scissor.extent.height = destHeight; 
 	scissor.offset.x = 0;
 	scissor.offset.y = 0;
 	vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
@@ -193,7 +191,7 @@ void TriangleApp::OnFrame()
 
 	if ((result == VK_ERROR_OUT_OF_DATE_KHR) || (result == VK_SUBOPTIMAL_KHR))
 	{
-		OnWindowResize();
+		windowResize(destWidth, destHeight);
 	}
 	else if (result != VK_SUCCESS)
 	{
@@ -204,16 +202,87 @@ void TriangleApp::OnFrame()
 	currentFrame = (currentFrame + 1) % MAX_CONCURRENT_FRAMES;
 }
 //-----------------------------------------------------------------------------
-void TriangleApp::OnWindowResize()
+void TriangleApp::OnWindowResize(uint32_t destWidth, uint32_t destHeight)
 {
-	EngineApp::OnWindowResize();
+	if ((destWidth > 0.0f) && (destHeight > 0.0f))
+		camera.updateAspectRatio((float)destWidth / (float)destHeight);
+}
+//-----------------------------------------------------------------------------
+void TriangleApp::OnKeyPressed(uint32_t key)
+{
+	if (key == KEY_F2)
+	{
+		if (camera.type == Camera::CameraType::lookat)
+		{
+			camera.type = Camera::CameraType::firstperson;
+		}
+		else
+		{
+			camera.type = Camera::CameraType::lookat;
+		}
+	}
+
+	if (camera.type == Camera::firstperson)
+	{
+		switch (key)
+		{
+		case KEY_W:
+			camera.keys.up = true;
+			break;
+		case KEY_S:
+			camera.keys.down = true;
+			break;
+		case KEY_A:
+			camera.keys.left = true;
+			break;
+		case KEY_D:
+			camera.keys.right = true;
+			break;
+		}
+	}
+}
+//-----------------------------------------------------------------------------
+void TriangleApp::OnKeyUp(uint32_t key)
+{
+	if (camera.type == Camera::firstperson)
+	{
+		switch (key)
+		{
+		case KEY_W:
+			camera.keys.up = false;
+			break;
+		case KEY_S:
+			camera.keys.down = false;
+			break;
+		case KEY_A:
+			camera.keys.left = false;
+			break;
+		case KEY_D:
+			camera.keys.right = false;
+			break;
+		}
+	}
+}
+//-----------------------------------------------------------------------------
+void TriangleApp::OnMouseMoved(int32_t x, int32_t y, int32_t dx, int32_t dy)
+{
+	if (mouseState.buttons.left)
+	{
+		camera.rotate(glm::vec3(dy * camera.rotationSpeed, -dx * camera.rotationSpeed, 0.0f));
+	}
+	if (mouseState.buttons.right)
+	{
+		camera.translate(glm::vec3(-0.0f, 0.0f, dy * .005f));
+	}
+	if (mouseState.buttons.middle)
+	{
+		camera.translate(glm::vec3(-dx * 0.005f, -dy * 0.005f, 0.0f));
+	}
 }
 //-----------------------------------------------------------------------------
 // Create the per-frame (in flight) sVulkan synchronization primitives used in this example
 void TriangleApp::createSynchronizationPrimitives()
 {
-	VkDevice& device = GetDevice();
-
 	// Semaphores are used for correct command ordering within a queue
 	VkSemaphoreCreateInfo semaphoreCI{};
 	semaphoreCI.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
@@ -241,13 +310,13 @@ void TriangleApp::createCommandBuffers()
 	// All command buffers are allocated from a command pool
 	VkCommandPoolCreateInfo commandPoolCI{};
 	commandPoolCI.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
-	commandPoolCI.queueFamilyIndex = GetSwapChain().queueNodeIndex;
+	commandPoolCI.queueFamilyIndex = swapChain.queueNodeIndex;
 	commandPoolCI.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
-	VK_CHECK_RESULT(vkCreateCommandPool(GetDevice(), &commandPoolCI, nullptr, &commandPool));
+	VK_CHECK_RESULT(vkCreateCommandPool(device, &commandPoolCI, nullptr, &commandPool));
 
 	// Allocate one command buffer per max. concurrent frame from above pool
 	VkCommandBufferAllocateInfo cmdBufAllocateInfo = vks::initializers::commandBufferAllocateInfo(commandPool, VK_COMMAND_BUFFER_LEVEL_PRIMARY, MAX_CONCURRENT_FRAMES);
-	VK_CHECK_RESULT(vkAllocateCommandBuffers(GetDevice(), &cmdBufAllocateInfo, commandBuffers.data()));
+	VK_CHECK_RESULT(vkAllocateCommandBuffers(device, &cmdBufAllocateInfo, commandBuffers.data()));
 }
 //-----------------------------------------------------------------------------
 // Prepare vertex and index buffers for an indexed triangle
