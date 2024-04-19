@@ -33,6 +33,30 @@
     <ClCompile Include="09_TextureCubeMap.cpp">
       <Filter>App\Examples</Filter>
     </ClCompile>
+    <ClCompile Include="10_TextureCubemapArray.cpp">
+      <Filter>App\Examples</Filter>
+    </ClCompile>
+    <ClCompile Include="11_Texture3D.cpp">
+      <Filter>App\Examples</Filter>
+    </ClCompile>
+    <ClCompile Include="12_InputAttachments.cpp">
+      <Filter>App\Examples</Filter>
+    </ClCompile>
+    <ClCompile Include="13_Subpasses.cpp">
+      <Filter>App\Examples</Filter>
+    </ClCompile>
+    <ClCompile Include="14_Offscreen.cpp">
+      <Filter>App\Examples</Filter>
+    </ClCompile>
+    <ClCompile Include="15_ParticleSystem.cpp">
+      <Filter>App\Examples</Filter>
+    </ClCompile>
+    <ClCompile Include="16_Stencilbuffer.cpp">
+      <Filter>App\Examples</Filter>
+    </ClCompile>
+    <ClCompile Include="17_VertexAttributes.cpp">
+      <Filter>App\Examples</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -64,6 +88,30 @@
       <Filter>App\Examples</Filter>
     </ClInclude>
     <ClInclude Include="09_TextureCubeMap.h">
+      <Filter>App\Examples</Filter>
+    </ClInclude>
+    <ClInclude Include="10_TextureCubemapArray.h">
+      <Filter>App\Examples</Filter>
+    </ClInclude>
+    <ClInclude Include="11_Texture3D.h">
+      <Filter>App\Examples</Filter>
+    </ClInclude>
+    <ClInclude Include="12_InputAttachments.h">
+      <Filter>App\Examples</Filter>
+    </ClInclude>
+    <ClInclude Include="13_Subpasses.h">
+      <Filter>App\Examples</Filter>
+    </ClInclude>
+    <ClInclude Include="14_Offscreen.h">
+      <Filter>App\Examples</Filter>
+    </ClInclude>
+    <ClInclude Include="15_ParticleSystem.h">
+      <Filter>App\Examples</Filter>
+    </ClInclude>
+    <ClInclude Include="16_Stencilbuffer.h">
+      <Filter>App\Examples</Filter>
+    </ClInclude>
+    <ClInclude Include="17_VertexAttributes.h">
       <Filter>App\Examples</Filter>
     </ClInclude>
   </ItemGroup>

@@ -1,11 +1,11 @@
 #pragma once
 
 /*
-* This sample shows how to load and render a cubemap. A cubemap is a textures that contains 6 images, one per cube face.
-* The sample displays the cubemap as a skybox (background) and as a reflection on a selectable object
+* This sample shows how load and render an cubemap array texture. A single image contains multiple cube maps.
+* The cubemap to be displayed is selected in the fragment shader
 */
 
-class TextureCubeMapApp final : public EngineApp
+class TextureCubemapArrayApp final : public EngineApp
 {
 public:
 	EngineCreateInfo GetCreateInfo() const final { return {}; }
@@ -23,13 +23,13 @@ public:
 private:
 	// Enable physical device features required for this example
 	void getEnabledFeatures() final;
-	// Loads a cubemap from a file, uploads it to the device and create all Vulkan resources required to display it
-	void loadCubemap(std::string filename, VkFormat format);
+	// Loads a cubemap array from a file, uploads it to the device and create all Vulkan resources required to display it
+	void loadCubemapArray(std::string filename, VkFormat format);
+
 	void buildCommandBuffers() final;
 	void loadAssets();
 	void setupDescriptors();
 	void preparePipelines();
-	// Prepare and initialize uniform buffer containing shader uniforms
 	void prepareUniformBuffers();
 	void updateUniformBuffers();
 	void draw();
@@ -38,21 +38,22 @@ private:
 
 	bool displaySkybox = true;
 
-	vks::Texture cubeMap;
+	vks::Texture cubeMapArray;
 
-	struct Models {
+	struct Meshes {
 		vkglTF::Model skybox;
-		// The sample lets you select different models to apply the cubemap to
 		std::vector<vkglTF::Model> objects;
 		int32_t objectIndex = 0;
 	} models;
 
-	struct UBOVS {
+	struct UniformData {
 		glm::mat4 projection;
 		glm::mat4 modelView;
 		glm::mat4 inverseModelview;
 		float lodBias = 0.0f;
-	} uboVS;
+		// Used by the fragment shader to select the cubemap from the array cubemap
+		int cubeMapIndex = 1;
+	} uniformData;
 	vks::Buffer uniformBuffer;
 
 	struct {

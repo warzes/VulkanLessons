@@ -9,6 +9,14 @@
 #include "07_Texture.h"
 #include "08_TextureArrays.h"
 #include "09_TextureCubeMap.h"
+#include "10_TextureCubemapArray.h"
+#include "11_Texture3D.h"
+#include "12_InputAttachments.h"
+#include "13_Subpasses.h"
+#include "14_Offscreen.h"
+#include "15_ParticleSystem.h"
+#include "16_Stencilbuffer.h"
+#include "17_VertexAttributes.h"
 //-----------------------------------------------------------------------------
 #if defined(_MSC_VER)
 #	pragma comment( lib, "3rdparty.lib" )
@@ -28,7 +36,15 @@ int main(
 	//SpecializationConstants app;
 	//TextureApp app;
 	//TextureArraysApp app;
-	TextureCubeMapApp app;
+	//TextureCubeMapApp app;
+	//TextureCubemapArrayApp app;
+	//Texture3DApp app;
+	InputAttachmentsApp app;
+	//SubpassesApp app;
+	//OffscreenApp app;
+	//ParticleSystemApp app;
+	//StencilbufferApp app;
+	//VertexAttributesApp app;
 
 	app.Run();
 

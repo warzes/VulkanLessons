@@ -7,6 +7,14 @@
 #include "VulkanTexture.h"
 #include "Benchmark.h"
 
+struct WindowSystemCreateInfo final
+{
+	int width = 1024;
+	int height = 768;
+	const wchar_t* title = L"Game";
+	bool fullscreen = false;
+};
+
 struct RenderSystemCreateInfo final
 {
 	std::vector<const char*> enabledInstanceExtensions;
@@ -16,14 +24,7 @@ struct RenderSystemCreateInfo final
 
 struct EngineCreateInfo final
 {
-	struct
-	{
-		int width = 1024;
-		int height = 768;
-		const wchar_t* title = L"Game";
-		bool fullscreen = false;
-	} window;
-
+	WindowSystemCreateInfo window;
 	RenderSystemCreateInfo render;
 };
 
@@ -179,6 +180,7 @@ protected:
 private:
 	bool create();
 	void setupDPIAwareness();
+	bool initWindow(const WindowSystemCreateInfo& createInfo);
 	bool initVulkan(const RenderSystemCreateInfo& createInfo);
 	VkResult createInstance(bool enableValidation);
 	/** @brief (Virtual) Called after the physical device features have been read, can be used to set features to enable on the device */

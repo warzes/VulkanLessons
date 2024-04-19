@@ -191,100 +191,8 @@ bool EngineApp::create()
 
 	setupDPIAwareness();
 
-	WNDCLASSEX wndClass{};
-	wndClass.cbSize = sizeof(WNDCLASSEX);
-	wndClass.style = CS_HREDRAW | CS_VREDRAW;
-	wndClass.lpfnWndProc = WndProc;
-	wndClass.hInstance = m_data->hInstance;
-	wndClass.hIcon = LoadIcon(nullptr, IDI_APPLICATION);
-	wndClass.hIconSm = LoadIcon(nullptr, IDI_WINLOGO);
-	wndClass.hCursor = LoadCursor(nullptr, IDC_ARROW);
-	wndClass.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
-	wndClass.lpszClassName = ClassName;
-	if (!RegisterClassEx(&wndClass))
-	{
-		Fatal("RegisterClassEx failed.");
-		return false;
-	}
-
-	int screenWidth = GetSystemMetrics(SM_CXSCREEN);
-	int screenHeight = GetSystemMetrics(SM_CYSCREEN);
-
-	if (createInfo.window.fullscreen)
-	{
-		if ((createInfo.window.width != (uint32_t)screenWidth) && (createInfo.window.height != (uint32_t)screenHeight))
-		{
-			DEVMODE dmScreenSettings;
-			memset(&dmScreenSettings, 0, sizeof(dmScreenSettings));
-			dmScreenSettings.dmSize = sizeof(dmScreenSettings);
-			dmScreenSettings.dmPelsWidth = createInfo.window.width;
-			dmScreenSettings.dmPelsHeight = createInfo.window.height;
-			dmScreenSettings.dmBitsPerPel = 32;
-			dmScreenSettings.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT;
-			if (ChangeDisplaySettings(&dmScreenSettings, CDS_FULLSCREEN) != DISP_CHANGE_SUCCESSFUL)
-			{
-				if (MessageBox(NULL, L"Fullscreen Mode not supported!\n Switch to window mode?", L"Error", MB_YESNO | MB_ICONEXCLAMATION) == IDYES)
-				{
-					createInfo.window.fullscreen = false;
-				}
-				else
-				{
-					return false;
-				}
-			}
-			screenWidth = createInfo.window.width;
-			screenHeight = createInfo.window.height;
-		}
-	}
-
-	DWORD dwExStyle;
-	DWORD dwStyle;
-
-	if (createInfo.window.fullscreen)
-	{
-		dwExStyle = WS_EX_APPWINDOW;
-		dwStyle = WS_POPUP | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
-	}
-	else
-	{
-		dwExStyle = WS_EX_APPWINDOW | WS_EX_WINDOWEDGE;
-		dwStyle = WS_OVERLAPPEDWINDOW | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
-	}
-
-	RECT windowRect;
-	windowRect.left = 0L;
-	windowRect.top = 0L;
-	windowRect.right = createInfo.window.fullscreen ? (long)screenWidth : (long)createInfo.window.width;
-	windowRect.bottom = createInfo.window.fullscreen ? (long)screenHeight : (long)createInfo.window.height;
-
-	AdjustWindowRectEx(&windowRect, dwStyle, FALSE, dwExStyle);
-
-	m_data->hwnd = CreateWindowEx(0, ClassName, createInfo.window.title, dwStyle | WS_CLIPSIBLINGS | WS_CLIPCHILDREN,
-		0, 0, windowRect.right - windowRect.left, windowRect.bottom - windowRect.top,
-		nullptr, nullptr, m_data->hInstance, nullptr);
-
-	if (!m_data->hwnd)
-	{
-		Fatal("Could not create window!");
-		return false;
-	}
-
-	if (!createInfo.window.fullscreen)
-	{
-		// Center on screen
-		uint32_t x = (GetSystemMetrics(SM_CXSCREEN) - windowRect.right) / 2;
-		uint32_t y = (GetSystemMetrics(SM_CYSCREEN) - windowRect.bottom) / 2;
-		SetWindowPos(m_data->hwnd, 0, x, y, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
-	}
-
-	ShowWindow(m_data->hwnd, SW_SHOW);
-	SetForegroundWindow(m_data->hwnd);
-	SetFocus(m_data->hwnd);
-
-	// TODO: вычислить реальный размер окна
-	m_data->frameWidth = createInfo.window.width;
-	m_data->frameHeight = createInfo.window.height;
-	// TODO: также рендер может менять размер, проверить что там и как это использовать
+	if (!initWindow(createInfo.window))
+		return false;	
 
 	if (!initVulkan(createInfo.render) ||
 		!prepareRender(createInfo.render, createInfo.window.fullscreen))
@@ -314,6 +222,108 @@ void EngineApp::setupDPIAwareness()
 
 		FreeLibrary(shCore);
 	}
+}
+//-----------------------------------------------------------------------------
+bool EngineApp::initWindow(const WindowSystemCreateInfo& createInfo)
+{
+	m_fullscreen = createInfo.fullscreen;
+
+	WNDCLASSEX wndClass{};
+	wndClass.cbSize = sizeof(WNDCLASSEX);
+	wndClass.style = CS_HREDRAW | CS_VREDRAW;
+	wndClass.lpfnWndProc = WndProc;
+	wndClass.hInstance = m_data->hInstance;
+	wndClass.hIcon = LoadIcon(nullptr, IDI_APPLICATION);
+	wndClass.hIconSm = LoadIcon(nullptr, IDI_WINLOGO);
+	wndClass.hCursor = LoadCursor(nullptr, IDC_ARROW);
+	wndClass.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
+	wndClass.lpszClassName = ClassName;
+	if (!RegisterClassEx(&wndClass))
+	{
+		Fatal("RegisterClassEx failed.");
+		return false;
+	}
+
+	int screenWidth = GetSystemMetrics(SM_CXSCREEN);
+	int screenHeight = GetSystemMetrics(SM_CYSCREEN);
+
+	if (m_fullscreen)
+	{
+		if ((createInfo.width != (uint32_t)screenWidth) && (createInfo.height != (uint32_t)screenHeight))
+		{
+			DEVMODE dmScreenSettings;
+			memset(&dmScreenSettings, 0, sizeof(dmScreenSettings));
+			dmScreenSettings.dmSize = sizeof(dmScreenSettings);
+			dmScreenSettings.dmPelsWidth = createInfo.width;
+			dmScreenSettings.dmPelsHeight = createInfo.height;
+			dmScreenSettings.dmBitsPerPel = 32;
+			dmScreenSettings.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT;
+			if (ChangeDisplaySettings(&dmScreenSettings, CDS_FULLSCREEN) != DISP_CHANGE_SUCCESSFUL)
+			{
+				if (MessageBox(NULL, L"Fullscreen Mode not supported!\n Switch to window mode?", L"Error", MB_YESNO | MB_ICONEXCLAMATION) == IDYES)
+				{
+					m_fullscreen = false;
+				}
+				else
+				{
+					return false;
+				}
+			}
+			screenWidth = createInfo.width;
+			screenHeight = createInfo.height;
+		}
+	}
+
+	DWORD dwExStyle;
+	DWORD dwStyle;
+
+	if (m_fullscreen)
+	{
+		dwExStyle = WS_EX_APPWINDOW;
+		dwStyle = WS_POPUP | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
+	}
+	else
+	{
+		dwExStyle = WS_EX_APPWINDOW | WS_EX_WINDOWEDGE;
+		dwStyle = WS_OVERLAPPEDWINDOW | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
+	}
+
+	RECT windowRect;
+	windowRect.left = 0L;
+	windowRect.top = 0L;
+	windowRect.right = createInfo.fullscreen ? (long)screenWidth : (long)createInfo.width;
+	windowRect.bottom = createInfo.fullscreen ? (long)screenHeight : (long)createInfo.height;
+
+	AdjustWindowRectEx(&windowRect, dwStyle, FALSE, dwExStyle);
+
+	m_data->hwnd = CreateWindowEx(0, ClassName, createInfo.title, dwStyle | WS_CLIPSIBLINGS | WS_CLIPCHILDREN,
+		0, 0, windowRect.right - windowRect.left, windowRect.bottom - windowRect.top,
+		nullptr, nullptr, m_data->hInstance, nullptr);
+
+	if (!m_data->hwnd)
+	{
+		Fatal("Could not create window!");
+		return false;
+	}
+
+	if (!m_fullscreen)
+	{
+		// Center on screen
+		uint32_t x = (GetSystemMetrics(SM_CXSCREEN) - windowRect.right) / 2;
+		uint32_t y = (GetSystemMetrics(SM_CYSCREEN) - windowRect.bottom) / 2;
+		SetWindowPos(m_data->hwnd, 0, x, y, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
+	}
+
+	ShowWindow(m_data->hwnd, SW_SHOW);
+	SetForegroundWindow(m_data->hwnd);
+	SetFocus(m_data->hwnd);
+
+	// TODO: вычислить реальный размер окна
+	m_data->frameWidth = createInfo.width;
+	m_data->frameHeight = createInfo.height;
+	// TODO: также рендер может менять размер, проверить что там и как это использовать
+
+	return true;
 }
 //-----------------------------------------------------------------------------
 bool EngineApp::initVulkan(const RenderSystemCreateInfo& createInfo)
@@ -404,7 +414,7 @@ bool EngineApp::initVulkan(const RenderSystemCreateInfo& createInfo)
 	}
 	assert(validFormat);
 
-	swapChain.connect(instance, physicalDevice, device);
+	swapChain.Connect(instance, physicalDevice, device);
 
 	// Create synchronization objects
 	VkSemaphoreCreateInfo semaphoreCreateInfo = vks::initializers::semaphoreCreateInfo();
