@@ -8,6 +8,7 @@
 #include "06_SpecializationConstants.h"
 #include "07_Texture.h"
 #include "08_TextureArrays.h"
+#include "09_TextureCubeMap.h"
 //-----------------------------------------------------------------------------
 #if defined(_MSC_VER)
 #	pragma comment( lib, "3rdparty.lib" )
@@ -26,7 +27,8 @@ int main(
 	//PushConstants app;
 	//SpecializationConstants app;
 	//TextureApp app;
-	TextureArraysApp app;
+	//TextureArraysApp app;
+	TextureCubeMapApp app;
 
 	app.Run();
 

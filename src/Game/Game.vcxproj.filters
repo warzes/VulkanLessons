@@ -30,6 +30,9 @@
     <ClCompile Include="08_TextureArrays.cpp">
       <Filter>App\Examples</Filter>
     </ClCompile>
+    <ClCompile Include="09_TextureCubeMap.cpp">
+      <Filter>App\Examples</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -58,6 +61,9 @@
       <Filter>App\Examples</Filter>
     </ClInclude>
     <ClInclude Include="08_TextureArrays.h">
+      <Filter>App\Examples</Filter>
+    </ClInclude>
+    <ClInclude Include="09_TextureCubeMap.h">
       <Filter>App\Examples</Filter>
     </ClInclude>
   </ItemGroup>
