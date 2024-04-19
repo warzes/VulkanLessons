@@ -9,6 +9,9 @@
     <ClCompile Include="01_TriangleApp.cpp">
       <Filter>App\Examples</Filter>
     </ClCompile>
+    <ClCompile Include="02_PipelinesApp.cpp">
+      <Filter>App\Examples</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -16,6 +19,9 @@
       <Filter>App</Filter>
     </ClInclude>
     <ClInclude Include="01_TriangleApp.h">
+      <Filter>App\Examples</Filter>
+    </ClInclude>
+    <ClInclude Include="02_PipelinesApp.h">
       <Filter>App\Examples</Filter>
     </ClInclude>
   </ItemGroup>

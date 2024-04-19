@@ -23,6 +23,12 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/quaternion.hpp>
 
+#define TINYGLTF_NO_STB_IMAGE_WRITE
+#ifdef VK_USE_PLATFORM_ANDROID_KHR
+#define TINYGLTF_ANDROID_LOAD_FROM_ASSETS
+#endif
+#include "tinygltf/tiny_gltf.h"
+
 #include "Engine/BaseMacros.h"
 #include "Engine/BaseFunc.h"
 #include "Engine/Log.h"

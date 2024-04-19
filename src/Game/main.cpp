@@ -1,6 +1,7 @@
 ﻿#include "stdafx.h"
 #include "GameApp.h"
 #include "01_TriangleApp.h"
+#include "02_PipelinesApp.h"
 //-----------------------------------------------------------------------------
 #if defined(_MSC_VER)
 #	pragma comment( lib, "3rdparty.lib" )
@@ -12,7 +13,10 @@ int main(
 	[[maybe_unused]] int   argc,
 	[[maybe_unused]] char* argv[])
 {
-	TriangleApp app;
+	//TriangleApp app;
+	PipelinesApp app;
+
 	app.Run();
+
 }
 //-----------------------------------------------------------------------------

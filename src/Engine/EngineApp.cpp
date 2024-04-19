@@ -925,7 +925,7 @@ void EngineApp::updateOverlay()
 	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0.0f, 5.0f * UIOverlay.scale));
 #endif
 	ImGui::PushItemWidth(110.0f * UIOverlay.scale);
-	onUpdateUIOverlay(&UIOverlay);
+	OnUpdateUIOverlay(&UIOverlay);
 	ImGui::PopItemWidth();
 #if defined(VK_USE_PLATFORM_ANDROID_KHR)
 	ImGui::PopStyleVar();
@@ -1035,5 +1035,62 @@ VkPipelineShaderStageCreateInfo EngineApp::loadShader(std::string fileName, VkSh
 	assert(shaderStage.module != VK_NULL_HANDLE);
 	shaderModules.push_back(shaderStage.module);
 	return shaderStage;
+}
+//-----------------------------------------------------------------------------
+void EngineApp::drawUI(const VkCommandBuffer commandBuffer)
+{
+	if (overlay && UIOverlay.visible)
+	{
+		const VkViewport viewport = vks::initializers::viewport((float)destWidth, (float)destHeight, 0.0f, 1.0f);
+		const VkRect2D scissor = vks::initializers::rect2D(destWidth, destHeight, 0, 0);
+		vkCmdSetViewport(commandBuffer, 0, 1, &viewport);
+		vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
+
+		UIOverlay.draw(commandBuffer);
+	}
+}
+//-----------------------------------------------------------------------------
+void EngineApp::prepareFrame()
+{
+	// Acquire the next image from the swap chain
+	VkResult result = swapChain.acquireNextImage(semaphores.presentComplete, &currentBuffer);
+	// Recreate the swapchain if it's no longer compatible with the surface (OUT_OF_DATE)
+	// SRS - If no longer optimal (VK_SUBOPTIMAL_KHR), wait until submitFrame() in case number of swapchain images will change on resize
+	if ((result == VK_ERROR_OUT_OF_DATE_KHR) || (result == VK_SUBOPTIMAL_KHR)) 
+	{
+		if (result == VK_ERROR_OUT_OF_DATE_KHR)
+		{
+			windowResize(destWidth, destHeight);
+		}
+		return;
+	}
+	else {
+		VK_CHECK_RESULT(result);
+	}
+}
+//-----------------------------------------------------------------------------
+void EngineApp::submitFrame()
+{
+	VkResult result = swapChain.queuePresent(queue, currentBuffer, semaphores.renderComplete);
+	// Recreate the swapchain if it's no longer compatible with the surface (OUT_OF_DATE) or no longer optimal for presentation (SUBOPTIMAL)
+	if ((result == VK_ERROR_OUT_OF_DATE_KHR) || (result == VK_SUBOPTIMAL_KHR)) {
+		windowResize(destWidth, destHeight);
+		if (result == VK_ERROR_OUT_OF_DATE_KHR) {
+			return;
+		}
+	}
+	else {
+		VK_CHECK_RESULT(result);
+	}
+	VK_CHECK_RESULT(vkQueueWaitIdle(queue));
+}
+//-----------------------------------------------------------------------------
+void EngineApp::renderFrame()
+{
+	EngineApp::prepareFrame();
+	submitInfo.commandBufferCount = 1;
+	submitInfo.pCommandBuffers = &drawCmdBuffers[currentBuffer];
+	VK_CHECK_RESULT(vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE));
+	EngineApp::submitFrame();
 }
 //-----------------------------------------------------------------------------

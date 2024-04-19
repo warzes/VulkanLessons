@@ -3,6 +3,7 @@
 #include "VulkanSwapChain.h"
 #include "VulkanDevice.h"
 #include "VulkanUIOverlay.h"
+#include "VulkanglTFModel.h"
 #include "Benchmark.h"
 
 struct RenderSystemCreateInfo final
@@ -46,6 +47,8 @@ public:
 	virtual void OnKeyUp(uint32_t) {}
 	/** @brief (Virtual) Called after the mouse cursor moved and before internal events (like camera rotation) is handled */
 	virtual void OnMouseMoved(int32_t x, int32_t y, int32_t dx, int32_t dy) {}
+	/** @brief (Virtual) Called when the UI overlay is updating, can be used to add custom elements to the overlay */
+	virtual void OnUpdateUIOverlay(vks::UIOverlay* /*overlay*/) {}
 
 	void Exit();
 	float GetDeltaTime() const;
@@ -85,6 +88,18 @@ public:
 	void windowResize(uint32_t destWidth, uint32_t destHeight);
 
 protected:
+	/** @brief Adds the drawing commands for the ImGui overlay to the given command buffer */
+	void drawUI(const VkCommandBuffer commandBuffer);
+	/** @brief Loads a SPIR-V shader file for the given shader stage */
+	VkPipelineShaderStageCreateInfo loadShader(std::string fileName, VkShaderStageFlagBits stage);
+
+	/** Prepare the next frame for workload submission by acquiring the next swap chain image */
+	void prepareFrame();
+	/** @brief Presents the current image to the swap chain */
+	void submitFrame();
+	/** @brief (Virtual) Default image acquire + submission and command buffer submission function */
+	virtual void renderFrame();
+
 	// Frame counter to display fps
 	uint32_t frameCounter = 0;
 	uint32_t lastFPS = 0;
@@ -148,6 +163,11 @@ protected:
 	std::vector<VkFence> waitFences;
 	bool requiresStencil{ false };
 
+	VkClearColorValue defaultClearColor = { { 0.025f, 0.025f, 0.025f, 1.0f } };
+
+	/** @brief Encapsulated physical and logical vulkan device */
+	vks::VulkanDevice* vulkanDevice;
+
 private:
 	bool create();
 	void setupDPIAwareness();
@@ -176,8 +196,7 @@ private:
 	void nextFrame();
 	void render();
 	void updateOverlay();
-	/** @brief (Virtual) Called when the UI overlay is updating, can be used to add custom elements to the overlay */
-	virtual void onUpdateUIOverlay(vks::UIOverlay* /*overlay*/) {}
+
 	/** @brief (Virtual) Called when resources have been recreated that require a rebuild of the command buffers (e.g. frame buffer), to be implemented by the sample application */
 	virtual void buildCommandBuffers() {}
 	void renderFinal();
@@ -187,8 +206,7 @@ private:
 
 	std::string getWindowTitle();
 
-	/** @brief Loads a SPIR-V shader file for the given shader stage */
-	VkPipelineShaderStageCreateInfo loadShader(std::string fileName, VkShaderStageFlagBits stage);
+
 
 	EngineAppImpl* m_data = nullptr;
 
@@ -205,13 +223,8 @@ private:
 
 	vks::Benchmark benchmark;
 
-	/** @brief Encapsulated physical and logical vulkan device */
-	vks::VulkanDevice* vulkanDevice;
-
 	bool m_vsync = false;
 	bool m_fullscreen = false;
-
-	VkClearColorValue defaultClearColor = { { 0.025f, 0.025f, 0.025f, 1.0f } };
 
 	// Defines a frame rate independent timer value clamped from -1.0...1.0
 	// For use in animations, rotations, etc.
