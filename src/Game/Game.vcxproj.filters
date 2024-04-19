@@ -15,6 +15,15 @@
     <ClCompile Include="03_DescriptorSets.cpp">
       <Filter>App\Examples</Filter>
     </ClCompile>
+    <ClCompile Include="04_DynamicUniformBuffer.cpp">
+      <Filter>App\Examples</Filter>
+    </ClCompile>
+    <ClCompile Include="05_PushConstants.cpp">
+      <Filter>App\Examples</Filter>
+    </ClCompile>
+    <ClCompile Include="06_SpecializationConstants.cpp">
+      <Filter>App\Examples</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -28,6 +37,15 @@
       <Filter>App\Examples</Filter>
     </ClInclude>
     <ClInclude Include="03_DescriptorSets.h">
+      <Filter>App\Examples</Filter>
+    </ClInclude>
+    <ClInclude Include="04_DynamicUniformBuffer.h">
+      <Filter>App\Examples</Filter>
+    </ClInclude>
+    <ClInclude Include="05_PushConstants.h">
+      <Filter>App\Examples</Filter>
+    </ClInclude>
+    <ClInclude Include="06_SpecializationConstants.h">
       <Filter>App\Examples</Filter>
     </ClInclude>
   </ItemGroup>

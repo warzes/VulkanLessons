@@ -3,6 +3,9 @@
 #include "01_TriangleApp.h"
 #include "02_PipelinesApp.h"
 #include "03_DescriptorSets.h"
+#include "04_DynamicUniformBuffer.h"
+#include "05_PushConstants.h"
+#include "06_SpecializationConstants.h"
 //-----------------------------------------------------------------------------
 #if defined(_MSC_VER)
 #	pragma comment( lib, "3rdparty.lib" )
@@ -16,7 +19,10 @@ int main(
 {
 	//TriangleApp app;
 	//PipelinesApp app;
-	DescriptorSets app;
+	//DescriptorSets app;
+	//DynamicUniformBuffer app;
+	//PushConstants app;
+	SpecializationConstants app;
 
 	app.Run();
 

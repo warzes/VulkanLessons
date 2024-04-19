@@ -1,0 +1,57 @@
+#pragma once
+
+// Push constants example (small shader block accessed outside of uniforms for fast updates)
+/*
+* Summary:
+* Using push constants it's possible to pass a small bit of static data to a shader, which is stored in the command buffer stat
+* This is perfect for passing e.g. static per-object data or parameters without the need for descriptor sets
+* The sample uses these to push different static parameters for rendering multiple objects
+*/
+
+class PushConstants final : public EngineApp
+{
+public:
+	EngineCreateInfo GetCreateInfo() const final { return {}; }
+	bool OnCreate() final;
+	void OnDestroy() final;
+	void OnUpdate(float deltaTime) final;
+	void OnFrame() final;
+
+	void OnWindowResize(uint32_t destWidth, uint32_t destHeight) final;
+	void OnKeyPressed(uint32_t key) final;
+	void OnKeyUp(uint32_t key) final;
+	void OnMouseMoved(int32_t x, int32_t y, int32_t dx, int32_t dy) final;
+
+private:
+	void setupSpheres();
+	void buildCommandBuffers() final;
+	void loadAssets();
+	void setupDescriptors();
+	void preparePipelines();
+	void prepareUniformBuffers();
+	void updateUniformBuffers();
+	void draw();
+
+	Camera camera;
+
+	vkglTF::Model model;
+
+	// Color and position data for each sphere is uploaded using push constants
+	struct SpherePushConstantData {
+		glm::vec4 color;
+		glm::vec4 position;
+	};
+	std::array<SpherePushConstantData, 16> spheres;
+
+	struct UniformData {
+		glm::mat4 projection;
+		glm::mat4 model;
+		glm::mat4 view;
+	} uniformData;
+	vks::Buffer uniformBuffer;
+
+	VkPipeline pipeline{ VK_NULL_HANDLE };
+	VkPipelineLayout pipelineLayout{ VK_NULL_HANDLE };
+	VkDescriptorSet descriptorSet{ VK_NULL_HANDLE };
+	VkDescriptorSetLayout descriptorSetLayout{ VK_NULL_HANDLE };
+};

@@ -97,6 +97,9 @@
   <ItemGroup>
     <ClCompile Include="02_PipelinesApp.cpp" />
     <ClCompile Include="03_DescriptorSets.cpp" />
+    <ClCompile Include="04_DynamicUniformBuffer.cpp" />
+    <ClCompile Include="05_PushConstants.cpp" />
+    <ClCompile Include="06_SpecializationConstants.cpp" />
     <ClCompile Include="GameApp.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="stdafx.cpp">
@@ -108,6 +111,9 @@
   <ItemGroup>
     <ClInclude Include="02_PipelinesApp.h" />
     <ClInclude Include="03_DescriptorSets.h" />
+    <ClInclude Include="04_DynamicUniformBuffer.h" />
+    <ClInclude Include="05_PushConstants.h" />
+    <ClInclude Include="06_SpecializationConstants.h" />
     <ClInclude Include="GameApp.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="01_TriangleApp.h" />

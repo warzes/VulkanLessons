@@ -174,6 +174,8 @@ protected:
 	/** @brief Last frame time measured using a high performance timer (if available) */
 	float frameTimer = 1.0f;
 
+	vks::Benchmark benchmark;
+
 private:
 	bool create();
 	void setupDPIAwareness();
@@ -223,10 +225,6 @@ private:
 	bool overlay = true;
 
 	vks::UIOverlay UIOverlay;
-
-
-
-	vks::Benchmark benchmark;
 
 	bool m_vsync = false;
 	bool m_fullscreen = false;
