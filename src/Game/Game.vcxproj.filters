@@ -12,6 +12,9 @@
     <ClCompile Include="02_PipelinesApp.cpp">
       <Filter>App\Examples</Filter>
     </ClCompile>
+    <ClCompile Include="03_DescriptorSets.cpp">
+      <Filter>App\Examples</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -22,6 +25,9 @@
       <Filter>App\Examples</Filter>
     </ClInclude>
     <ClInclude Include="02_PipelinesApp.h">
+      <Filter>App\Examples</Filter>
+    </ClInclude>
+    <ClInclude Include="03_DescriptorSets.h">
       <Filter>App\Examples</Filter>
     </ClInclude>
   </ItemGroup>

@@ -96,6 +96,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="02_PipelinesApp.cpp" />
+    <ClCompile Include="03_DescriptorSets.cpp" />
     <ClCompile Include="GameApp.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="stdafx.cpp">
@@ -106,6 +107,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="02_PipelinesApp.h" />
+    <ClInclude Include="03_DescriptorSets.h" />
     <ClInclude Include="GameApp.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="01_TriangleApp.h" />

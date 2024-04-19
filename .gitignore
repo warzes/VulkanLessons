@@ -12,3 +12,4 @@ Thumbs.db
 
 /bin/Game_Debug.*
 /bin/Game_Release.*
+/bin/imgui.ini

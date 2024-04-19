@@ -6,13 +6,7 @@
 // iOS & macOS: VulkanExampleBase::getAssetPath() implemented externally to allow access to Objective-C components
 const std::string getAssetPath()
 {
-#if defined(VK_USE_PLATFORM_ANDROID_KHR)
-	return "";
-#elif defined(VK_EXAMPLE_ASSETS_DIR)
-	return VK_EXAMPLE_ASSETS_DIR;
-#else
-	return "./../assets/";
-#endif
+	return "data/assets/";
 }
 #endif
 
@@ -20,13 +14,7 @@ const std::string getAssetPath()
 // iOS & macOS: VulkanExampleBase::getAssetPath() implemented externally to allow access to Objective-C components
 const std::string getShaderBasePath()
 {
-#if defined(VK_USE_PLATFORM_ANDROID_KHR)
-	return "shaders/";
-#elif defined(VK_EXAMPLE_SHADERS_DIR)
-	return VK_EXAMPLE_SHADERS_DIR;
-#else
-	return "./../shaders/";
-#endif
+	return "data/shaders/";
 }
 #endif
 

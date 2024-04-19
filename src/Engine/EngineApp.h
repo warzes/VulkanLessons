@@ -4,6 +4,7 @@
 #include "VulkanDevice.h"
 #include "VulkanUIOverlay.h"
 #include "VulkanglTFModel.h"
+#include "VulkanTexture.h"
 #include "Benchmark.h"
 
 struct RenderSystemCreateInfo final
@@ -168,6 +169,11 @@ protected:
 	/** @brief Encapsulated physical and logical vulkan device */
 	vks::VulkanDevice* vulkanDevice;
 
+	bool paused = false;
+
+	/** @brief Last frame time measured using a high performance timer (if available) */
+	float frameTimer = 1.0f;
+
 private:
 	bool create();
 	void setupDPIAwareness();
@@ -214,12 +220,11 @@ private:
 	bool prepared = false;
 	bool resized = false;
 	bool validation = false;
-	bool overlay = false;
+	bool overlay = true;
 
 	vks::UIOverlay UIOverlay;
 
-	/** @brief Last frame time measured using a high performance timer (if available) */
-	float frameTimer = 1.0f;
+
 
 	vks::Benchmark benchmark;
 
@@ -231,7 +236,7 @@ private:
 	float timer = 0.0f;
 	// Multiplier for speeding up (or slowing down) the global timer
 	float timerSpeed = 0.25f;
-	bool paused = false;
+
 
 	/** @brief Default depth stencil attachment used by the default render pass */
 	struct {

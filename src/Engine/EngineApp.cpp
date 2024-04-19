@@ -550,8 +550,8 @@ bool EngineApp::prepareRender(const RenderSystemCreateInfo& createInfo, bool ful
 		UIOverlay.device = vulkanDevice;
 		UIOverlay.queue = queue;
 		UIOverlay.shaders = {
-			loadShader("base/uioverlay.vert.spv", VK_SHADER_STAGE_VERTEX_BIT),
-			loadShader("base/uioverlay.frag.spv", VK_SHADER_STAGE_FRAGMENT_BIT),
+			loadShader(getShaderBasePath() + "base/uioverlay.vert.spv", VK_SHADER_STAGE_VERTEX_BIT),
+			loadShader(getShaderBasePath() + "base/uioverlay.frag.spv", VK_SHADER_STAGE_FRAGMENT_BIT),
 		};
 		UIOverlay.prepareResources();
 		UIOverlay.preparePipeline(pipelineCache, renderPass, swapChain.colorFormat, depthFormat);

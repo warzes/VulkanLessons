@@ -23,6 +23,9 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/quaternion.hpp>
 
+#include <ktx/ktx.h>
+#include <ktx/ktxvulkan.h>
+
 #define TINYGLTF_NO_STB_IMAGE_WRITE
 #ifdef VK_USE_PLATFORM_ANDROID_KHR
 #define TINYGLTF_ANDROID_LOAD_FROM_ASSETS
