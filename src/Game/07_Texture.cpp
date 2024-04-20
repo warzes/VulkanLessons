@@ -186,7 +186,7 @@ void TextureApp::loadTexture()
 		// Don't use linear if format is not supported for (linear) shader sampling
 		// Get device properties for the requested texture format
 		VkFormatProperties formatProperties;
-		vkGetPhysicalDeviceFormatProperties(physicalDevice, format, &formatProperties);
+		vkGetPhysicalDeviceFormatProperties(m_physicalDevice, format, &formatProperties);
 		useStaging = !(formatProperties.linearTilingFeatures & VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT);
 	}
 

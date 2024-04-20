@@ -84,9 +84,7 @@ namespace vks
 		void freeDebugCallback(VkInstance instance)
 		{
 			if (debugUtilsMessenger != VK_NULL_HANDLE)
-			{
 				vkDestroyDebugUtilsMessengerEXT(instance, debugUtilsMessenger, nullptr);
-			}
 		}
 	}
 

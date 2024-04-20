@@ -114,10 +114,10 @@ protected:
 	std::chrono::time_point<std::chrono::high_resolution_clock> lastTimestamp, tPrevEnd;
 
 	// Vulkan instance, stores all per-application states
-	VkInstance instance{ VK_NULL_HANDLE };
-	std::vector<std::string> supportedInstanceExtensions;
+	VkInstance m_instance{ VK_NULL_HANDLE };
+	std::vector<std::string> m_supportedInstanceExtensions;
 	// Physical device (GPU) that Vulkan will use
-	VkPhysicalDevice physicalDevice{ VK_NULL_HANDLE };
+	VkPhysicalDevice m_physicalDevice{ VK_NULL_HANDLE };
 
 	// Stores physical device properties (for e.g. checking device limits)
 	VkPhysicalDeviceProperties deviceProperties{};
@@ -202,6 +202,7 @@ private:
 	bool initWindow(const WindowSystemCreateInfo& createInfo);
 	bool initVulkan(const RenderSystemCreateInfo& createInfo);
 	VkResult createInstance(bool enableValidation);
+	bool selectPhysicalDevice();
 	/** @brief (Virtual) Called after the physical device features have been read, can be used to set features to enable on the device */
 	virtual void getEnabledFeatures() {} // TODO: если нужно
 	/** @brief (Virtual) Called after the physical device extensions have been read, can be used to enable extensions based on the supported extension listing*/

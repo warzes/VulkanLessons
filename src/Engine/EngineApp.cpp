@@ -334,59 +334,34 @@ bool EngineApp::initVulkan(const RenderSystemCreateInfo& createInfo)
 #endif
 	requiresStencil = createInfo.requiresStencil;
 
-	VkResult result;
-
 	// Vulkan instance
-	result = createInstance(validation);
+	 VkResult result = createInstance(validation);
 	if (result)
 	{
-		vks::tools::exitFatal("Could not create Vulkan instance : \n" + std::string(string_VkResult(result)), result);
+		Fatal("Could not create Vulkan instance : \n" + std::string(string_VkResult(result)));
 		return false;
 	}
 
 	// If requested, we enable the default validation layers for debugging
 	if (validation)
-		vks::debug::setupDebugging(instance);
+		vks::debug::setupDebugging(m_instance);
 
-	// Physical device
-	uint32_t gpuCount = 0;
-	// Get number of available physical devices
-	VK_CHECK_RESULT(vkEnumeratePhysicalDevices(instance, &gpuCount, nullptr));
-	if (gpuCount == 0)
+	if (!selectPhysicalDevice())
 	{
-		vks::tools::exitFatal("No device with Vulkan support found", -1);
 		return false;
 	}
-	// Enumerate devices
-	std::vector<VkPhysicalDevice> physicalDevices(gpuCount);
-	result = vkEnumeratePhysicalDevices(instance, &gpuCount, physicalDevices.data());
-	if (result)
-	{
-		vks::tools::exitFatal("Could not enumerate physical devices : \n" + std::string(string_VkResult(result)), result);
-		return false;
-	}
-
-	// GPU selection
-
-	// Select physical device to be used for the Vulkan example
-	// Defaults to the first device unless specified by command line
-	uint32_t selectedDevice = 0;
-
-	// TODO: доделать выбор GPU
-
-	physicalDevice = physicalDevices[selectedDevice];
 
 	// Store properties (including limits), features and memory properties of the physical device (so that examples can check against them)
-	vkGetPhysicalDeviceProperties(physicalDevice, &deviceProperties);
-	vkGetPhysicalDeviceFeatures(physicalDevice, &deviceFeatures);
-	vkGetPhysicalDeviceMemoryProperties(physicalDevice, &deviceMemoryProperties);
+	vkGetPhysicalDeviceProperties(m_physicalDevice, &deviceProperties);
+	vkGetPhysicalDeviceFeatures(m_physicalDevice, &deviceFeatures);
+	vkGetPhysicalDeviceMemoryProperties(m_physicalDevice, &deviceMemoryProperties);
 
 	// Derived examples can override this to set actual features (based on above readings) to enable for logical device creation
 	getEnabledFeatures();
 
 	// Vulkan device creation
 	// This is handled by a separate class that gets a logical device representation and encapsulates functions related to a device
-	vulkanDevice = new vks::VulkanDevice(physicalDevice);
+	vulkanDevice = new vks::VulkanDevice(m_physicalDevice);
 
 	// Derived examples can enable extensions based on the list of supported extensions read from the physical device
 	getEnabledExtensions();
@@ -407,15 +382,15 @@ bool EngineApp::initVulkan(const RenderSystemCreateInfo& createInfo)
 	// Samples that make use of stencil will require a depth + stencil format, so we select from a different list
 	if (requiresStencil)
 	{
-		validFormat = vks::tools::getSupportedDepthStencilFormat(physicalDevice, &depthFormat);
+		validFormat = vks::tools::getSupportedDepthStencilFormat(m_physicalDevice, &depthFormat);
 	}
 	else
 	{
-		validFormat = vks::tools::getSupportedDepthFormat(physicalDevice, &depthFormat);
+		validFormat = vks::tools::getSupportedDepthFormat(m_physicalDevice, &depthFormat);
 	}
 	assert(validFormat);
 
-	swapChain.Connect(instance, physicalDevice, device);
+	swapChain.Connect(m_instance, m_physicalDevice, device);
 
 	// Create synchronization objects
 	VkSemaphoreCreateInfo semaphoreCreateInfo = vks::initializers::semaphoreCreateInfo();
@@ -443,8 +418,8 @@ VkResult EngineApp::createInstance(bool enableValidation)
 {
 	VkApplicationInfo appInfo = {};
 	appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-	appInfo.pApplicationName = "GameApp";
-	appInfo.pEngineName = "VulkanEngine";
+	appInfo.pApplicationName = "GameApp"; // TODO:
+	appInfo.pEngineName = "VulkanEngine"; // TODO:
 	appInfo.apiVersion = VK_API_VERSION_1_3;
 
 	std::vector<const char*> instanceExtensions = { VK_KHR_SURFACE_EXTENSION_NAME };
@@ -463,7 +438,7 @@ VkResult EngineApp::createInstance(bool enableValidation)
 		{
 			for (VkExtensionProperties& extension : extensions)
 			{
-				supportedInstanceExtensions.push_back(extension.extensionName);
+				m_supportedInstanceExtensions.push_back(extension.extensionName);
 			}
 		}
 	}
@@ -474,7 +449,7 @@ VkResult EngineApp::createInstance(bool enableValidation)
 		for (const char* enabledExtension : enabledInstanceExtensions)
 		{
 			// Output message if requested extension is not available
-			if (std::find(supportedInstanceExtensions.begin(), supportedInstanceExtensions.end(), enabledExtension) == supportedInstanceExtensions.end())
+			if (std::find(m_supportedInstanceExtensions.begin(), m_supportedInstanceExtensions.end(), enabledExtension) == m_supportedInstanceExtensions.end())
 			{
 				Fatal("Enabled instance extension '" + std::string(enabledExtension) + "' is not present at instance level");
 			}
@@ -484,19 +459,19 @@ VkResult EngineApp::createInstance(bool enableValidation)
 
 	VkInstanceCreateInfo instanceCreateInfo = {};
 	instanceCreateInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-	instanceCreateInfo.pNext = NULL;
+	instanceCreateInfo.pNext = nullptr;
 	instanceCreateInfo.pApplicationInfo = &appInfo;
 
-	VkDebugUtilsMessengerCreateInfoEXT debugUtilsMessengerCI{};
 	if (enableValidation)
 	{
+		VkDebugUtilsMessengerCreateInfoEXT debugUtilsMessengerCI{};
 		vks::debug::setupDebugingMessengerCreateInfo(debugUtilsMessengerCI);
 		debugUtilsMessengerCI.pNext = instanceCreateInfo.pNext;
 		instanceCreateInfo.pNext = &debugUtilsMessengerCI;
 	}
 
 	// Enable the debug utils extension if available (e.g. when debugging tools are present)
-	if (enableValidation || std::find(supportedInstanceExtensions.begin(), supportedInstanceExtensions.end(), VK_EXT_DEBUG_UTILS_EXTENSION_NAME) != supportedInstanceExtensions.end())
+	if (enableValidation || std::find(m_supportedInstanceExtensions.begin(), m_supportedInstanceExtensions.end(), VK_EXT_DEBUG_UTILS_EXTENSION_NAME) != m_supportedInstanceExtensions.end())
 	{
 		instanceExtensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
 	}
@@ -507,11 +482,10 @@ VkResult EngineApp::createInstance(bool enableValidation)
 		instanceCreateInfo.ppEnabledExtensionNames = instanceExtensions.data();
 	}
 
-	// The VK_LAYER_KHRONOS_validation contains all current validation functionality.
-	// Note that on Android this layer requires at least NDK r20
-	const char* validationLayerName = "VK_LAYER_KHRONOS_validation";
 	if (enableValidation)
 	{
+		// The VK_LAYER_KHRONOS_validation contains all current validation functionality.
+		const char* validationLayerName = "VK_LAYER_KHRONOS_validation";
 		// Check if this layer is available at instance level
 		uint32_t instanceLayerCount;
 		vkEnumerateInstanceLayerProperties(&instanceLayerCount, nullptr);
@@ -524,7 +498,8 @@ VkResult EngineApp::createInstance(bool enableValidation)
 				break;
 			}
 		}
-		if (validationLayerPresent) {
+		if (validationLayerPresent)
+		{
 			instanceCreateInfo.ppEnabledLayerNames = &validationLayerName;
 			instanceCreateInfo.enabledLayerCount = 1;
 		}
@@ -533,15 +508,81 @@ VkResult EngineApp::createInstance(bool enableValidation)
 			Fatal("Validation layer VK_LAYER_KHRONOS_validation not present, validation is disabled");
 		}
 	}
-	VkResult result = vkCreateInstance(&instanceCreateInfo, nullptr, &instance);
+	VkResult result = vkCreateInstance(&instanceCreateInfo, nullptr, &m_instance);
 
 	// If the debug utils extension is present we set up debug functions, so samples can label objects for debugging
-	if (std::find(supportedInstanceExtensions.begin(), supportedInstanceExtensions.end(), VK_EXT_DEBUG_UTILS_EXTENSION_NAME) != supportedInstanceExtensions.end())
+	if (std::find(m_supportedInstanceExtensions.begin(), m_supportedInstanceExtensions.end(), VK_EXT_DEBUG_UTILS_EXTENSION_NAME) != m_supportedInstanceExtensions.end())
 	{
-		vks::debugutils::setup(instance);
+		vks::debugutils::setup(m_instance);
 	}
 
 	return result;
+}
+//-----------------------------------------------------------------------------
+bool EngineApp::selectPhysicalDevice()
+{
+	uint32_t gpuDeviceCount = 0;
+	// Get number of available physical devices
+	VK_CHECK_RESULT(vkEnumeratePhysicalDevices(m_instance, &gpuDeviceCount, nullptr));
+	if (gpuDeviceCount == 0)
+	{
+		Fatal("No device with Vulkan support found");
+		return false;
+	}
+	// Enumerate devices
+	std::vector<VkPhysicalDevice> physicalDevices(gpuDeviceCount);
+	VkResult result = vkEnumeratePhysicalDevices(m_instance, &gpuDeviceCount, physicalDevices.data());
+	if (result)
+	{
+		Fatal("Could not enumerate physical devices : \n" + std::string(string_VkResult(result)));
+		return false;
+	}
+
+	// GPU selection
+
+	VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
+
+	constexpr auto isDeviceSuitable = [](const VkPhysicalDevice device) -> bool {
+		// look for all the features we want
+		VkPhysicalDevicePushDescriptorPropertiesKHR devicePushDescriptors{
+			.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PUSH_DESCRIPTOR_PROPERTIES_KHR,
+			.pNext = nullptr
+		};
+
+		VkPhysicalDeviceProperties2 deviceProperties{
+			.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2,
+			.pNext = &devicePushDescriptors,
+		};
+		vkGetPhysicalDeviceProperties2(device, &deviceProperties);
+
+		VkPhysicalDeviceFeatures deviceFeatures;
+		vkGetPhysicalDeviceFeatures(device, &deviceFeatures);
+
+		auto queueFamilyData = vks::findQueueFamilies(device);
+
+		// right now we don't care so pick any gpu in the future implement a scoring system to pick the best device
+		return deviceProperties.properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU && queueFamilyData.isComplete();
+		};
+
+	for (const auto& device : physicalDevices) 
+	{
+		if (isDeviceSuitable(device)) 
+		{
+			physicalDevice = device;
+			break;
+		}
+	}
+	if (physicalDevice != VK_NULL_HANDLE)
+	{
+		m_physicalDevice = physicalDevice;
+	}
+	else
+	{
+		LogWarning("failed to find a discrete GPU!");
+		m_physicalDevice = physicalDevices[0];
+	}	
+
+	return true;
 }
 //-----------------------------------------------------------------------------
 bool EngineApp::prepareRender(const RenderSystemCreateInfo& createInfo, bool fullscreen)
@@ -1016,9 +1057,9 @@ void EngineApp::renderDestroy()
 	delete vulkanDevice;
 
 	if (validation)
-		vks::debug::freeDebugCallback(instance);
+		vks::debug::freeDebugCallback(m_instance);
 
-	vkDestroyInstance(instance, nullptr);
+	vkDestroyInstance(m_instance, nullptr);
 }
 //-----------------------------------------------------------------------------
 void EngineApp::destroyCommandBuffers()

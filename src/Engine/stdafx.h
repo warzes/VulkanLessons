@@ -33,6 +33,7 @@
 #include <cassert>
 #include <string>
 #include <vector>
+#include <set>
 #include <chrono>
 #include <iostream>
 #include <sstream>
