@@ -1,20 +1,56 @@
 #include "stdafx.h"
 #include "13_Subpasses.h"
 //-----------------------------------------------------------------------------
+EngineCreateInfo SubpassesApp::GetCreateInfo() const
+{
+	EngineCreateInfo ci{};
+	ci.render.overlay.subpass = 2;
+	return ci;
+}
+//-----------------------------------------------------------------------------
 bool SubpassesApp::OnCreate()
 {
-	camera.type = Camera::CameraType::lookat;
-	camera.setPosition(glm::vec3(0.0f, 0.0f, -4.0f));
-	camera.setRotation(glm::vec3(0.0f));
-	camera.setRotationSpeed(0.25f);
+	camera.type = Camera::CameraType::firstperson;
+	camera.movementSpeed = 5.0f;
+	camera.rotationSpeed = 0.25f;
+	camera.setPosition(glm::vec3(-3.2f, 1.0f, 5.9f));
+	camera.setRotation(glm::vec3(0.5f, 210.05f, 0.0f));
 	camera.setPerspective(60.0f, (float)destWidth / (float)destHeight, 0.1f, 256.0f);
+
+	loadAssets();
+	prepareUniformBuffers();
+	initLights();
+	setupDescriptors();
+	preparePipelines();
+	prepareCompositionPass();
+	buildCommandBuffers();
 
 	return true;
 }
 //-----------------------------------------------------------------------------
 void SubpassesApp::OnDestroy()
 {
+	// Clean up used Vulkan resources
+		// Note : Inherited destructor cleans up resources stored in base class
+	vkDestroyPipeline(device, pipelines.offscreen, nullptr);
+	vkDestroyPipeline(device, pipelines.composition, nullptr);
+	vkDestroyPipeline(device, pipelines.transparent, nullptr);
 
+	vkDestroyPipelineLayout(device, pipelineLayouts.offscreen, nullptr);
+	vkDestroyPipelineLayout(device, pipelineLayouts.composition, nullptr);
+	vkDestroyPipelineLayout(device, pipelineLayouts.transparent, nullptr);
+
+	vkDestroyDescriptorSetLayout(device, descriptorSetLayouts.scene, nullptr);
+	vkDestroyDescriptorSetLayout(device, descriptorSetLayouts.composition, nullptr);
+	vkDestroyDescriptorSetLayout(device, descriptorSetLayouts.transparent, nullptr);
+
+	clearAttachment(&attachments.position);
+	clearAttachment(&attachments.normal);
+	clearAttachment(&attachments.albedo);
+
+	textures.glass.destroy();
+	buffers.GBuffer.destroy();
+	buffers.lights.destroy();
 }
 //-----------------------------------------------------------------------------
 void SubpassesApp::OnUpdate(float deltaTime)
@@ -24,12 +60,24 @@ void SubpassesApp::OnUpdate(float deltaTime)
 //-----------------------------------------------------------------------------
 void SubpassesApp::OnFrame()
 {
-
+	if (camera.updated) {
+		updateUniformBufferDeferredMatrices();
+	}
+	draw();
 }
 //-----------------------------------------------------------------------------
 void SubpassesApp::OnUpdateUIOverlay(vks::UIOverlay* overlay)
 {
-
+	if (overlay->header("Subpasses")) {
+		overlay->text("0: Deferred G-Buffer creation");
+		overlay->text("1: Deferred composition");
+		overlay->text("2: Forward transparency");
+	}
+	if (overlay->header("Settings")) {
+		if (overlay->button("Randomize lights")) {
+			initLights();
+		}
+	}
 }
 //-----------------------------------------------------------------------------
 void SubpassesApp::OnWindowResize(uint32_t destWidth, uint32_t destHeight)

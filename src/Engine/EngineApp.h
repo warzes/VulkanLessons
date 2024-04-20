@@ -182,6 +182,19 @@ protected:
 
 	vks::Benchmark benchmark;
 
+	/** @brief Default depth stencil attachment used by the default render pass */
+	struct {
+		VkImage image;
+		VkDeviceMemory memory;
+		VkImageView view;
+	} depthStencil{};
+
+	// Defines a frame rate independent timer value clamped from -1.0...1.0
+	// For use in animations, rotations, etc.
+	float timer = 0.0f;
+	// Multiplier for speeding up (or slowing down) the global timer
+	float timerSpeed = 0.25f;
+
 private:
 	bool create();
 	void setupDPIAwareness();
@@ -235,18 +248,4 @@ private:
 
 	bool m_vsync = false;
 	bool m_fullscreen = false;
-
-	// Defines a frame rate independent timer value clamped from -1.0...1.0
-	// For use in animations, rotations, etc.
-	float timer = 0.0f;
-	// Multiplier for speeding up (or slowing down) the global timer
-	float timerSpeed = 0.25f;
-
-
-	/** @brief Default depth stencil attachment used by the default render pass */
-	struct {
-		VkImage image;
-		VkDeviceMemory memory;
-		VkImageView view;
-	} depthStencil{};
 };

@@ -81,10 +81,10 @@ int main(
 	//TextureCubeMapApp app;
 	//TextureCubemapArrayApp app;
 	//Texture3DApp app;
-	InputAttachmentsApp app;
+	//InputAttachmentsApp app;
 	//SubpassesApp app;
 	//OffscreenApp app;
-	//ParticleSystemApp app;
+	ParticleSystemApp app;
 	//StencilbufferApp app;
 	//VertexAttributesApp app;
 	//GLTFLoadingApp app;

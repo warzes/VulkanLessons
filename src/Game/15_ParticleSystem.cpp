@@ -4,17 +4,46 @@
 bool ParticleSystemApp::OnCreate()
 {
 	camera.type = Camera::CameraType::lookat;
-	camera.setPosition(glm::vec3(0.0f, 0.0f, -4.0f));
-	camera.setRotation(glm::vec3(0.0f));
-	camera.setRotationSpeed(0.25f);
-	camera.setPerspective(60.0f, (float)destWidth / (float)destHeight, 0.1f, 256.0f);
+	camera.setPosition(glm::vec3(0.0f, 0.0f, -75.0f));
+	camera.setRotation(glm::vec3(-15.0f, 45.0f, 0.0f));
+	camera.setPerspective(60.0f, (float)destWidth / (float)destHeight, 1.0f, 256.0f);
+
+	timerSpeed *= 8.0f;
+	rndEngine.seed(benchmark.active ? 0 : (unsigned)time(nullptr));
+
+	loadAssets();
+	prepareParticles();
+	prepareUniformBuffers();
+	setupDescriptors();
+	preparePipelines();
+	buildCommandBuffers();
 
 	return true;
 }
 //-----------------------------------------------------------------------------
 void ParticleSystemApp::OnDestroy()
 {
+	if (device) {
+		textures.particles.smoke.destroy();
+		textures.particles.fire.destroy();
+		textures.floor.colorMap.destroy();
+		textures.floor.normalMap.destroy();
 
+		vkDestroyPipeline(device, pipelines.particles, nullptr);
+		vkDestroyPipeline(device, pipelines.environment, nullptr);
+
+		vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
+		vkDestroyDescriptorSetLayout(device, descriptorSetLayout, nullptr);
+
+		vkUnmapMemory(device, particles.memory);
+		vkDestroyBuffer(device, particles.buffer, nullptr);
+		vkFreeMemory(device, particles.memory, nullptr);
+
+		uniformBuffers.environment.destroy();
+		uniformBuffers.particles.destroy();
+
+		vkDestroySampler(device, textures.particles.sampler, nullptr);
+	}
 }
 //-----------------------------------------------------------------------------
 void ParticleSystemApp::OnUpdate(float deltaTime)
@@ -24,7 +53,11 @@ void ParticleSystemApp::OnUpdate(float deltaTime)
 //-----------------------------------------------------------------------------
 void ParticleSystemApp::OnFrame()
 {
-
+	updateUniformBuffers();
+	if (!paused) {
+		updateParticles();
+	}
+	draw();
 }
 //-----------------------------------------------------------------------------
 void ParticleSystemApp::OnUpdateUIOverlay(vks::UIOverlay* overlay)
