@@ -340,7 +340,7 @@ bool EngineApp::initVulkan(const RenderSystemCreateInfo& createInfo)
 	result = createInstance(validation);
 	if (result)
 	{
-		vks::tools::exitFatal("Could not create Vulkan instance : \n" + vks::tools::errorString(result), result);
+		vks::tools::exitFatal("Could not create Vulkan instance : \n" + std::string(string_VkResult(result)), result);
 		return false;
 	}
 
@@ -362,7 +362,7 @@ bool EngineApp::initVulkan(const RenderSystemCreateInfo& createInfo)
 	result = vkEnumeratePhysicalDevices(instance, &gpuCount, physicalDevices.data());
 	if (result)
 	{
-		vks::tools::exitFatal("Could not enumerate physical devices : \n" + vks::tools::errorString(result), result);
+		vks::tools::exitFatal("Could not enumerate physical devices : \n" + std::string(string_VkResult(result)), result);
 		return false;
 	}
 
@@ -394,7 +394,7 @@ bool EngineApp::initVulkan(const RenderSystemCreateInfo& createInfo)
 	VkResult res = vulkanDevice->createLogicalDevice(enabledFeatures, enabledDeviceExtensions, deviceCreatepNextChain);
 	if (res != VK_SUCCESS)
 	{
-		vks::tools::exitFatal("Could not create Vulkan device: \n" + vks::tools::errorString(res), res);
+		vks::tools::exitFatal("Could not create Vulkan device: \n" + std::string(string_VkResult(res)), res);
 		return false;
 	}
 	device = vulkanDevice->logicalDevice;

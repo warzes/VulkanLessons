@@ -5,11 +5,14 @@
 #	pragma warning(disable : 5039)
 #endif
 
+#define _SILENCE_CXX20_CISO646_REMOVED_WARNING
+
 #include "WindowsInclude.h"
 #include <ShellScalingAPI.h>
 
 #define VK_USE_PLATFORM_WIN32_KHR
 #include <vulkan/vulkan.h>
+#include <vulkan/vk_enum_string_helper.h> 
 
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE

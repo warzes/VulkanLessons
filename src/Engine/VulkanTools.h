@@ -7,28 +7,19 @@
 // Default fence timeout in nanoseconds
 #define DEFAULT_FENCE_TIMEOUT 100000000000
 
-// Macro to check and display Vulkan return results
-#if defined(__ANDROID__)
-#define VK_CHECK_RESULT(f)																				\
-{																										\
-	VkResult res = (f);																					\
-	if (res != VK_SUCCESS)																				\
-	{																									\
-		LOGE("Fatal : VkResult is \" %s \" in %s at line %d", vks::tools::errorString(res).c_str(), __FILE__, __LINE__); \
-		assert(res == VK_SUCCESS);																		\
-	}																									\
+#define VK_CHECK_RESULT(f)										\
+{																\
+	const VkResult res = (f);									\
+	if (res != VK_SUCCESS)										\
+	{															\
+		std::string textError = "VkResult is '";				\
+		textError += std::string(string_VkResult(res));			\
+		textError += "' in " + std::string(__FILE__);			\
+		textError += " at line " + std::to_string(__LINE__);	\
+		Fatal(textError);										\
+		assert(res == VK_SUCCESS);								\
+	}															\
 }
-#else
-#define VK_CHECK_RESULT(f)																				\
-{																										\
-	VkResult res = (f);																					\
-	if (res != VK_SUCCESS)																				\
-	{																									\
-		Fatal("VkResult is '" + vks::tools::errorString(res) + "' in " + std::string(__FILE__) + " at line " + std::to_string(__LINE__)); \
-		assert(res == VK_SUCCESS);																		\
-	}																									\
-}
-#endif
 
 const std::string getAssetPath();
 const std::string getShadersPath();
@@ -39,12 +30,6 @@ namespace vks
 	{
 		/** @brief Disable message boxes on fatal errors */
 		extern bool errorModeSilent;
-
-		/** @brief Returns an error code as a string */
-		std::string errorString(VkResult errorCode);
-
-		/** @brief Returns the device type as a string */
-		std::string physicalDeviceTypeString(VkPhysicalDeviceType type);
 
 		// Selected a suitable supported depth format starting with 32 bit down to 16 bit
 		// Returns false if none of the depth formats in the list is supported by the device
