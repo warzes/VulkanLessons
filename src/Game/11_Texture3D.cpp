@@ -150,7 +150,7 @@ void Texture3DApp::prepareNoiseTexture(uint32_t width, uint32_t height, uint32_t
 		return;
 	}
 	// Check if GPU supports requested 3D texture dimensions
-	uint32_t maxImageDimension3D(vulkanDevice->properties.limits.maxImageDimension3D);
+	uint32_t maxImageDimension3D(m_vulkanDevice->properties.limits.maxImageDimension3D);
 	if (width > maxImageDimension3D || height > maxImageDimension3D || depth > maxImageDimension3D)
 	{
 		std::cout << "Error: Requested texture dimensions is greater than supported 3D texture dimension!" << std::endl;
@@ -179,7 +179,7 @@ void Texture3DApp::prepareNoiseTexture(uint32_t width, uint32_t height, uint32_t
 	VkMemoryRequirements memReqs = {};
 	vkGetImageMemoryRequirements(device, texture.image, &memReqs);
 	memAllocInfo.allocationSize = memReqs.size;
-	memAllocInfo.memoryTypeIndex = vulkanDevice->getMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+	memAllocInfo.memoryTypeIndex = m_vulkanDevice->getMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 	VK_CHECK_RESULT(vkAllocateMemory(device, &memAllocInfo, nullptr, &texture.deviceMemory));
 	VK_CHECK_RESULT(vkBindImageMemory(device, texture.image, texture.deviceMemory, 0));
 
@@ -275,7 +275,7 @@ void Texture3DApp::updateNoiseTexture()
 	VkMemoryRequirements memReqs = {};
 	vkGetBufferMemoryRequirements(device, stagingBuffer, &memReqs);
 	memAllocInfo.allocationSize = memReqs.size;
-	memAllocInfo.memoryTypeIndex = vulkanDevice->getMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+	memAllocInfo.memoryTypeIndex = m_vulkanDevice->getMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 	VK_CHECK_RESULT(vkAllocateMemory(device, &memAllocInfo, nullptr, &stagingMemory));
 	VK_CHECK_RESULT(vkBindBufferMemory(device, stagingBuffer, stagingMemory, 0));
 
@@ -285,7 +285,7 @@ void Texture3DApp::updateNoiseTexture()
 	memcpy(mapped, data, texMemSize);
 	vkUnmapMemory(device, stagingMemory);
 
-	VkCommandBuffer copyCmd = vulkanDevice->createCommandBuffer(VK_COMMAND_BUFFER_LEVEL_PRIMARY, true);
+	VkCommandBuffer copyCmd = m_vulkanDevice->createCommandBuffer(VK_COMMAND_BUFFER_LEVEL_PRIMARY, true);
 
 	// The sub resource range describes the regions of the image we will be transitioned
 	VkImageSubresourceRange subresourceRange = {};
@@ -332,7 +332,7 @@ void Texture3DApp::updateNoiseTexture()
 		texture.imageLayout,
 		subresourceRange);
 
-	vulkanDevice->flushCommandBuffer(copyCmd, queue, true);
+	m_vulkanDevice->flushCommandBuffer(copyCmd, queue, true);
 
 	// Clean up staging resources
 	delete[] data;
@@ -422,16 +422,16 @@ void Texture3DApp::generateQuad()
 	} stagingBuffers;
 
 	// Host visible source buffers (staging)
-	VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &stagingBuffers.vertices, vertices.size() * sizeof(Vertex), vertices.data()));
-	VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &stagingBuffers.indices, indices.size() * sizeof(uint32_t), indices.data()));
+	VK_CHECK_RESULT(m_vulkanDevice->createBuffer(VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &stagingBuffers.vertices, vertices.size() * sizeof(Vertex), vertices.data()));
+	VK_CHECK_RESULT(m_vulkanDevice->createBuffer(VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &stagingBuffers.indices, indices.size() * sizeof(uint32_t), indices.data()));
 
 	// Device local destination buffers
-	VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, &vertexBuffer, vertices.size() * sizeof(Vertex)));
-	VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, &indexBuffer, indices.size() * sizeof(uint32_t)));
+	VK_CHECK_RESULT(m_vulkanDevice->createBuffer(VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, &vertexBuffer, vertices.size() * sizeof(Vertex)));
+	VK_CHECK_RESULT(m_vulkanDevice->createBuffer(VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, &indexBuffer, indices.size() * sizeof(uint32_t)));
 
 	// Copy from host do device
-	vulkanDevice->copyBuffer(&stagingBuffers.vertices, &vertexBuffer, queue);
-	vulkanDevice->copyBuffer(&stagingBuffers.indices, &indexBuffer, queue);
+	m_vulkanDevice->copyBuffer(&stagingBuffers.vertices, &vertexBuffer, queue);
+	m_vulkanDevice->copyBuffer(&stagingBuffers.indices, &indexBuffer, queue);
 
 	// Clean up
 	stagingBuffers.vertices.destroy();
@@ -532,7 +532,7 @@ void Texture3DApp::preparePipelines()
 void Texture3DApp::prepareUniformBuffers()
 {
 	// Vertex shader uniform buffer block
-	VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformBuffer, sizeof(UniformData), &uniformData));
+	VK_CHECK_RESULT(m_vulkanDevice->createBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformBuffer, sizeof(UniformData), &uniformData));
 	VK_CHECK_RESULT(uniformBuffer.map());
 }
 //-----------------------------------------------------------------------------

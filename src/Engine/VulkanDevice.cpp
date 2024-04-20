@@ -43,6 +43,7 @@ namespace vks
 		assert(physicalDevice);
 		this->physicalDevice = physicalDevice;
 
+		// TODO: зачем дублируется?
 		// Store Properties features, limits and properties of the physical device for later use
 		// Device properties also contain limits and sparse properties
 		vkGetPhysicalDeviceProperties(physicalDevice, &properties);
@@ -284,14 +285,6 @@ namespace vks
 			deviceCreateInfo.pEnabledFeatures = nullptr;
 			deviceCreateInfo.pNext = &physicalDeviceFeatures2;
 		}
-
-#if (defined(VK_USE_PLATFORM_IOS_MVK) || defined(VK_USE_PLATFORM_MACOS_MVK)) && defined(VK_KHR_portability_subset)
-		// SRS - When running on iOS/macOS with MoltenVK and VK_KHR_portability_subset is defined and supported by the device, enable the extension
-		if (extensionSupported(VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME))
-		{
-			deviceExtensions.push_back(VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME);
-		}
-#endif
 
 		if (deviceExtensions.size() > 0)
 		{

@@ -51,7 +51,7 @@ void MultisamplingApp::OnFrame()
 //-----------------------------------------------------------------------------
 void MultisamplingApp::OnUpdateUIOverlay(vks::UIOverlay* overlay)
 {
-	if (vulkanDevice->features.sampleRateShading) {
+	if (m_vulkanDevice->features.sampleRateShading) {
 		if (overlay->header("Settings")) {
 			if (overlay->checkBox("Sample rate shading", &useSampleShading)) {
 				buildCommandBuffers();

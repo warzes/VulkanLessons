@@ -131,7 +131,7 @@ void PipelinesApp::buildCommandBuffers()
 void PipelinesApp::loadAssets()
 {
 	const uint32_t glTFLoadingFlags = vkglTF::FileLoadingFlags::PreTransformVertices | vkglTF::FileLoadingFlags::PreMultiplyVertexColors | vkglTF::FileLoadingFlags::FlipY;
-	scene.loadFromFile(getAssetPath() + "models/treasure_smooth.gltf", vulkanDevice, queue, glTFLoadingFlags);
+	scene.loadFromFile(getAssetPath() + "models/treasure_smooth.gltf", m_vulkanDevice, queue, glTFLoadingFlags);
 }
 //-----------------------------------------------------------------------------
 void PipelinesApp::setupDescriptors()
@@ -234,7 +234,7 @@ void PipelinesApp::preparePipelines()
 void PipelinesApp::prepareUniformBuffers()
 {
 	// Create the vertex shader uniform buffer block
-	VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformBuffer, sizeof(UniformData)));
+	VK_CHECK_RESULT(m_vulkanDevice->createBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformBuffer, sizeof(UniformData)));
 	// Map persistent
 	VK_CHECK_RESULT(uniformBuffer.map());
 }

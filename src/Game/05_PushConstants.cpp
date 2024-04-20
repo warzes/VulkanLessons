@@ -190,7 +190,7 @@ void PushConstants::buildCommandBuffers()
 void PushConstants::loadAssets()
 {
 	const uint32_t glTFLoadingFlags = vkglTF::FileLoadingFlags::PreTransformVertices | vkglTF::FileLoadingFlags::PreMultiplyVertexColors | vkglTF::FileLoadingFlags::FlipY;
-	model.loadFromFile(getAssetPath() + "models/sphere.gltf", vulkanDevice, queue, glTFLoadingFlags);
+	model.loadFromFile(getAssetPath() + "models/sphere.gltf", m_vulkanDevice, queue, glTFLoadingFlags);
 }
 //-----------------------------------------------------------------------------
 void PushConstants::setupDescriptors()
@@ -263,7 +263,7 @@ void PushConstants::preparePipelines()
 //-----------------------------------------------------------------------------
 void PushConstants::prepareUniformBuffers()
 {
-	VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformBuffer, sizeof(UniformData)));
+	VK_CHECK_RESULT(m_vulkanDevice->createBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformBuffer, sizeof(UniformData)));
 	VK_CHECK_RESULT(uniformBuffer.map());
 	updateUniformBuffers();
 }

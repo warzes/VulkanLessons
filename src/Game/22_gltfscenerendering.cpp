@@ -467,7 +467,7 @@ void GLTFSceneApp::loadglTFFile(std::string filename)
 	bool fileLoaded = gltfContext.LoadASCIIFromFile(&glTFInput, &error, &warning, filename);
 
 	// Pass some Vulkan resources required for setup and rendering to the glTF model loading class
-	glTFScene.vulkanDevice = vulkanDevice;
+	glTFScene.vulkanDevice = m_vulkanDevice;
 	glTFScene.copyQueue = queue;
 
 	size_t pos = filename.find_last_of('/');
@@ -505,7 +505,7 @@ void GLTFSceneApp::loadglTFFile(std::string filename)
 	} vertexStaging, indexStaging;
 
 	// Create host visible staging buffers (source)
-	VK_CHECK_RESULT(vulkanDevice->createBuffer(
+	VK_CHECK_RESULT(m_vulkanDevice->createBuffer(
 		VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
 		VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
 		vertexBufferSize,
@@ -513,7 +513,7 @@ void GLTFSceneApp::loadglTFFile(std::string filename)
 		&vertexStaging.memory,
 		vertexBuffer.data()));
 	// Index data
-	VK_CHECK_RESULT(vulkanDevice->createBuffer(
+	VK_CHECK_RESULT(m_vulkanDevice->createBuffer(
 		VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
 		VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
 		indexBufferSize,
@@ -522,13 +522,13 @@ void GLTFSceneApp::loadglTFFile(std::string filename)
 		indexBuffer.data()));
 
 	// Create device local buffers (target)
-	VK_CHECK_RESULT(vulkanDevice->createBuffer(
+	VK_CHECK_RESULT(m_vulkanDevice->createBuffer(
 		VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
 		VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
 		vertexBufferSize,
 		&glTFScene.vertices.buffer,
 		&glTFScene.vertices.memory));
-	VK_CHECK_RESULT(vulkanDevice->createBuffer(
+	VK_CHECK_RESULT(m_vulkanDevice->createBuffer(
 		VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
 		VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
 		indexBufferSize,
@@ -536,7 +536,7 @@ void GLTFSceneApp::loadglTFFile(std::string filename)
 		&glTFScene.indices.memory));
 
 	// Copy data from staging buffers (host) do device local buffer (gpu)
-	VkCommandBuffer copyCmd = vulkanDevice->createCommandBuffer(VK_COMMAND_BUFFER_LEVEL_PRIMARY, true);
+	VkCommandBuffer copyCmd = m_vulkanDevice->createCommandBuffer(VK_COMMAND_BUFFER_LEVEL_PRIMARY, true);
 	VkBufferCopy copyRegion = {};
 
 	copyRegion.size = vertexBufferSize;
@@ -555,7 +555,7 @@ void GLTFSceneApp::loadglTFFile(std::string filename)
 		1,
 		&copyRegion);
 
-	vulkanDevice->flushCommandBuffer(copyCmd, queue, true);
+	m_vulkanDevice->flushCommandBuffer(copyCmd, queue, true);
 
 	// Free staging resources
 	vkDestroyBuffer(device, vertexStaging.buffer, nullptr);
@@ -705,7 +705,7 @@ void GLTFSceneApp::preparePipelines()
 
 void GLTFSceneApp::prepareUniformBuffers()
 {
-	VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &shaderData.buffer, sizeof(shaderData.values)));
+	VK_CHECK_RESULT(m_vulkanDevice->createBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &shaderData.buffer, sizeof(shaderData.values)));
 	VK_CHECK_RESULT(shaderData.buffer.map());
 }
 

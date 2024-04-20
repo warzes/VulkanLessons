@@ -118,6 +118,8 @@ protected:
 	std::vector<std::string> m_supportedInstanceExtensions;
 	// Physical device (GPU) that Vulkan will use
 	VkPhysicalDevice m_physicalDevice{ VK_NULL_HANDLE };
+	/** @brief Encapsulated physical and logical vulkan device */
+	vks::VulkanDevice* m_vulkanDevice;
 
 	// Stores physical device properties (for e.g. checking device limits)
 	VkPhysicalDeviceProperties deviceProperties{};
@@ -133,7 +135,7 @@ protected:
 	/** @brief Optional pNext structure for passing extension structures to device creation */
 	void* deviceCreatepNextChain = nullptr;
 	/** @brief Logical device, application's view of the physical device (GPU) */
-	VkDevice device{ VK_NULL_HANDLE };
+	VkDevice device{ VK_NULL_HANDLE }; // TODO: копия из m_vulkanDevice
 	// Handle to the device graphics queue that command buffers are submitted to
 	VkQueue queue{ VK_NULL_HANDLE };
 	// Depth buffer format (selected during Vulkan initialization)
@@ -173,8 +175,7 @@ protected:
 
 	VkClearColorValue defaultClearColor = { { 0.025f, 0.025f, 0.025f, 1.0f } };
 
-	/** @brief Encapsulated physical and logical vulkan device */
-	vks::VulkanDevice* vulkanDevice;
+
 
 	bool paused = false;
 

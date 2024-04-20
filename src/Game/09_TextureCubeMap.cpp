@@ -198,7 +198,7 @@ void TextureCubeMapApp::loadCubemap(std::string filename, VkFormat format)
 	vkGetBufferMemoryRequirements(device, stagingBuffer, &memReqs);
 	memAllocInfo.allocationSize = memReqs.size;
 	// Get memory type index for a host visible buffer
-	memAllocInfo.memoryTypeIndex = vulkanDevice->getMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+	memAllocInfo.memoryTypeIndex = m_vulkanDevice->getMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 	VK_CHECK_RESULT(vkAllocateMemory(device, &memAllocInfo, nullptr, &stagingMemory));
 	VK_CHECK_RESULT(vkBindBufferMemory(device, stagingBuffer, stagingMemory, 0));
 
@@ -229,12 +229,12 @@ void TextureCubeMapApp::loadCubemap(std::string filename, VkFormat format)
 	vkGetImageMemoryRequirements(device, cubeMap.image, &memReqs);
 
 	memAllocInfo.allocationSize = memReqs.size;
-	memAllocInfo.memoryTypeIndex = vulkanDevice->getMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+	memAllocInfo.memoryTypeIndex = m_vulkanDevice->getMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
 	VK_CHECK_RESULT(vkAllocateMemory(device, &memAllocInfo, nullptr, &cubeMap.deviceMemory));
 	VK_CHECK_RESULT(vkBindImageMemory(device, cubeMap.image, cubeMap.deviceMemory, 0));
 
-	VkCommandBuffer copyCmd = vulkanDevice->createCommandBuffer(VK_COMMAND_BUFFER_LEVEL_PRIMARY, true);
+	VkCommandBuffer copyCmd = m_vulkanDevice->createCommandBuffer(VK_COMMAND_BUFFER_LEVEL_PRIMARY, true);
 
 	// Setup buffer copy regions for each face including all of its miplevels
 	std::vector<VkBufferImageCopy> bufferCopyRegions;
@@ -295,7 +295,7 @@ void TextureCubeMapApp::loadCubemap(std::string filename, VkFormat format)
 		cubeMap.imageLayout,
 		subresourceRange);
 
-	vulkanDevice->flushCommandBuffer(copyCmd, queue, true);
+	m_vulkanDevice->flushCommandBuffer(copyCmd, queue, true);
 
 	// Create sampler
 	VkSamplerCreateInfo sampler = vks::initializers::samplerCreateInfo();
@@ -311,9 +311,9 @@ void TextureCubeMapApp::loadCubemap(std::string filename, VkFormat format)
 	sampler.maxLod = static_cast<float>(cubeMap.mipLevels);
 	sampler.borderColor = VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE;
 	sampler.maxAnisotropy = 1.0f;
-	if (vulkanDevice->features.samplerAnisotropy)
+	if (m_vulkanDevice->features.samplerAnisotropy)
 	{
-		sampler.maxAnisotropy = vulkanDevice->properties.limits.maxSamplerAnisotropy;
+		sampler.maxAnisotropy = m_vulkanDevice->properties.limits.maxSamplerAnisotropy;
 		sampler.anisotropyEnable = VK_TRUE;
 	}
 	VK_CHECK_RESULT(vkCreateSampler(device, &sampler, nullptr, &cubeMap.sampler));
@@ -394,13 +394,13 @@ void TextureCubeMapApp::loadAssets()
 {
 	uint32_t glTFLoadingFlags = vkglTF::FileLoadingFlags::PreTransformVertices | vkglTF::FileLoadingFlags::FlipY;
 	// Skybox
-	models.skybox.loadFromFile(getAssetPath() + "models/cube.gltf", vulkanDevice, queue, glTFLoadingFlags);
+	models.skybox.loadFromFile(getAssetPath() + "models/cube.gltf", m_vulkanDevice, queue, glTFLoadingFlags);
 	// Objects
 	std::vector<std::string> filenames = { "sphere.gltf", "teapot.gltf", "torusknot.gltf", "venus.gltf" };
 	objectNames = { "Sphere", "Teapot", "Torusknot", "Venus" };
 	models.objects.resize(filenames.size());
 	for (size_t i = 0; i < filenames.size(); i++) {
-		models.objects[i].loadFromFile(getAssetPath() + "models/" + filenames[i], vulkanDevice, queue, glTFLoadingFlags);
+		models.objects[i].loadFromFile(getAssetPath() + "models/" + filenames[i], m_vulkanDevice, queue, glTFLoadingFlags);
 	}
 	// Cubemap texture
 	loadCubemap(getAssetPath() + "textures/cubemap_yokohama_rgba.ktx", VK_FORMAT_R8G8B8A8_UNORM);
@@ -491,7 +491,7 @@ void TextureCubeMapApp::preparePipelines()
 //-----------------------------------------------------------------------------
 void TextureCubeMapApp::prepareUniformBuffers()
 {
-	VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformBuffer, sizeof(uboVS)));
+	VK_CHECK_RESULT(m_vulkanDevice->createBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformBuffer, sizeof(uboVS)));
 	VK_CHECK_RESULT(uniformBuffer.map());
 }
 //-----------------------------------------------------------------------------

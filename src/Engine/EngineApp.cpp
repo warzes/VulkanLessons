@@ -351,6 +351,7 @@ bool EngineApp::initVulkan(const RenderSystemCreateInfo& createInfo)
 		return false;
 	}
 
+	// TODO: это дублируется в VulkanDevice
 	// Store properties (including limits), features and memory properties of the physical device (so that examples can check against them)
 	vkGetPhysicalDeviceProperties(m_physicalDevice, &deviceProperties);
 	vkGetPhysicalDeviceFeatures(m_physicalDevice, &deviceFeatures);
@@ -361,21 +362,21 @@ bool EngineApp::initVulkan(const RenderSystemCreateInfo& createInfo)
 
 	// Vulkan device creation
 	// This is handled by a separate class that gets a logical device representation and encapsulates functions related to a device
-	vulkanDevice = new vks::VulkanDevice(m_physicalDevice);
+	m_vulkanDevice = new vks::VulkanDevice(m_physicalDevice);
 
 	// Derived examples can enable extensions based on the list of supported extensions read from the physical device
 	getEnabledExtensions();
 
-	VkResult res = vulkanDevice->createLogicalDevice(enabledFeatures, enabledDeviceExtensions, deviceCreatepNextChain);
-	if (res != VK_SUCCESS)
+	result = m_vulkanDevice->createLogicalDevice(enabledFeatures, enabledDeviceExtensions, deviceCreatepNextChain);
+	if (result != VK_SUCCESS)
 	{
-		vks::tools::exitFatal("Could not create Vulkan device: \n" + std::string(string_VkResult(res)), res);
+		Fatal("Could not create Vulkan device: \n" + std::string(string_VkResult(result)));
 		return false;
 	}
-	device = vulkanDevice->logicalDevice;
+	device = m_vulkanDevice->logicalDevice;
 
 	// Get a graphics queue from the device
-	vkGetDeviceQueue(device, vulkanDevice->queueFamilyIndices.graphics, 0, &queue);
+	vkGetDeviceQueue(device, m_vulkanDevice->queueFamilyIndices.graphics, 0, &queue);
 
 	// Find a suitable depth and/or stencil format
 	VkBool32 validFormat{ false };
@@ -601,7 +602,7 @@ bool EngineApp::prepareRender(const RenderSystemCreateInfo& createInfo, bool ful
 	overlay = overlay && (!benchmark.active);
 	if (overlay)
 	{
-		UIOverlay.device = vulkanDevice;
+		UIOverlay.device = m_vulkanDevice;
 		UIOverlay.queue = queue;
 		UIOverlay.shaders = {
 			loadShader(getShadersPath() + "base/uioverlay.vert.spv", VK_SHADER_STAGE_VERTEX_BIT),
@@ -684,7 +685,7 @@ void EngineApp::setupDepthStencil(uint32_t width, uint32_t height)
 
 
 	memAlloc.allocationSize = memReqs.size;
-	memAlloc.memoryTypeIndex = vulkanDevice->getMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+	memAlloc.memoryTypeIndex = m_vulkanDevice->getMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 	VK_CHECK_RESULT(vkAllocateMemory(device, &memAlloc, nullptr, &depthStencil.memory));
 	VK_CHECK_RESULT(vkBindImageMemory(device, depthStencil.image, depthStencil.memory, 0));
 
@@ -1054,7 +1055,7 @@ void EngineApp::renderDestroy()
 	if (overlay)
 		UIOverlay.freeResources();
 
-	delete vulkanDevice;
+	delete m_vulkanDevice;
 
 	if (validation)
 		vks::debug::freeDebugCallback(m_instance);

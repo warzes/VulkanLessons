@@ -34,10 +34,10 @@ void VertexAttributesApp::OnDestroy()
 		separateVertexBuffers.uv.destroy();
 		interleavedVertexBuffer.destroy();
 		for (Image image : scene.images) {
-			vkDestroyImageView(vulkanDevice->logicalDevice, image.texture.view, nullptr);
-			vkDestroyImage(vulkanDevice->logicalDevice, image.texture.image, nullptr);
-			vkDestroySampler(vulkanDevice->logicalDevice, image.texture.sampler, nullptr);
-			vkFreeMemory(vulkanDevice->logicalDevice, image.texture.deviceMemory, nullptr);
+			vkDestroyImageView(m_vulkanDevice->logicalDevice, image.texture.view, nullptr);
+			vkDestroyImage(m_vulkanDevice->logicalDevice, image.texture.image, nullptr);
+			vkDestroySampler(m_vulkanDevice->logicalDevice, image.texture.sampler, nullptr);
+			vkFreeMemory(m_vulkanDevice->logicalDevice, image.texture.deviceMemory, nullptr);
 		}
 	}
 }
@@ -398,7 +398,7 @@ void VertexAttributesApp::loadglTFFile(std::string filename)
 	scene.images.resize(glTFInput.images.size());
 	for (size_t i = 0; i < glTFInput.images.size(); i++) {
 		tinygltf::Image& glTFImage = glTFInput.images[i];
-		scene.images[i].texture.loadFromFile(path + "/" + glTFImage.uri, VK_FORMAT_R8G8B8A8_UNORM, vulkanDevice, queue);
+		scene.images[i].texture.loadFromFile(path + "/" + glTFImage.uri, VK_FORMAT_R8G8B8A8_UNORM, m_vulkanDevice, queue);
 	}
 	// Load textures
 	scene.textures.resize(glTFInput.textures.size());
@@ -443,11 +443,11 @@ void VertexAttributesApp::uploadVertexData()
 	// Anonymous functions to simplify buffer creation
 	// Create a staging buffer used as a source for copies
 	auto createStagingBuffer = [this](vks::Buffer& buffer, void* data, VkDeviceSize size) {
-		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &buffer, size, data));
+		VK_CHECK_RESULT(m_vulkanDevice->createBuffer(VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &buffer, size, data));
 		};
 	// Create a device local buffer used as a target for copies
 	auto createDeviceBuffer = [this](vks::Buffer& buffer, VkDeviceSize size, VkBufferUsageFlags usageFlags = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT) {
-		VK_CHECK_RESULT(vulkanDevice->createBuffer(usageFlags | VK_BUFFER_USAGE_TRANSFER_DST_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, &buffer, size));
+		VK_CHECK_RESULT(m_vulkanDevice->createBuffer(usageFlags | VK_BUFFER_USAGE_TRANSFER_DST_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, &buffer, size));
 		};
 
 	VkCommandBuffer copyCmd;
@@ -463,10 +463,10 @@ void VertexAttributesApp::uploadVertexData()
 	createDeviceBuffer(interleavedVertexBuffer, vertexStaging.size);
 
 	// Copy data from staging buffer (host) do device local buffer (gpu)
-	copyCmd = vulkanDevice->createCommandBuffer(VK_COMMAND_BUFFER_LEVEL_PRIMARY, true);
+	copyCmd = m_vulkanDevice->createCommandBuffer(VK_COMMAND_BUFFER_LEVEL_PRIMARY, true);
 	copyRegion.size = vertexBufferSize;
 	vkCmdCopyBuffer(copyCmd, vertexStaging.buffer, interleavedVertexBuffer.buffer, 1, &copyRegion);
-	vulkanDevice->flushCommandBuffer(copyCmd, queue, true);
+	m_vulkanDevice->flushCommandBuffer(copyCmd, queue, true);
 	vertexStaging.destroy();
 
 	/*
@@ -493,12 +493,12 @@ void VertexAttributesApp::uploadVertexData()
 	};
 
 	// Copy data from staging buffer (host) do device local buffer (gpu)
-	copyCmd = vulkanDevice->createCommandBuffer(VK_COMMAND_BUFFER_LEVEL_PRIMARY, true);
+	copyCmd = m_vulkanDevice->createCommandBuffer(VK_COMMAND_BUFFER_LEVEL_PRIMARY, true);
 	for (size_t i = 0; i < attributeBuffers.size(); i++) {
 		copyRegion.size = attributeBuffers[i].size;
 		vkCmdCopyBuffer(copyCmd, stagingBuffers[i].buffer, attributeBuffers[i].buffer, 1, &copyRegion);
 	}
-	vulkanDevice->flushCommandBuffer(copyCmd, queue, true);
+	m_vulkanDevice->flushCommandBuffer(copyCmd, queue, true);
 
 	for (size_t i = 0; i < 4; i++) {
 		stagingBuffers[i].destroy();
@@ -513,10 +513,10 @@ void VertexAttributesApp::uploadVertexData()
 	createStagingBuffer(indexStaging, indexBuffer.data(), indexBufferSize);
 	createDeviceBuffer(indices, indexStaging.size, VK_BUFFER_USAGE_INDEX_BUFFER_BIT);
 	// Copy data from staging buffer (host) do device local buffer (gpu)
-	copyCmd = vulkanDevice->createCommandBuffer(VK_COMMAND_BUFFER_LEVEL_PRIMARY, true);
+	copyCmd = m_vulkanDevice->createCommandBuffer(VK_COMMAND_BUFFER_LEVEL_PRIMARY, true);
 	copyRegion.size = indexBufferSize;
 	vkCmdCopyBuffer(copyCmd, indexStaging.buffer, indices.buffer, 1, &copyRegion);
-	vulkanDevice->flushCommandBuffer(copyCmd, queue, true);
+	m_vulkanDevice->flushCommandBuffer(copyCmd, queue, true);
 	// Free staging resources
 	indexStaging.destroy();
 }
@@ -650,7 +650,7 @@ void VertexAttributesApp::preparePipelines()
 
 void VertexAttributesApp::prepareUniformBuffers()
 {
-	VK_CHECK_RESULT(vulkanDevice->createBuffer(
+	VK_CHECK_RESULT(m_vulkanDevice->createBuffer(
 		VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
 		VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
 		&shaderData.buffer,
