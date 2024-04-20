@@ -25,6 +25,7 @@ struct RenderSystemCreateInfo final
 	{
 		uint32_t subpass = 0;
 	} overlay;
+	bool requiresStencil = false;
 };
 
 struct EngineCreateInfo final

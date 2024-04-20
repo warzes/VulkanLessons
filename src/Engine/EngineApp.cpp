@@ -332,6 +332,7 @@ bool EngineApp::initVulkan(const RenderSystemCreateInfo& createInfo)
 #if defined(_DEBUG)
 	validation = true;
 #endif
+	requiresStencil = createInfo.requiresStencil;
 
 	VkResult result;
 

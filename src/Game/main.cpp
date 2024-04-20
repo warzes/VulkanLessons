@@ -84,12 +84,14 @@ int main(
 	//InputAttachmentsApp app;
 	//SubpassesApp app;
 	//OffscreenApp app;
-	ParticleSystemApp app;
+	//ParticleSystemApp app;
 	//StencilbufferApp app;
-	//VertexAttributesApp app;
+	VertexAttributesApp app;
+	
 	//GLTFLoadingApp app;
 	//GLTFSkinningApp app;
 	//GLTFSceneApp app;
+	
 	//HDRApp app;
 	//ShadowMappingApp app;
 	//ShadowMappingCascadeApp app;

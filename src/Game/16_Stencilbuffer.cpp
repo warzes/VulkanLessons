@@ -1,20 +1,40 @@
 #include "stdafx.h"
 #include "16_Stencilbuffer.h"
 //-----------------------------------------------------------------------------
+EngineCreateInfo StencilbufferApp::GetCreateInfo() const
+{
+	EngineCreateInfo ci{};
+	// This samples requires a format that supports depth AND stencil, which will be handled by the base class
+	ci.render.requiresStencil = true;
+	return ci;
+}
+//-----------------------------------------------------------------------------
 bool StencilbufferApp::OnCreate()
 {
+	timerSpeed *= 0.25f;
 	camera.type = Camera::CameraType::lookat;
-	camera.setPosition(glm::vec3(0.0f, 0.0f, -4.0f));
-	camera.setRotation(glm::vec3(0.0f));
-	camera.setRotationSpeed(0.25f);
-	camera.setPerspective(60.0f, (float)destWidth / (float)destHeight, 0.1f, 256.0f);
+	camera.setPerspective(60.0f, (float)destWidth / (float)destHeight, 0.1f, 512.0f);
+	camera.setRotation(glm::vec3(2.5f, -35.0f, 0.0f));
+	camera.setTranslation(glm::vec3(0.0f, 0.0f, -2.0f));
+
+	loadAssets();
+	prepareUniformBuffers();
+	setupDescriptors();
+	preparePipelines();
+	buildCommandBuffers();
 
 	return true;
 }
 //-----------------------------------------------------------------------------
 void StencilbufferApp::OnDestroy()
 {
-
+	if (device) {
+		vkDestroyPipeline(device, pipelines.stencil, nullptr);
+		vkDestroyPipeline(device, pipelines.outline, nullptr);
+		vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
+		vkDestroyDescriptorSetLayout(device, descriptorSetLayout, nullptr);
+		uniformBuffer.destroy();
+	}
 }
 //-----------------------------------------------------------------------------
 void StencilbufferApp::OnUpdate(float deltaTime)
@@ -24,12 +44,17 @@ void StencilbufferApp::OnUpdate(float deltaTime)
 //-----------------------------------------------------------------------------
 void StencilbufferApp::OnFrame()
 {
-
+	updateUniformBuffers();
+	draw();
 }
 //-----------------------------------------------------------------------------
 void StencilbufferApp::OnUpdateUIOverlay(vks::UIOverlay* overlay)
 {
-
+	if (overlay->header("Settings")) {
+		if (overlay->inputFloat("Outline width", &uniformData.outlineWidth, 0.01f, 2)) {
+			updateUniformBuffers();
+		}
+	}
 }
 //-----------------------------------------------------------------------------
 void StencilbufferApp::OnWindowResize(uint32_t destWidth, uint32_t destHeight)
