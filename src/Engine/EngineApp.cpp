@@ -833,7 +833,8 @@ void EngineApp::nextFrame()
 //-----------------------------------------------------------------------------
 void EngineApp::render()
 {
-	OnFrame();
+	if (RenderPrepared())
+		OnFrame();
 }
 //-----------------------------------------------------------------------------
 void EngineApp::windowResize(uint32_t destWidth, uint32_t destHeight)

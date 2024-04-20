@@ -1,0 +1,28 @@
+#pragma once
+
+/*
+Debug shader printf (VK_KHR_shader_non_semantic_info)
+
+Shows how to use printf in a shader to output additional information per invocation. This information can help debugging shader related issues in tools like RenderDoc.
+
+Note: This sample should be run from a graphics debugger like RenderDoc.
+*/
+
+class DebugPrintfApp final : public EngineApp
+{
+public:
+	EngineCreateInfo GetCreateInfo() const final { return {}; }
+	bool OnCreate() final;
+	void OnDestroy() final;
+	void OnUpdate(float deltaTime) final;
+	void OnFrame() final;
+	void OnUpdateUIOverlay(vks::UIOverlay* overlay) final;
+
+	void OnWindowResize(uint32_t destWidth, uint32_t destHeight) final;
+	void OnKeyPressed(uint32_t key) final;
+	void OnKeyUp(uint32_t key) final;
+	void OnMouseMoved(int32_t x, int32_t y, int32_t dx, int32_t dy) final;
+
+private:
+	Camera camera;
+};
