@@ -35,13 +35,11 @@ void TextureCubeMapApp::OnDestroy()
 //-----------------------------------------------------------------------------
 void TextureCubeMapApp::OnUpdate(float deltaTime)
 {
+	camera.update(deltaTime);
 }
 //-----------------------------------------------------------------------------
 void TextureCubeMapApp::OnFrame()
 {
-	if (!RenderPrepared())
-		return;
-
 	updateUniformBuffers();
 	draw();
 }

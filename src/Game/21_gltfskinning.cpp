@@ -19,12 +19,11 @@ void GLTFSkinningApp::OnDestroy()
 //-----------------------------------------------------------------------------
 void GLTFSkinningApp::OnUpdate(float deltaTime)
 {
+	camera.update(deltaTime);
 }
 //-----------------------------------------------------------------------------
 void GLTFSkinningApp::OnFrame()
 {
-	if (!RenderPrepared())
-		return;
 
 }
 //-----------------------------------------------------------------------------

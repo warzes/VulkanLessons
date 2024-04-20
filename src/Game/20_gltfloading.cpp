@@ -19,12 +19,11 @@ void GLTFLoadingApp::OnDestroy()
 //-----------------------------------------------------------------------------
 void GLTFLoadingApp::OnUpdate(float deltaTime)
 {
+	camera.update(deltaTime);
 }
 //-----------------------------------------------------------------------------
 void GLTFLoadingApp::OnFrame()
 {
-	if (!RenderPrepared())
-		return;
 
 }
 //-----------------------------------------------------------------------------

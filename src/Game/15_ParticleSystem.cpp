@@ -19,12 +19,11 @@ void ParticleSystemApp::OnDestroy()
 //-----------------------------------------------------------------------------
 void ParticleSystemApp::OnUpdate(float deltaTime)
 {
+	camera.update(deltaTime);
 }
 //-----------------------------------------------------------------------------
 void ParticleSystemApp::OnFrame()
 {
-	if (!RenderPrepared())
-		return;
 
 }
 //-----------------------------------------------------------------------------

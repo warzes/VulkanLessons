@@ -35,13 +35,11 @@ void DynamicUniformBuffer::OnDestroy()
 //-----------------------------------------------------------------------------
 void DynamicUniformBuffer::OnUpdate(float deltaTime)
 {
+	camera.update(deltaTime);
 }
 //-----------------------------------------------------------------------------
 void DynamicUniformBuffer::OnFrame()
 {
-	if (!RenderPrepared())
-		return;
-
 	updateUniformBuffers();
 	updateDynamicUniformBuffer();
 	draw();

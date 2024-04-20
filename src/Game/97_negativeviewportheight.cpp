@@ -19,6 +19,7 @@ void NegativeViewportHeightApp::OnDestroy()
 //-----------------------------------------------------------------------------
 void NegativeViewportHeightApp::OnUpdate(float deltaTime)
 {
+	camera.update(deltaTime);
 }
 //-----------------------------------------------------------------------------
 void NegativeViewportHeightApp::OnFrame()

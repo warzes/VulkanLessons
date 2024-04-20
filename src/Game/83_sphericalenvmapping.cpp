@@ -19,6 +19,7 @@ void SphericalEnvMappingApp::OnDestroy()
 //-----------------------------------------------------------------------------
 void SphericalEnvMappingApp::OnUpdate(float deltaTime)
 {
+	camera.update(deltaTime);
 }
 //-----------------------------------------------------------------------------
 void SphericalEnvMappingApp::OnFrame()

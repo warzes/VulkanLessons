@@ -192,7 +192,9 @@ bool EngineApp::create()
 	setupDPIAwareness();
 
 	if (!initWindow(createInfo.window))
-		return false;	
+		return false;
+	destWidth = m_data->frameWidth;
+	destHeight = m_data->frameHeight;
 
 	if (!initVulkan(createInfo.render) ||
 		!prepareRender(createInfo.render, createInfo.window.fullscreen))
@@ -201,8 +203,6 @@ bool EngineApp::create()
 		return false;
 	}
 
-	destWidth = m_data->frameWidth;
-	destHeight = m_data->frameHeight;
 	lastTimestamp = std::chrono::high_resolution_clock::now();
 	tPrevEnd = lastTimestamp;
 	IsExit = false;
@@ -545,6 +545,8 @@ VkResult EngineApp::createInstance(bool enableValidation)
 //-----------------------------------------------------------------------------
 bool EngineApp::prepareRender(const RenderSystemCreateInfo& createInfo, bool fullscreen)
 {
+	UIOverlay.subpass = createInfo.overlay.subpass;
+
 	initSwapchain();
 	createCommandPool();
 	setupSwapChain(createInfo.vsync, &m_data->frameWidth, &m_data->frameHeight, fullscreen);

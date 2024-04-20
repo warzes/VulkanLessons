@@ -19,6 +19,7 @@ void DistanceFieldFontsApp::OnDestroy()
 //-----------------------------------------------------------------------------
 void DistanceFieldFontsApp::OnUpdate(float deltaTime)
 {
+	camera.update(deltaTime);
 }
 //-----------------------------------------------------------------------------
 void DistanceFieldFontsApp::OnFrame()

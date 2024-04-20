@@ -19,6 +19,7 @@ void GraphicsPipelineLibraryApp::OnDestroy()
 //-----------------------------------------------------------------------------
 void GraphicsPipelineLibraryApp::OnUpdate(float deltaTime)
 {
+	camera.update(deltaTime);
 }
 //-----------------------------------------------------------------------------
 void GraphicsPipelineLibraryApp::OnFrame()

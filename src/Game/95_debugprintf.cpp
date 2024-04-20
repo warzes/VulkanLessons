@@ -19,6 +19,7 @@ void DebugPrintfApp::OnDestroy()
 //-----------------------------------------------------------------------------
 void DebugPrintfApp::OnUpdate(float deltaTime)
 {
+	camera.update(deltaTime);
 }
 //-----------------------------------------------------------------------------
 void DebugPrintfApp::OnFrame()

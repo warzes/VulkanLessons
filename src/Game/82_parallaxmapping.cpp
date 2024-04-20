@@ -19,6 +19,7 @@ void ParallaxMappingApp::OnDestroy()
 //-----------------------------------------------------------------------------
 void ParallaxMappingApp::OnUpdate(float deltaTime)
 {
+	camera.update(deltaTime);
 }
 //-----------------------------------------------------------------------------
 void ParallaxMappingApp::OnFrame()

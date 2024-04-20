@@ -19,13 +19,11 @@ void PBRTextureApp::OnDestroy()
 //-----------------------------------------------------------------------------
 void PBRTextureApp::OnUpdate(float deltaTime)
 {
+	camera.update(deltaTime);
 }
 //-----------------------------------------------------------------------------
 void PBRTextureApp::OnFrame()
 {
-	if (!RenderPrepared())
-		return;
-
 }
 //-----------------------------------------------------------------------------
 void PBRTextureApp::OnUpdateUIOverlay(vks::UIOverlay* overlay)

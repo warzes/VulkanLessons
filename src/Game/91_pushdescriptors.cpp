@@ -19,6 +19,7 @@ void PushDescriptorsApp::OnDestroy()
 //-----------------------------------------------------------------------------
 void PushDescriptorsApp::OnUpdate(float deltaTime)
 {
+	camera.update(deltaTime);
 }
 //-----------------------------------------------------------------------------
 void PushDescriptorsApp::OnFrame()

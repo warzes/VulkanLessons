@@ -19,6 +19,7 @@ void ConditionalRenderApp::OnDestroy()
 //-----------------------------------------------------------------------------
 void ConditionalRenderApp::OnUpdate(float deltaTime)
 {
+	camera.update(deltaTime);
 }
 //-----------------------------------------------------------------------------
 void ConditionalRenderApp::OnFrame()

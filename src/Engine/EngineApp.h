@@ -20,6 +20,11 @@ struct RenderSystemCreateInfo final
 	std::vector<const char*> enabledInstanceExtensions;
 	bool validation = false;
 	bool vsync = false;
+
+	struct
+	{
+		uint32_t subpass = 0;
+	} overlay;
 };
 
 struct EngineCreateInfo final

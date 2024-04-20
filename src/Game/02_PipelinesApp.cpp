@@ -38,12 +38,11 @@ void PipelinesApp::OnDestroy()
 //-----------------------------------------------------------------------------
 void PipelinesApp::OnUpdate(float deltaTime)
 {
+	camera.update(deltaTime);
 }
 //-----------------------------------------------------------------------------
 void PipelinesApp::OnFrame()
 {
-	if (!RenderPrepared())
-		return;
 	updateUniformBuffers();
 	draw();
 }

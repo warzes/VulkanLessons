@@ -19,13 +19,11 @@ void GLTFSceneApp::OnDestroy()
 //-----------------------------------------------------------------------------
 void GLTFSceneApp::OnUpdate(float deltaTime)
 {
+	camera.update(deltaTime);
 }
 //-----------------------------------------------------------------------------
 void GLTFSceneApp::OnFrame()
 {
-	if (!RenderPrepared())
-		return;
-
 }
 //-----------------------------------------------------------------------------
 void GLTFSceneApp::OnUpdateUIOverlay(vks::UIOverlay* overlay)

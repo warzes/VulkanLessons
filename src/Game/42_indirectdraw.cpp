@@ -19,13 +19,11 @@ void IndirectDrawApp::OnDestroy()
 //-----------------------------------------------------------------------------
 void IndirectDrawApp::OnUpdate(float deltaTime)
 {
+	camera.update(deltaTime);
 }
 //-----------------------------------------------------------------------------
 void IndirectDrawApp::OnFrame()
 {
-	if (!RenderPrepared())
-		return;
-
 }
 //-----------------------------------------------------------------------------
 void IndirectDrawApp::OnUpdateUIOverlay(vks::UIOverlay* overlay)

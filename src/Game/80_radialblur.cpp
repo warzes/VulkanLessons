@@ -19,6 +19,7 @@ void RadialBlurApp::OnDestroy()
 //-----------------------------------------------------------------------------
 void RadialBlurApp::OnUpdate(float deltaTime)
 {
+	camera.update(deltaTime);
 }
 //-----------------------------------------------------------------------------
 void RadialBlurApp::OnFrame()

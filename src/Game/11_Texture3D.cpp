@@ -34,13 +34,11 @@ void Texture3DApp::OnDestroy()
 //-----------------------------------------------------------------------------
 void Texture3DApp::OnUpdate(float deltaTime)
 {
+	camera.update(deltaTime);
 }
 //-----------------------------------------------------------------------------
 void Texture3DApp::OnFrame()
 {
-	if (!RenderPrepared())
-		return;
-
 	updateUniformBuffers();
 	draw();
 }

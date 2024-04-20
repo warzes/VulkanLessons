@@ -19,6 +19,7 @@ void ConservativerasterApp::OnDestroy()
 //-----------------------------------------------------------------------------
 void ConservativerasterApp::OnUpdate(float deltaTime)
 {
+	camera.update(deltaTime);
 }
 //-----------------------------------------------------------------------------
 void ConservativerasterApp::OnFrame()

@@ -19,6 +19,7 @@ void TextOverlayApp::OnDestroy()
 //-----------------------------------------------------------------------------
 void TextOverlayApp::OnUpdate(float deltaTime)
 {
+	camera.update(deltaTime);
 }
 //-----------------------------------------------------------------------------
 void TextOverlayApp::OnFrame()

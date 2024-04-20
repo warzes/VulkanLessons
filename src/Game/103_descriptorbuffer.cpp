@@ -19,6 +19,7 @@ void DescriptorBufferApp::OnDestroy()
 //-----------------------------------------------------------------------------
 void DescriptorBufferApp::OnUpdate(float deltaTime)
 {
+	camera.update(deltaTime);
 }
 //-----------------------------------------------------------------------------
 void DescriptorBufferApp::OnFrame()

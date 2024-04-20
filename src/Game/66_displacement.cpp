@@ -19,6 +19,7 @@ void DisplacementApp::OnDestroy()
 //-----------------------------------------------------------------------------
 void DisplacementApp::OnUpdate(float deltaTime)
 {
+	camera.update(deltaTime);
 }
 //-----------------------------------------------------------------------------
 void DisplacementApp::OnFrame()

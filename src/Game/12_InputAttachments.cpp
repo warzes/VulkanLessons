@@ -1,36 +1,96 @@
 #include "stdafx.h"
 #include "12_InputAttachments.h"
 //-----------------------------------------------------------------------------
+EngineCreateInfo InputAttachmentsApp::GetCreateInfo() const
+{
+	EngineCreateInfo ci{};
+	ci.render.overlay.subpass = 1;
+	return ci;
+}
+//-----------------------------------------------------------------------------
 bool InputAttachmentsApp::OnCreate()
 {
-	camera.type = Camera::CameraType::lookat;
-	camera.setPosition(glm::vec3(0.0f, 0.0f, -4.0f));
-	camera.setRotation(glm::vec3(0.0f));
-	camera.setRotationSpeed(0.25f);
+	camera.type = Camera::CameraType::firstperson;
+	camera.movementSpeed = 2.5f;
+	camera.setPosition(glm::vec3(1.65f, 1.75f, -6.15f));
+	camera.setRotation(glm::vec3(-12.75f, 380.0f, 0.0f));
 	camera.setPerspective(60.0f, (float)destWidth / (float)destHeight, 0.1f, 256.0f);
+
+	loadAssets();
+	prepareUniformBuffers();
+	setupDescriptors();
+	preparePipelines();
+	buildCommandBuffers();
 
 	return true;
 }
 //-----------------------------------------------------------------------------
 void InputAttachmentsApp::OnDestroy()
 {
+	if (device) {
+		for (uint32_t i = 0; i < attachments.size(); i++) {
+			vkDestroyImageView(device, attachments[i].color.view, nullptr);
+			vkDestroyImage(device, attachments[i].color.image, nullptr);
+			vkFreeMemory(device, attachments[i].color.memory, nullptr);
+			vkDestroyImageView(device, attachments[i].depth.view, nullptr);
+			vkDestroyImage(device, attachments[i].depth.image, nullptr);
+			vkFreeMemory(device, attachments[i].depth.memory, nullptr);
+		}
 
+		vkDestroyPipeline(device, pipelines.attachmentRead, nullptr);
+		vkDestroyPipeline(device, pipelines.attachmentWrite, nullptr);
+
+		vkDestroyPipelineLayout(device, pipelineLayouts.attachmentWrite, nullptr);
+		vkDestroyPipelineLayout(device, pipelineLayouts.attachmentRead, nullptr);
+
+		vkDestroyDescriptorSetLayout(device, descriptorSetLayouts.attachmentWrite, nullptr);
+		vkDestroyDescriptorSetLayout(device, descriptorSetLayouts.attachmentRead, nullptr);
+
+		uniformBuffers.matrices.destroy();
+		uniformBuffers.params.destroy();
+	}
 }
 //-----------------------------------------------------------------------------
 void InputAttachmentsApp::OnUpdate(float deltaTime)
 {
+	camera.update(deltaTime);
 }
 //-----------------------------------------------------------------------------
 void InputAttachmentsApp::OnFrame()
 {
-	if (!RenderPrepared())
-		return;
-
+	updateUniformBuffers();
+	draw();
 }
 //-----------------------------------------------------------------------------
 void InputAttachmentsApp::OnUpdateUIOverlay(vks::UIOverlay* overlay)
 {
-
+	if (overlay->header("Settings")) {
+		overlay->text("Input attachment");
+		if (overlay->comboBox("##attachment", &uboParams.attachmentIndex, { "color", "depth" })) {
+			updateUniformBuffers();
+		}
+		switch (uboParams.attachmentIndex) {
+		case 0:
+			overlay->text("Brightness");
+			if (overlay->sliderFloat("##b", &uboParams.brightnessContrast[0], 0.0f, 2.0f)) {
+				updateUniformBuffers();
+			}
+			overlay->text("Contrast");
+			if (overlay->sliderFloat("##c", &uboParams.brightnessContrast[1], 0.0f, 4.0f)) {
+				updateUniformBuffers();
+			}
+			break;
+		case 1:
+			overlay->text("Visible range");
+			if (overlay->sliderFloat("min", &uboParams.range[0], 0.0f, uboParams.range[1])) {
+				updateUniformBuffers();
+			}
+			if (overlay->sliderFloat("max", &uboParams.range[1], uboParams.range[0], 1.0f)) {
+				updateUniformBuffers();
+			}
+			break;
+		}
+	}
 }
 //-----------------------------------------------------------------------------
 void InputAttachmentsApp::OnWindowResize(uint32_t destWidth, uint32_t destHeight)

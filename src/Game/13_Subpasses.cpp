@@ -19,12 +19,11 @@ void SubpassesApp::OnDestroy()
 //-----------------------------------------------------------------------------
 void SubpassesApp::OnUpdate(float deltaTime)
 {
+	camera.update(deltaTime);
 }
 //-----------------------------------------------------------------------------
 void SubpassesApp::OnFrame()
 {
-	if (!RenderPrepared())
-		return;
 
 }
 //-----------------------------------------------------------------------------

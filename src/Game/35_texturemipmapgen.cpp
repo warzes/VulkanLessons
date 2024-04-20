@@ -19,12 +19,11 @@ void TextureMipmapgenApp::OnDestroy()
 //-----------------------------------------------------------------------------
 void TextureMipmapgenApp::OnUpdate(float deltaTime)
 {
+	camera.update(deltaTime);
 }
 //-----------------------------------------------------------------------------
 void TextureMipmapgenApp::OnFrame()
 {
-	if (!RenderPrepared())
-		return;
 
 }
 //-----------------------------------------------------------------------------

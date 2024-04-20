@@ -34,13 +34,11 @@ void TextureCubemapArrayApp::OnDestroy()
 //-----------------------------------------------------------------------------
 void TextureCubemapArrayApp::OnUpdate(float deltaTime)
 {
+	camera.update(deltaTime);
 }
 //-----------------------------------------------------------------------------
 void TextureCubemapArrayApp::OnFrame()
 {
-	if (!RenderPrepared())
-		return;
-
 	updateUniformBuffers();
 	draw();
 }

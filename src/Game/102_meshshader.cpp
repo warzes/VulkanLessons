@@ -19,6 +19,7 @@ void MeshShaderApp::OnDestroy()
 //-----------------------------------------------------------------------------
 void MeshShaderApp::OnUpdate(float deltaTime)
 {
+	camera.update(deltaTime);
 }
 //-----------------------------------------------------------------------------
 void MeshShaderApp::OnFrame()

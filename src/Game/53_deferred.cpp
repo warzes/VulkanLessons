@@ -19,13 +19,11 @@ void DefferedApp::OnDestroy()
 //-----------------------------------------------------------------------------
 void DefferedApp::OnUpdate(float deltaTime)
 {
+	camera.update(deltaTime);
 }
 //-----------------------------------------------------------------------------
 void DefferedApp::OnFrame()
 {
-	if (!RenderPrepared())
-		return;
-
 }
 //-----------------------------------------------------------------------------
 void DefferedApp::OnUpdateUIOverlay(vks::UIOverlay* overlay)

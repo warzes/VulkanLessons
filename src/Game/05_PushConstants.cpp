@@ -31,13 +31,11 @@ void PushConstants::OnDestroy()
 //-----------------------------------------------------------------------------
 void PushConstants::OnUpdate(float deltaTime)
 {
+	camera.update(deltaTime);
 }
 //-----------------------------------------------------------------------------
 void PushConstants::OnFrame()
 {
-	if (!RenderPrepared())
-		return;
-
 	updateUniformBuffers();
 	draw();
 }

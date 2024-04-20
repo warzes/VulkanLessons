@@ -19,12 +19,11 @@ void StencilbufferApp::OnDestroy()
 //-----------------------------------------------------------------------------
 void StencilbufferApp::OnUpdate(float deltaTime)
 {
+	camera.update(deltaTime);
 }
 //-----------------------------------------------------------------------------
 void StencilbufferApp::OnFrame()
 {
-	if (!RenderPrepared())
-		return;
 
 }
 //-----------------------------------------------------------------------------

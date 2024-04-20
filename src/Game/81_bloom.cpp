@@ -19,6 +19,7 @@ void BloomApp::OnDestroy()
 //-----------------------------------------------------------------------------
 void BloomApp::OnUpdate(float deltaTime)
 {
+	camera.update(deltaTime);
 }
 //-----------------------------------------------------------------------------
 void BloomApp::OnFrame()

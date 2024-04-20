@@ -59,9 +59,6 @@ void TriangleApp::OnUpdate(float deltaTime)
 //-----------------------------------------------------------------------------
 void TriangleApp::OnFrame()
 {
-	if (!RenderPrepared())
-		return;
-
 	// Use a fence to wait until the command buffer has finished execution before using it again
 	vkWaitForFences(device, 1, &waitFences[currentFrame], VK_TRUE, UINT64_MAX);
 	VK_CHECK_RESULT(vkResetFences(device, 1, &waitFences[currentFrame]));

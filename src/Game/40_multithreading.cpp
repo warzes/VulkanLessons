@@ -19,12 +19,11 @@ void MultithreadingApp::OnDestroy()
 //-----------------------------------------------------------------------------
 void MultithreadingApp::OnUpdate(float deltaTime)
 {
+	camera.update(deltaTime);
 }
 //-----------------------------------------------------------------------------
 void MultithreadingApp::OnFrame()
 {
-	if (!RenderPrepared())
-		return;
 
 }
 //-----------------------------------------------------------------------------

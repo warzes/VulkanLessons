@@ -19,12 +19,11 @@ void MultisamplingApp::OnDestroy()
 //-----------------------------------------------------------------------------
 void MultisamplingApp::OnUpdate(float deltaTime)
 {
+	camera.update(deltaTime);
 }
 //-----------------------------------------------------------------------------
 void MultisamplingApp::OnFrame()
 {
-	if (!RenderPrepared())
-		return;
 
 }
 //-----------------------------------------------------------------------------

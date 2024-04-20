@@ -19,6 +19,7 @@ void GeometryShaderApp::OnDestroy()
 //-----------------------------------------------------------------------------
 void GeometryShaderApp::OnUpdate(float deltaTime)
 {
+	camera.update(deltaTime);
 }
 //-----------------------------------------------------------------------------
 void GeometryShaderApp::OnFrame()

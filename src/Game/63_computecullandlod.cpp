@@ -19,6 +19,7 @@ void ComputeCullAndLodApp::OnDestroy()
 //-----------------------------------------------------------------------------
 void ComputeCullAndLodApp::OnUpdate(float deltaTime)
 {
+	camera.update(deltaTime);
 }
 //-----------------------------------------------------------------------------
 void ComputeCullAndLodApp::OnFrame()

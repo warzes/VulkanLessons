@@ -19,12 +19,11 @@ void ShadowMappingOmniApp::OnDestroy()
 //-----------------------------------------------------------------------------
 void ShadowMappingOmniApp::OnUpdate(float deltaTime)
 {
+	camera.update(deltaTime);
 }
 //-----------------------------------------------------------------------------
 void ShadowMappingOmniApp::OnFrame()
 {
-	if (!RenderPrepared())
-		return;
 
 }
 //-----------------------------------------------------------------------------

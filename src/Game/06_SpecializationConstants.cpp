@@ -32,12 +32,11 @@ void SpecializationConstants::OnDestroy()
 //-----------------------------------------------------------------------------
 void SpecializationConstants::OnUpdate(float deltaTime)
 {
+	camera.update(deltaTime);
 }
 //-----------------------------------------------------------------------------
 void SpecializationConstants::OnFrame()
 {
-	if (!RenderPrepared())
-		return;
 	updateUniformBuffers();
 	draw();
 }

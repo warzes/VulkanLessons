@@ -19,12 +19,11 @@ void ScreenshotApp::OnDestroy()
 //-----------------------------------------------------------------------------
 void ScreenshotApp::OnUpdate(float deltaTime)
 {
+	camera.update(deltaTime);
 }
 //-----------------------------------------------------------------------------
 void ScreenshotApp::OnFrame()
 {
-	if (!RenderPrepared())
-		return;
 
 }
 //-----------------------------------------------------------------------------

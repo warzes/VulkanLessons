@@ -19,6 +19,7 @@ void TessellationApp::OnDestroy()
 //-----------------------------------------------------------------------------
 void TessellationApp::OnUpdate(float deltaTime)
 {
+	camera.update(deltaTime);
 }
 //-----------------------------------------------------------------------------
 void TessellationApp::OnFrame()

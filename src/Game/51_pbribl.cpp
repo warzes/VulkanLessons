@@ -19,13 +19,11 @@ void PBRIBLApp::OnDestroy()
 //-----------------------------------------------------------------------------
 void PBRIBLApp::OnUpdate(float deltaTime)
 {
+	camera.update(deltaTime);
 }
 //-----------------------------------------------------------------------------
 void PBRIBLApp::OnFrame()
 {
-	if (!RenderPrepared())
-		return;
-
 }
 //-----------------------------------------------------------------------------
 void PBRIBLApp::OnUpdateUIOverlay(vks::UIOverlay* overlay)

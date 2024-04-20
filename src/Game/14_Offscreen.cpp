@@ -19,12 +19,11 @@ void OffscreenApp::OnDestroy()
 //-----------------------------------------------------------------------------
 void OffscreenApp::OnUpdate(float deltaTime)
 {
+	camera.update(deltaTime);
 }
 //-----------------------------------------------------------------------------
 void OffscreenApp::OnFrame()
 {
-	if (!RenderPrepared())
-		return;
 
 }
 //-----------------------------------------------------------------------------

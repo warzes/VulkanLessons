@@ -19,13 +19,11 @@ void DeferredShadowsApp::OnDestroy()
 //-----------------------------------------------------------------------------
 void DeferredShadowsApp::OnUpdate(float deltaTime)
 {
+	camera.update(deltaTime);
 }
 //-----------------------------------------------------------------------------
 void DeferredShadowsApp::OnFrame()
 {
-	if (!RenderPrepared())
-		return;
-
 }
 //-----------------------------------------------------------------------------
 void DeferredShadowsApp::OnUpdateUIOverlay(vks::UIOverlay* overlay)

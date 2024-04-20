@@ -19,12 +19,11 @@ void VertexAttributesApp::OnDestroy()
 //-----------------------------------------------------------------------------
 void VertexAttributesApp::OnUpdate(float deltaTime)
 {
+	camera.update(deltaTime);
 }
 //-----------------------------------------------------------------------------
 void VertexAttributesApp::OnFrame()
 {
-	if (!RenderPrepared())
-		return;
 
 }
 //-----------------------------------------------------------------------------

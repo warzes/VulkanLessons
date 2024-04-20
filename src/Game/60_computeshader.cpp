@@ -19,6 +19,7 @@ void ComputeShaderApp::OnDestroy()
 //-----------------------------------------------------------------------------
 void ComputeShaderApp::OnUpdate(float deltaTime)
 {
+	camera.update(deltaTime);
 }
 //-----------------------------------------------------------------------------
 void ComputeShaderApp::OnFrame()

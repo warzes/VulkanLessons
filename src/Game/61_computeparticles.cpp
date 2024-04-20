@@ -19,6 +19,7 @@ void ComputeParticlesApp::OnDestroy()
 //-----------------------------------------------------------------------------
 void ComputeParticlesApp::OnUpdate(float deltaTime)
 {
+	camera.update(deltaTime);
 }
 //-----------------------------------------------------------------------------
 void ComputeParticlesApp::OnFrame()

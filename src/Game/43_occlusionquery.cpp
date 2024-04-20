@@ -19,13 +19,11 @@ void OcclusionQueryApp::OnDestroy()
 //-----------------------------------------------------------------------------
 void OcclusionQueryApp::OnUpdate(float deltaTime)
 {
+	camera.update(deltaTime);
 }
 //-----------------------------------------------------------------------------
 void OcclusionQueryApp::OnFrame()
 {
-	if (!RenderPrepared())
-		return;
-
 }
 //-----------------------------------------------------------------------------
 void OcclusionQueryApp::OnUpdateUIOverlay(vks::UIOverlay* overlay)

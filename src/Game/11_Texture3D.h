@@ -1,5 +1,10 @@
 #pragma once
 
+/*
+3D textures
+Generates a 3D texture on the cpu (using perlin noise), uploads it to the device and samples it to render an animation. 3D textures store volumetric data and interpolate in all three dimensions.
+*/
+
 class Texture3DApp final : public EngineApp
 {
 public:

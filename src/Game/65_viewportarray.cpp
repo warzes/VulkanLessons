@@ -19,6 +19,7 @@ void ViewportArrayApp::OnDestroy()
 //-----------------------------------------------------------------------------
 void ViewportArrayApp::OnUpdate(float deltaTime)
 {
+	camera.update(deltaTime);
 }
 //-----------------------------------------------------------------------------
 void ViewportArrayApp::OnFrame()

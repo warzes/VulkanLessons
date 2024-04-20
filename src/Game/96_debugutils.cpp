@@ -19,6 +19,7 @@ void DebugUtilsApp::OnDestroy()
 //-----------------------------------------------------------------------------
 void DebugUtilsApp::OnUpdate(float deltaTime)
 {
+	camera.update(deltaTime);
 }
 //-----------------------------------------------------------------------------
 void DebugUtilsApp::OnFrame()

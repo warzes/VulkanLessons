@@ -19,12 +19,11 @@ void InstancingApp::OnDestroy()
 //-----------------------------------------------------------------------------
 void InstancingApp::OnUpdate(float deltaTime)
 {
+	camera.update(deltaTime);
 }
 //-----------------------------------------------------------------------------
 void InstancingApp::OnFrame()
 {
-	if (!RenderPrepared())
-		return;
 
 }
 //-----------------------------------------------------------------------------

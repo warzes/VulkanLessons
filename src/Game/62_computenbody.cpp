@@ -19,6 +19,7 @@ void ComputeNBodyApp::OnDestroy()
 //-----------------------------------------------------------------------------
 void ComputeNBodyApp::OnUpdate(float deltaTime)
 {
+	camera.update(deltaTime);
 }
 //-----------------------------------------------------------------------------
 void ComputeNBodyApp::OnFrame()

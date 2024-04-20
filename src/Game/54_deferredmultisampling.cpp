@@ -19,13 +19,11 @@ void DeferredMultisamplingApp::OnDestroy()
 //-----------------------------------------------------------------------------
 void DeferredMultisamplingApp::OnUpdate(float deltaTime)
 {
+	camera.update(deltaTime);
 }
 //-----------------------------------------------------------------------------
 void DeferredMultisamplingApp::OnFrame()
 {
-	if (!RenderPrepared())
-		return;
-
 }
 //-----------------------------------------------------------------------------
 void DeferredMultisamplingApp::OnUpdateUIOverlay(vks::UIOverlay* overlay)

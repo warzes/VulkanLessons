@@ -19,6 +19,7 @@ void InlineUniformBlocksApp::OnDestroy()
 //-----------------------------------------------------------------------------
 void InlineUniformBlocksApp::OnUpdate(float deltaTime)
 {
+	camera.update(deltaTime);
 }
 //-----------------------------------------------------------------------------
 void InlineUniformBlocksApp::OnFrame()

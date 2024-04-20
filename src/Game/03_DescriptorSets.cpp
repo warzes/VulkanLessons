@@ -30,13 +30,11 @@ void DescriptorSets::OnDestroy()
 //-----------------------------------------------------------------------------
 void DescriptorSets::OnUpdate(float deltaTime)
 {
+	camera.update(deltaTime);
 }
 //-----------------------------------------------------------------------------
 void DescriptorSets::OnFrame()
 {
-	if (!RenderPrepared())
-		return;
-
 	draw();
 	if (animate && !paused) 
 	{

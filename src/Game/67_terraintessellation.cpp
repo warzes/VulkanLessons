@@ -19,6 +19,7 @@ void TerrainTessellationApp::OnDestroy()
 //-----------------------------------------------------------------------------
 void TerrainTessellationApp::OnUpdate(float deltaTime)
 {
+	camera.update(deltaTime);
 }
 //-----------------------------------------------------------------------------
 void TerrainTessellationApp::OnFrame()

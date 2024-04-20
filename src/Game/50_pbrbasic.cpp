@@ -19,6 +19,7 @@ void PBRBasicApp::OnDestroy()
 //-----------------------------------------------------------------------------
 void PBRBasicApp::OnUpdate(float deltaTime)
 {
+	camera.update(deltaTime);
 }
 //-----------------------------------------------------------------------------
 void PBRBasicApp::OnFrame()

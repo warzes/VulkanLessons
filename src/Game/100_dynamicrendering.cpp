@@ -19,6 +19,7 @@ void DynamicRenderingApp::OnDestroy()
 //-----------------------------------------------------------------------------
 void DynamicRenderingApp::OnUpdate(float deltaTime)
 {
+	camera.update(deltaTime);
 }
 //-----------------------------------------------------------------------------
 void DynamicRenderingApp::OnFrame()

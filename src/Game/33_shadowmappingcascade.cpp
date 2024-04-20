@@ -19,12 +19,11 @@ void ShadowMappingCascadeApp::OnDestroy()
 //-----------------------------------------------------------------------------
 void ShadowMappingCascadeApp::OnUpdate(float deltaTime)
 {
+	camera.update(deltaTime);
 }
 //-----------------------------------------------------------------------------
 void ShadowMappingCascadeApp::OnFrame()
 {
-	if (!RenderPrepared())
-		return;
 
 }
 //-----------------------------------------------------------------------------

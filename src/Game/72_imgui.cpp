@@ -19,6 +19,7 @@ void ImguiApp::OnDestroy()
 //-----------------------------------------------------------------------------
 void ImguiApp::OnUpdate(float deltaTime)
 {
+	camera.update(deltaTime);
 }
 //-----------------------------------------------------------------------------
 void ImguiApp::OnFrame()

@@ -19,6 +19,7 @@ void VariableRateShadingApp::OnDestroy()
 //-----------------------------------------------------------------------------
 void VariableRateShadingApp::OnUpdate(float deltaTime)
 {
+	camera.update(deltaTime);
 }
 //-----------------------------------------------------------------------------
 void VariableRateShadingApp::OnFrame()

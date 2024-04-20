@@ -19,13 +19,11 @@ void PipelineStatisticsApp::OnDestroy()
 //-----------------------------------------------------------------------------
 void PipelineStatisticsApp::OnUpdate(float deltaTime)
 {
+	camera.update(deltaTime);
 }
 //-----------------------------------------------------------------------------
 void PipelineStatisticsApp::OnFrame()
 {
-	if (!RenderPrepared())
-		return;
-
 }
 //-----------------------------------------------------------------------------
 void PipelineStatisticsApp::OnUpdateUIOverlay(vks::UIOverlay* overlay)

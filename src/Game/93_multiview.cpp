@@ -19,6 +19,7 @@ void MultiviewApp::OnDestroy()
 //-----------------------------------------------------------------------------
 void MultiviewApp::OnUpdate(float deltaTime)
 {
+	camera.update(deltaTime);
 }
 //-----------------------------------------------------------------------------
 void MultiviewApp::OnFrame()

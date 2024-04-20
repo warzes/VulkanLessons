@@ -19,6 +19,7 @@ void SSAOApp::OnDestroy()
 //-----------------------------------------------------------------------------
 void SSAOApp::OnUpdate(float deltaTime)
 {
+	camera.update(deltaTime);
 }
 //-----------------------------------------------------------------------------
 void SSAOApp::OnFrame()
