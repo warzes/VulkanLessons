@@ -86,14 +86,15 @@ int main(
 	//OffscreenApp app;
 	//ParticleSystemApp app;
 	//StencilbufferApp app;
-	VertexAttributesApp app;
+	//VertexAttributesApp app;
 	
 	//GLTFLoadingApp app;
 	//GLTFSkinningApp app;
 	//GLTFSceneApp app;
 	
+	//MultisamplingApp app;
 	//HDRApp app;
-	//ShadowMappingApp app;
+	ShadowMappingApp app;
 	//ShadowMappingCascadeApp app;
 	//ShadowMappingOmniApp app;
 	//TextureMipmapgenApp app;

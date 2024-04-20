@@ -4,17 +4,32 @@
 bool GLTFLoadingApp::OnCreate()
 {
 	camera.type = Camera::CameraType::lookat;
-	camera.setPosition(glm::vec3(0.0f, 0.0f, -4.0f));
-	camera.setRotation(glm::vec3(0.0f));
-	camera.setRotationSpeed(0.25f);
+	camera.flipY = true;
+	camera.setPosition(glm::vec3(0.0f, -0.1f, -1.0f));
+	camera.setRotation(glm::vec3(0.0f, 45.0f, 0.0f));
 	camera.setPerspective(60.0f, (float)destWidth / (float)destHeight, 0.1f, 256.0f);
+
+	loadAssets();
+	prepareUniformBuffers();
+	setupDescriptors();
+	preparePipelines();
+	buildCommandBuffers();
 
 	return true;
 }
 //-----------------------------------------------------------------------------
 void GLTFLoadingApp::OnDestroy()
 {
-
+	if (device) {
+		vkDestroyPipeline(device, pipelines.solid, nullptr);
+		if (pipelines.wireframe != VK_NULL_HANDLE) {
+			vkDestroyPipeline(device, pipelines.wireframe, nullptr);
+		}
+		vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
+		vkDestroyDescriptorSetLayout(device, descriptorSetLayouts.matrices, nullptr);
+		vkDestroyDescriptorSetLayout(device, descriptorSetLayouts.textures, nullptr);
+		shaderData.buffer.destroy();
+	}
 }
 //-----------------------------------------------------------------------------
 void GLTFLoadingApp::OnUpdate(float deltaTime)
@@ -24,12 +39,17 @@ void GLTFLoadingApp::OnUpdate(float deltaTime)
 //-----------------------------------------------------------------------------
 void GLTFLoadingApp::OnFrame()
 {
-
+	updateUniformBuffers();
+	renderFrame();
 }
 //-----------------------------------------------------------------------------
 void GLTFLoadingApp::OnUpdateUIOverlay(vks::UIOverlay* overlay)
 {
-
+	if (overlay->header("Settings")) {
+		if (overlay->checkBox("Wireframe", &wireframe)) {
+			buildCommandBuffers();
+		}
+	}
 }
 //-----------------------------------------------------------------------------
 void GLTFLoadingApp::OnWindowResize(uint32_t destWidth, uint32_t destHeight)

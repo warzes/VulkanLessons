@@ -4,17 +4,38 @@
 bool MultisamplingApp::OnCreate()
 {
 	camera.type = Camera::CameraType::lookat;
-	camera.setPosition(glm::vec3(0.0f, 0.0f, -4.0f));
-	camera.setRotation(glm::vec3(0.0f));
-	camera.setRotationSpeed(0.25f);
 	camera.setPerspective(60.0f, (float)destWidth / (float)destHeight, 0.1f, 256.0f);
+	camera.setRotation(glm::vec3(0.0f, -90.0f, 0.0f));
+	camera.setTranslation(glm::vec3(2.5f, 2.5f, -7.5f));
+
+	loadAssets();
+	prepareUniformBuffers();
+	setupDescriptors();
+	preparePipelines();
+	buildCommandBuffers();
 
 	return true;
 }
 //-----------------------------------------------------------------------------
 void MultisamplingApp::OnDestroy()
 {
+	if (device) {
+		vkDestroyPipeline(device, pipelines.MSAA, nullptr);
+		vkDestroyPipeline(device, pipelines.MSAASampleShading, nullptr);
 
+		vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
+		vkDestroyDescriptorSetLayout(device, descriptorSetLayout, nullptr);
+
+		// Destroy MSAA target
+		vkDestroyImage(device, multisampleTarget.color.image, nullptr);
+		vkDestroyImageView(device, multisampleTarget.color.view, nullptr);
+		vkFreeMemory(device, multisampleTarget.color.memory, nullptr);
+		vkDestroyImage(device, multisampleTarget.depth.image, nullptr);
+		vkDestroyImageView(device, multisampleTarget.depth.view, nullptr);
+		vkFreeMemory(device, multisampleTarget.depth.memory, nullptr);
+
+		uniformBuffer.destroy();
+	}
 }
 //-----------------------------------------------------------------------------
 void MultisamplingApp::OnUpdate(float deltaTime)
@@ -24,12 +45,19 @@ void MultisamplingApp::OnUpdate(float deltaTime)
 //-----------------------------------------------------------------------------
 void MultisamplingApp::OnFrame()
 {
-
+	updateUniformBuffers();
+	draw();
 }
 //-----------------------------------------------------------------------------
 void MultisamplingApp::OnUpdateUIOverlay(vks::UIOverlay* overlay)
 {
-
+	if (vulkanDevice->features.sampleRateShading) {
+		if (overlay->header("Settings")) {
+			if (overlay->checkBox("Sample rate shading", &useSampleShading)) {
+				buildCommandBuffers();
+			}
+		}
+	}
 }
 //-----------------------------------------------------------------------------
 void MultisamplingApp::OnWindowResize(uint32_t destWidth, uint32_t destHeight)

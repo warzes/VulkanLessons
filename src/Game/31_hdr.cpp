@@ -4,17 +4,47 @@
 bool HDRApp::OnCreate()
 {
 	camera.type = Camera::CameraType::lookat;
-	camera.setPosition(glm::vec3(0.0f, 0.0f, -4.0f));
-	camera.setRotation(glm::vec3(0.0f));
-	camera.setRotationSpeed(0.25f);
+	camera.setPosition(glm::vec3(0.0f, 0.0f, -6.0f));
+	camera.setRotation(glm::vec3(0.0f, 0.0f, 0.0f));
 	camera.setPerspective(60.0f, (float)destWidth / (float)destHeight, 0.1f, 256.0f);
+
+	loadAssets();
+	prepareUniformBuffers();
+	prepareoffscreenfer();
+	setupDescriptors();
+	preparePipelines();
+	buildCommandBuffers();
 
 	return true;
 }
 //-----------------------------------------------------------------------------
 void HDRApp::OnDestroy()
 {
-
+	if (device) {
+		vkDestroyPipeline(device, pipelines.skybox, nullptr);
+		vkDestroyPipeline(device, pipelines.reflect, nullptr);
+		vkDestroyPipeline(device, pipelines.composition, nullptr);
+		vkDestroyPipeline(device, pipelines.bloom[0], nullptr);
+		vkDestroyPipeline(device, pipelines.bloom[1], nullptr);
+		vkDestroyPipelineLayout(device, pipelineLayouts.models, nullptr);
+		vkDestroyPipelineLayout(device, pipelineLayouts.composition, nullptr);
+		vkDestroyPipelineLayout(device, pipelineLayouts.bloomFilter, nullptr);
+		vkDestroyDescriptorSetLayout(device, descriptorSetLayouts.models, nullptr);
+		vkDestroyDescriptorSetLayout(device, descriptorSetLayouts.composition, nullptr);
+		vkDestroyDescriptorSetLayout(device, descriptorSetLayouts.bloomFilter, nullptr);
+		vkDestroyRenderPass(device, offscreen.renderPass, nullptr);
+		vkDestroyRenderPass(device, filterPass.renderPass, nullptr);
+		vkDestroyFramebuffer(device, offscreen.frameBuffer, nullptr);
+		vkDestroyFramebuffer(device, filterPass.frameBuffer, nullptr);
+		vkDestroySampler(device, offscreen.sampler, nullptr);
+		vkDestroySampler(device, filterPass.sampler, nullptr);
+		offscreen.depth.destroy(device);
+		offscreen.color[0].destroy(device);
+		offscreen.color[1].destroy(device);
+		filterPass.color[0].destroy(device);
+		uniformBuffer.destroy();
+		textures.envmap.destroy();
+	}
 }
 //-----------------------------------------------------------------------------
 void HDRApp::OnUpdate(float deltaTime)
@@ -24,12 +54,24 @@ void HDRApp::OnUpdate(float deltaTime)
 //-----------------------------------------------------------------------------
 void HDRApp::OnFrame()
 {
-
+	updateUniformBuffers();
+	draw();
 }
 //-----------------------------------------------------------------------------
 void HDRApp::OnUpdateUIOverlay(vks::UIOverlay* overlay)
 {
-
+	if (overlay->header("Settings")) {
+		if (overlay->comboBox("Object type", &models.index, modelNames)) {
+			buildCommandBuffers();
+		}
+		overlay->inputFloat("Exposure", &uniformData.exposure, 0.025f, 3);
+		if (overlay->checkBox("Bloom", &bloom)) {
+			buildCommandBuffers();
+		}
+		if (overlay->checkBox("Skybox", &displaySkybox)) {
+			buildCommandBuffers();
+		}
+	}
 }
 //-----------------------------------------------------------------------------
 void HDRApp::OnWindowResize(uint32_t destWidth, uint32_t destHeight)

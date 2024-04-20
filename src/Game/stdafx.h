@@ -29,9 +29,9 @@
 #include <ktx/ktxvulkan.h>
 
 #define TINYGLTF_NO_STB_IMAGE_WRITE
-#define TINYGLTF_NO_STB_IMAGE
-#define TINYGLTF_NO_EXTERNAL_IMAGE
 #include "tinygltf/tiny_gltf.h"
+
+#include "imgui/imgui.h"
 
 #include "Engine/BaseMacros.h"
 #include "Engine/BaseFunc.h"
