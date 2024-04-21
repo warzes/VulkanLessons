@@ -197,6 +197,8 @@ protected:
 	// Multiplier for speeding up (or slowing down) the global timer
 	float timerSpeed = 0.25f;
 
+	bool resized = false;
+
 private:
 	bool create();
 	void setupDPIAwareness();
@@ -243,7 +245,7 @@ private:
 
 
 	bool prepared = false;
-	bool resized = false;
+
 	bool validation = false;
 	bool overlay = true;
 

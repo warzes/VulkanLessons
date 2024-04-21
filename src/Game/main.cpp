@@ -94,17 +94,19 @@ int main(
 	
 	//MultisamplingApp app;
 	//HDRApp app;
-	ShadowMappingApp app;
+	//ShadowMappingApp app;
 	//ShadowMappingCascadeApp app;
 	//ShadowMappingOmniApp app;
 	//TextureMipmapgenApp app;
 	//ScreenshotApp app;
-	//OITApp app;
+	OITApp app;
+		
 	//MultithreadingApp app;
 	//InstancingApp app;
 	//IndirectDrawApp app;
 	//OcclusionQueryApp app;
 	//PipelineStatisticsApp app;
+	
 	//PBRBasicApp app;
 	//PBRIBLApp app;
 	//PBRTextureApp app;

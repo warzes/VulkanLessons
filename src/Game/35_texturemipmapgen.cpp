@@ -3,18 +3,35 @@
 //-----------------------------------------------------------------------------
 bool TextureMipmapgenApp::OnCreate()
 {
-	camera.type = Camera::CameraType::lookat;
-	camera.setPosition(glm::vec3(0.0f, 0.0f, -4.0f));
-	camera.setRotation(glm::vec3(0.0f));
-	camera.setRotationSpeed(0.25f);
-	camera.setPerspective(60.0f, (float)destWidth / (float)destHeight, 0.1f, 256.0f);
+	camera.type = Camera::CameraType::firstperson;
+	camera.setPerspective(60.0f, (float)destWidth / (float)destHeight, 0.1f, 1024.0f);
+	camera.setRotation(glm::vec3(0.0f, 90.0f, 0.0f));
+	camera.setTranslation(glm::vec3(40.75f, 0.0f, 0.0f));
+	camera.movementSpeed = 2.5f;
+	camera.rotationSpeed = 0.5f;
+	timerSpeed *= 0.05f;
+
+	loadAssets();
+	prepareUniformBuffers();
+	setupDescriptors();
+	preparePipelines();
+	buildCommandBuffers();
 
 	return true;
 }
 //-----------------------------------------------------------------------------
 void TextureMipmapgenApp::OnDestroy()
 {
-
+	if (device) {
+		destroyTextureImage(texture);
+		vkDestroyPipeline(device, pipeline, nullptr);
+		vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
+		vkDestroyDescriptorSetLayout(device, descriptorSetLayout, nullptr);
+		uniformBuffer.destroy();
+		for (auto sampler : samplers) {
+			vkDestroySampler(device, sampler, nullptr);
+		}
+	}
 }
 //-----------------------------------------------------------------------------
 void TextureMipmapgenApp::OnUpdate(float deltaTime)
@@ -24,12 +41,20 @@ void TextureMipmapgenApp::OnUpdate(float deltaTime)
 //-----------------------------------------------------------------------------
 void TextureMipmapgenApp::OnFrame()
 {
-
+	updateUniformBuffers();
+	draw();
 }
 //-----------------------------------------------------------------------------
 void TextureMipmapgenApp::OnUpdateUIOverlay(vks::UIOverlay* overlay)
 {
-
+	if (overlay->header("Settings")) {
+		if (overlay->sliderFloat("LOD bias", &uniformData.lodBias, 0.0f, (float)texture.mipLevels)) {
+			updateUniformBuffers();
+		}
+		if (overlay->comboBox("Sampler type", &uniformData.samplerIndex, samplerNames)) {
+			updateUniformBuffers();
+		}
+	}
 }
 //-----------------------------------------------------------------------------
 void TextureMipmapgenApp::OnWindowResize(uint32_t destWidth, uint32_t destHeight)

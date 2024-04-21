@@ -4,17 +4,33 @@
 bool OITApp::OnCreate()
 {
 	camera.type = Camera::CameraType::lookat;
-	camera.setPosition(glm::vec3(0.0f, 0.0f, -4.0f));
-	camera.setRotation(glm::vec3(0.0f));
-	camera.setRotationSpeed(0.25f);
+	camera.setPosition(glm::vec3(0.0f, 0.0f, -6.0f));
+	camera.setRotation(glm::vec3(0.0f, 0.0f, 0.0f));
 	camera.setPerspective(60.0f, (float)destWidth / (float)destHeight, 0.1f, 256.0f);
+
+	loadAssets();
+	prepareUniformBuffers();
+	prepareGeometryPass();
+	setupDescriptors();
+	preparePipelines();
+	buildCommandBuffers();
+	updateUniformBuffers();
 
 	return true;
 }
 //-----------------------------------------------------------------------------
 void OITApp::OnDestroy()
 {
-
+	if (device) {
+		vkDestroyPipeline(device, pipelines.geometry, nullptr);
+		vkDestroyPipeline(device, pipelines.color, nullptr);
+		vkDestroyPipelineLayout(device, pipelineLayouts.geometry, nullptr);
+		vkDestroyPipelineLayout(device, pipelineLayouts.color, nullptr);
+		vkDestroyDescriptorSetLayout(device, descriptorSetLayouts.geometry, nullptr);
+		vkDestroyDescriptorSetLayout(device, descriptorSetLayouts.color, nullptr);
+		destroyGeometryPass();
+		renderPassUniformBuffer.destroy();
+	}
 }
 //-----------------------------------------------------------------------------
 void OITApp::OnUpdate(float deltaTime)
@@ -24,7 +40,8 @@ void OITApp::OnUpdate(float deltaTime)
 //-----------------------------------------------------------------------------
 void OITApp::OnFrame()
 {
-
+	updateUniformBuffers();
+	draw();
 }
 //-----------------------------------------------------------------------------
 void OITApp::OnUpdateUIOverlay(vks::UIOverlay* overlay)
@@ -36,6 +53,13 @@ void OITApp::OnWindowResize(uint32_t destWidth, uint32_t destHeight)
 {
 	if ((destWidth > 0.0f) && (destHeight > 0.0f))
 		camera.updateAspectRatio((float)destWidth / (float)destHeight);
+
+	destroyGeometryPass();
+	prepareGeometryPass();
+	vkResetDescriptorPool(device, descriptorPool, 0);
+	setupDescriptors();
+	resized = false;
+	buildCommandBuffers();
 }
 //-----------------------------------------------------------------------------
 void OITApp::OnKeyPressed(uint32_t key)

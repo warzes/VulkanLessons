@@ -3,18 +3,48 @@
 //-----------------------------------------------------------------------------
 bool ShadowMappingCascadeApp::OnCreate()
 {
-	camera.type = Camera::CameraType::lookat;
-	camera.setPosition(glm::vec3(0.0f, 0.0f, -4.0f));
-	camera.setRotation(glm::vec3(0.0f));
-	camera.setRotationSpeed(0.25f);
-	camera.setPerspective(60.0f, (float)destWidth / (float)destHeight, 0.1f, 256.0f);
+	timerSpeed *= 0.025f;
+	camera.type = Camera::CameraType::firstperson;
+	camera.movementSpeed = 2.5f;
+	camera.setPerspective(45.0f, (float)destWidth / (float)destHeight, zNear, zFar);
+	camera.setPosition(glm::vec3(-0.12f, 1.14f, -2.25f));
+	camera.setRotation(glm::vec3(-17.0f, 7.0f, 0.0f));
+	timer = 0.2f;
+
+	loadAssets();
+	updateLight();
+	updateCascades();
+	prepareDepthPass();
+	prepareUniformBuffers();
+	setupLayoutsAndDescriptors();
+	preparePipelines();
+	buildCommandBuffers();
 
 	return true;
 }
 //-----------------------------------------------------------------------------
 void ShadowMappingCascadeApp::OnDestroy()
 {
+	for (auto cascade : cascades) {
+		cascade.destroy(device);
+	}
+	depth.destroy(device);
 
+	vkDestroyRenderPass(device, depthPass.renderPass, nullptr);
+
+	vkDestroyPipeline(device, pipelines.debugShadowMap, nullptr);
+	vkDestroyPipeline(device, depthPass.pipeline, nullptr);
+	vkDestroyPipeline(device, pipelines.sceneShadow, nullptr);
+	vkDestroyPipeline(device, pipelines.sceneShadowPCF, nullptr);
+
+	vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
+	vkDestroyPipelineLayout(device, depthPass.pipelineLayout, nullptr);
+
+	vkDestroyDescriptorSetLayout(device, descriptorSetLayouts.base, nullptr);
+
+	depthPass.uniformBuffer.destroy();
+	uniformBuffers.VS.destroy();
+	uniformBuffers.FS.destroy();
 }
 //-----------------------------------------------------------------------------
 void ShadowMappingCascadeApp::OnUpdate(float deltaTime)
@@ -24,12 +54,36 @@ void ShadowMappingCascadeApp::OnUpdate(float deltaTime)
 //-----------------------------------------------------------------------------
 void ShadowMappingCascadeApp::OnFrame()
 {
-
+	draw();
+	if (!paused || camera.updated) {
+		updateLight();
+		updateCascades();
+		updateUniformBuffers();
+	}
 }
 //-----------------------------------------------------------------------------
 void ShadowMappingCascadeApp::OnUpdateUIOverlay(vks::UIOverlay* overlay)
 {
-
+	if (overlay->header("Settings")) {
+		if (overlay->sliderFloat("Split lambda", &cascadeSplitLambda, 0.1f, 1.0f)) {
+			updateCascades();
+			updateUniformBuffers();
+		}
+		if (overlay->checkBox("Color cascades", &colorCascades)) {
+			updateUniformBuffers();
+		}
+		if (overlay->checkBox("Display depth map", &displayDepthMap)) {
+			buildCommandBuffers();
+		}
+		if (displayDepthMap) {
+			if (overlay->sliderInt("Cascade", &displayDepthMapCascadeIndex, 0, SHADOW_MAP_CASCADE_COUNT - 1)) {
+				buildCommandBuffers();
+			}
+		}
+		if (overlay->checkBox("PCF filtering", &filterPCF)) {
+			buildCommandBuffers();
+		}
+	}
 }
 //-----------------------------------------------------------------------------
 void ShadowMappingCascadeApp::OnWindowResize(uint32_t destWidth, uint32_t destHeight)

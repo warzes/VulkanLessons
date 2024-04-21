@@ -4,17 +4,62 @@
 bool ShadowMappingOmniApp::OnCreate()
 {
 	camera.type = Camera::CameraType::lookat;
-	camera.setPosition(glm::vec3(0.0f, 0.0f, -4.0f));
-	camera.setRotation(glm::vec3(0.0f));
-	camera.setRotationSpeed(0.25f);
-	camera.setPerspective(60.0f, (float)destWidth / (float)destHeight, 0.1f, 256.0f);
+	camera.setPerspective(45.0f, (float)destWidth / (float)destHeight, zNear, zFar);
+	camera.setRotation(glm::vec3(-20.5f, -673.0f, 0.0f));
+	camera.setPosition(glm::vec3(0.0f, 0.5f, -15.0f));
+	timerSpeed *= 0.5f;
+
+	loadAssets();
+	prepareUniformBuffers();
+	prepareCubeMap();
+	setupDescriptors();
+	prepareOffscreenRenderpass();
+	preparePipelines();
+	prepareOffscreenFramebuffer();
+	buildCommandBuffers();
 
 	return true;
 }
 //-----------------------------------------------------------------------------
 void ShadowMappingOmniApp::OnDestroy()
 {
+	if (device) {
+		// Cube map
+		for (uint32_t i = 0; i < 6; i++) {
+			vkDestroyImageView(device, shadowCubeMapFaceImageViews[i], nullptr);
+		}
 
+		vkDestroyImageView(device, shadowCubeMap.view, nullptr);
+		vkDestroyImage(device, shadowCubeMap.image, nullptr);
+		vkDestroySampler(device, shadowCubeMap.sampler, nullptr);
+		vkFreeMemory(device, shadowCubeMap.deviceMemory, nullptr);
+
+		// Depth attachment
+		vkDestroyImageView(device, offscreenPass.depth.view, nullptr);
+		vkDestroyImage(device, offscreenPass.depth.image, nullptr);
+		vkFreeMemory(device, offscreenPass.depth.mem, nullptr);
+
+		for (uint32_t i = 0; i < 6; i++)
+		{
+			vkDestroyFramebuffer(device, offscreenPass.frameBuffers[i], nullptr);
+		}
+
+		vkDestroyRenderPass(device, offscreenPass.renderPass, nullptr);
+
+		// Pipelines
+		vkDestroyPipeline(device, pipelines.scene, nullptr);
+		vkDestroyPipeline(device, pipelines.offscreen, nullptr);
+		vkDestroyPipeline(device, pipelines.cubemapDisplay, nullptr);
+
+		vkDestroyPipelineLayout(device, pipelineLayouts.scene, nullptr);
+		vkDestroyPipelineLayout(device, pipelineLayouts.offscreen, nullptr);
+
+		vkDestroyDescriptorSetLayout(device, descriptorSetLayout, nullptr);
+
+		// Uniform buffers
+		uniformBuffers.offscreen.destroy();
+		uniformBuffers.scene.destroy();
+	}
 }
 //-----------------------------------------------------------------------------
 void ShadowMappingOmniApp::OnUpdate(float deltaTime)
@@ -24,12 +69,18 @@ void ShadowMappingOmniApp::OnUpdate(float deltaTime)
 //-----------------------------------------------------------------------------
 void ShadowMappingOmniApp::OnFrame()
 {
-
+	updateUniformBuffers();
+	updateUniformBufferOffscreen();
+	draw();
 }
 //-----------------------------------------------------------------------------
 void ShadowMappingOmniApp::OnUpdateUIOverlay(vks::UIOverlay* overlay)
 {
-
+	if (overlay->header("Settings")) {
+		if (overlay->checkBox("Display shadow cube render target", &displayCubeMap)) {
+			buildCommandBuffers();
+		}
+	}
 }
 //-----------------------------------------------------------------------------
 void ShadowMappingOmniApp::OnWindowResize(uint32_t destWidth, uint32_t destHeight)

@@ -4,17 +4,27 @@
 bool ScreenshotApp::OnCreate()
 {
 	camera.type = Camera::CameraType::lookat;
-	camera.setPosition(glm::vec3(0.0f, 0.0f, -4.0f));
-	camera.setRotation(glm::vec3(0.0f));
-	camera.setRotationSpeed(0.25f);
-	camera.setPerspective(60.0f, (float)destWidth / (float)destHeight, 0.1f, 256.0f);
+	camera.setPerspective(60.0f, (float)destWidth / (float)destHeight, 0.1f, 512.0f);
+	camera.setRotation(glm::vec3(-25.0f, 23.75f, 0.0f));
+	camera.setTranslation(glm::vec3(0.0f, 0.0f, -3.0f));
+
+	loadAssets();
+	prepareUniformBuffers();
+	setupDescriptors();
+	preparePipelines();
+	buildCommandBuffers();
 
 	return true;
 }
 //-----------------------------------------------------------------------------
 void ScreenshotApp::OnDestroy()
 {
-
+	if (device) {
+		vkDestroyPipeline(device, pipeline, nullptr);
+		vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
+		vkDestroyDescriptorSetLayout(device, descriptorSetLayout, nullptr);
+		uniformBuffer.destroy();
+	}
 }
 //-----------------------------------------------------------------------------
 void ScreenshotApp::OnUpdate(float deltaTime)
@@ -24,12 +34,20 @@ void ScreenshotApp::OnUpdate(float deltaTime)
 //-----------------------------------------------------------------------------
 void ScreenshotApp::OnFrame()
 {
-
+	updateUniformBuffers();
+	draw();
 }
 //-----------------------------------------------------------------------------
 void ScreenshotApp::OnUpdateUIOverlay(vks::UIOverlay* overlay)
 {
-
+	if (overlay->header("Functions")) {
+		if (overlay->button("Take screenshot")) {
+			saveScreenshot("screenshot.ppm");
+		}
+		if (screenshotSaved) {
+			overlay->text("Screenshot saved as screenshot.ppm");
+		}
+	}
 }
 //-----------------------------------------------------------------------------
 void ScreenshotApp::OnWindowResize(uint32_t destWidth, uint32_t destHeight)
