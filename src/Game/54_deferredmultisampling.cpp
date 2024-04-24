@@ -3,18 +3,55 @@
 //-----------------------------------------------------------------------------
 bool DeferredMultisamplingApp::OnCreate()
 {
-	camera.type = Camera::CameraType::lookat;
-	camera.setPosition(glm::vec3(0.0f, 0.0f, -4.0f));
-	camera.setRotation(glm::vec3(0.0f));
-	camera.setRotationSpeed(0.25f);
+	camera.type = Camera::CameraType::firstperson;
+	camera.movementSpeed = 5.0f;
+#ifndef __ANDROID__
+	camera.rotationSpeed = 0.25f;
+#endif
+	camera.position = { 2.15f, 0.3f, -8.75f };
+	camera.setRotation(glm::vec3(-0.75f, 12.5f, 0.0f));
 	camera.setPerspective(60.0f, (float)destWidth / (float)destHeight, 0.1f, 256.0f);
+
+	sampleCount = getMaxUsableSampleCount();
+	loadAssets();
+	deferredSetup();
+	prepareUniformBuffers();
+	setupDescriptors();
+	preparePipelines();
+	buildCommandBuffers();
+	buildDeferredCommandBuffer();
 
 	return true;
 }
 //-----------------------------------------------------------------------------
 void DeferredMultisamplingApp::OnDestroy()
 {
+	if (device) {
+		// Frame buffers
+		if (offscreenframeBuffers) {
+			delete offscreenframeBuffers;
+		}
 
+		vkDestroyPipeline(device, pipelines.deferred, nullptr);
+		vkDestroyPipeline(device, pipelines.deferredNoMSAA, nullptr);
+		vkDestroyPipeline(device, pipelines.offscreen, nullptr);
+		vkDestroyPipeline(device, pipelines.offscreenSampleShading, nullptr);
+
+		vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
+
+		vkDestroyDescriptorSetLayout(device, descriptorSetLayout, nullptr);
+
+		// Uniform buffers
+		uniformBuffers.offscreen.destroy();
+		uniformBuffers.composition.destroy();
+
+		textures.model.colorMap.destroy();
+		textures.model.normalMap.destroy();
+		textures.background.colorMap.destroy();
+		textures.background.normalMap.destroy();
+
+		vkDestroySemaphore(device, offscreenSemaphore, nullptr);
+	}
 }
 //-----------------------------------------------------------------------------
 void DeferredMultisamplingApp::OnUpdate(float deltaTime)
@@ -24,11 +61,25 @@ void DeferredMultisamplingApp::OnUpdate(float deltaTime)
 //-----------------------------------------------------------------------------
 void DeferredMultisamplingApp::OnFrame()
 {
+	updateUniformBufferOffscreen();
+	draw();
 }
 //-----------------------------------------------------------------------------
 void DeferredMultisamplingApp::OnUpdateUIOverlay(vks::UIOverlay* overlay)
 {
-
+	if (overlay->header("Settings")) {
+		if (overlay->comboBox("Display", &debugDisplayTarget, { "Final composition", "Position", "Normals", "Albedo", "Specular" })) {
+			updateUniformBufferDeferred();
+		}
+		if (overlay->checkBox("MSAA", &useMSAA)) {
+			buildCommandBuffers();
+		}
+		if (m_vulkanDevice->features.sampleRateShading) {
+			if (overlay->checkBox("Sample rate shading", &useSampleShading)) {
+				buildDeferredCommandBuffer();
+			}
+		}
+	}
 }
 //-----------------------------------------------------------------------------
 void DeferredMultisamplingApp::OnWindowResize(uint32_t destWidth, uint32_t destHeight)

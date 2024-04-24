@@ -109,13 +109,13 @@ int main(
 	
 	//PBRBasicApp app;
 	//PBRIBLApp app;
-	PBRTextureApp app;
+	//PBRTextureApp app;
 	//DefferedApp app;
 	//DeferredMultisamplingApp app;
 	//DeferredShadowsApp app;
 	//SSAOApp app;
 	
-	//ComputeShaderApp app;
+	ComputeShaderApp app;
 	//ComputeParticlesApp app;
 	//ComputeNBodyApp app;
 	//ComputeCullAndLodApp app;
@@ -124,9 +124,11 @@ int main(
 	//DisplacementApp app;
 	//TerrainTessellationApp app;
 	//TessellationApp app;
+	
 	//TextOverlayApp app;
 	//DistanceFieldFontsApp app;
 	//ImguiApp app;
+	
 	//RadialBlurApp app;
 	//BloomApp app;
 	//ParallaxMappingApp app;

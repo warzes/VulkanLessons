@@ -4,17 +4,48 @@
 bool ComputeShaderApp::OnCreate()
 {
 	camera.type = Camera::CameraType::lookat;
-	camera.setPosition(glm::vec3(0.0f, 0.0f, -4.0f));
+	camera.setPosition(glm::vec3(0.0f, 0.0f, -2.0f));
 	camera.setRotation(glm::vec3(0.0f));
-	camera.setRotationSpeed(0.25f);
-	camera.setPerspective(60.0f, (float)destWidth / (float)destHeight, 0.1f, 256.0f);
+	camera.setPerspective(60.0f, (float)destWidth * 0.5f / (float)destHeight, 1.0f, 256.0f);
+
+	loadAssets();
+	generateQuad();
+	prepareUniformBuffers();
+	prepareStorageImage();
+	setupDescriptorPool();
+	prepareGraphics();
+	prepareCompute();
+	buildCommandBuffers();
 
 	return true;
 }
 //-----------------------------------------------------------------------------
 void ComputeShaderApp::OnDestroy()
 {
+	if (device) {
+		// Graphics
+		vkDestroyPipeline(device, graphics.pipeline, nullptr);
+		vkDestroyPipelineLayout(device, graphics.pipelineLayout, nullptr);
+		vkDestroyDescriptorSetLayout(device, graphics.descriptorSetLayout, nullptr);
+		vkDestroySemaphore(device, graphics.semaphore, nullptr);
+		graphics.uniformBuffer.destroy();
 
+		// Compute
+		for (auto& pipeline : compute.pipelines)
+		{
+			vkDestroyPipeline(device, pipeline, nullptr);
+		}
+		vkDestroyPipelineLayout(device, compute.pipelineLayout, nullptr);
+		vkDestroyDescriptorSetLayout(device, compute.descriptorSetLayout, nullptr);
+		vkDestroySemaphore(device, compute.semaphore, nullptr);
+		vkDestroyCommandPool(device, compute.commandPool, nullptr);
+
+		vertexBuffer.destroy();
+		indexBuffer.destroy();
+
+		textureColorMap.destroy();
+		storageImage.destroy();
+	}
 }
 //-----------------------------------------------------------------------------
 void ComputeShaderApp::OnUpdate(float deltaTime)
@@ -24,12 +55,17 @@ void ComputeShaderApp::OnUpdate(float deltaTime)
 //-----------------------------------------------------------------------------
 void ComputeShaderApp::OnFrame()
 {
-
+	draw();
+	updateUniformBuffers();
 }
 //-----------------------------------------------------------------------------
 void ComputeShaderApp::OnUpdateUIOverlay(vks::UIOverlay* overlay)
 {
-
+	if (overlay->header("Settings")) {
+		if (overlay->comboBox("Shader", &compute.pipelineIndex, filterNames)) {
+			buildComputeCommandBuffer();
+		}
+	}
 }
 //-----------------------------------------------------------------------------
 void ComputeShaderApp::OnWindowResize(uint32_t destWidth, uint32_t destHeight)

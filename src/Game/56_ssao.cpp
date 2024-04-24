@@ -3,18 +3,64 @@
 //-----------------------------------------------------------------------------
 bool SSAOApp::OnCreate()
 {
-	camera.type = Camera::CameraType::lookat;
-	camera.setPosition(glm::vec3(0.0f, 0.0f, -4.0f));
-	camera.setRotation(glm::vec3(0.0f));
-	camera.setRotationSpeed(0.25f);
-	camera.setPerspective(60.0f, (float)destWidth / (float)destHeight, 0.1f, 256.0f);
+	camera.type = Camera::CameraType::firstperson;
+#ifndef __ANDROID__
+	camera.rotationSpeed = 0.25f;
+#endif
+	camera.position = { 1.0f, 0.75f, 0.0f };
+	camera.setRotation(glm::vec3(0.0f, 90.0f, 0.0f));
+	camera.setPerspective(60.0f, (float)destWidth / (float)destHeight, uboSceneParams.nearPlane, uboSceneParams.farPlane);
+
+	loadAssets();
+	prepareOffscreenFramebuffers();
+	prepareUniformBuffers();
+	setupDescriptors();
+	preparePipelines();
+	buildCommandBuffers();
 
 	return true;
 }
 //-----------------------------------------------------------------------------
 void SSAOApp::OnDestroy()
 {
+	if (device) {
+		vkDestroySampler(device, colorSampler, nullptr);
 
+		// Attachments
+		frameBuffers.offscreen.position.destroy(device);
+		frameBuffers.offscreen.normal.destroy(device);
+		frameBuffers.offscreen.albedo.destroy(device);
+		frameBuffers.offscreen.depth.destroy(device);
+		frameBuffers.ssao.color.destroy(device);
+		frameBuffers.ssaoBlur.color.destroy(device);
+
+		// Framebuffers
+		frameBuffers.offscreen.destroy(device);
+		frameBuffers.ssao.destroy(device);
+		frameBuffers.ssaoBlur.destroy(device);
+
+		vkDestroyPipeline(device, pipelines.offscreen, nullptr);
+		vkDestroyPipeline(device, pipelines.composition, nullptr);
+		vkDestroyPipeline(device, pipelines.ssao, nullptr);
+		vkDestroyPipeline(device, pipelines.ssaoBlur, nullptr);
+
+		vkDestroyPipelineLayout(device, pipelineLayouts.gBuffer, nullptr);
+		vkDestroyPipelineLayout(device, pipelineLayouts.ssao, nullptr);
+		vkDestroyPipelineLayout(device, pipelineLayouts.ssaoBlur, nullptr);
+		vkDestroyPipelineLayout(device, pipelineLayouts.composition, nullptr);
+
+		vkDestroyDescriptorSetLayout(device, descriptorSetLayouts.gBuffer, nullptr);
+		vkDestroyDescriptorSetLayout(device, descriptorSetLayouts.ssao, nullptr);
+		vkDestroyDescriptorSetLayout(device, descriptorSetLayouts.ssaoBlur, nullptr);
+		vkDestroyDescriptorSetLayout(device, descriptorSetLayouts.composition, nullptr);
+
+		// Uniform buffers
+		uniformBuffers.sceneParams.destroy();
+		uniformBuffers.ssaoKernel.destroy();
+		uniformBuffers.ssaoParams.destroy();
+
+		ssaoNoise.destroy();
+	}
 }
 //-----------------------------------------------------------------------------
 void SSAOApp::OnUpdate(float deltaTime)
@@ -24,12 +70,18 @@ void SSAOApp::OnUpdate(float deltaTime)
 //-----------------------------------------------------------------------------
 void SSAOApp::OnFrame()
 {
-
+	updateUniformBufferMatrices();
+	updateUniformBufferSSAOParams();
+	draw();
 }
 //-----------------------------------------------------------------------------
 void SSAOApp::OnUpdateUIOverlay(vks::UIOverlay* overlay)
 {
-
+	if (overlay->header("Settings")) {
+		overlay->checkBox("Enable SSAO", &uboSSAOParams.ssao);
+		overlay->checkBox("SSAO blur", &uboSSAOParams.ssaoBlur);
+		overlay->checkBox("SSAO pass only", &uboSSAOParams.ssaoOnly);
+	}
 }
 //-----------------------------------------------------------------------------
 void SSAOApp::OnWindowResize(uint32_t destWidth, uint32_t destHeight)

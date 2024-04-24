@@ -48,6 +48,7 @@
 #include "Engine/KeyCodes.h"
 #include "Engine/Frustum.h"
 #include "Engine/ThreadPool.h"
+#include "Engine/VulkanFrameBuffer.h"
 
 
 #if defined(_MSC_VER)
