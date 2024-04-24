@@ -3,18 +3,37 @@
 //-----------------------------------------------------------------------------
 bool IndirectDrawApp::OnCreate()
 {
-	camera.type = Camera::CameraType::lookat;
-	camera.setPosition(glm::vec3(0.0f, 0.0f, -4.0f));
-	camera.setRotation(glm::vec3(0.0f));
-	camera.setRotationSpeed(0.25f);
-	camera.setPerspective(60.0f, (float)destWidth / (float)destHeight, 0.1f, 256.0f);
+	camera.type = Camera::CameraType::firstperson;
+	camera.setPerspective(60.0f, (float)destWidth / (float)destHeight, 0.1f, 512.0f);
+	camera.setRotation(glm::vec3(-12.0f, 159.0f, 0.0f));
+	camera.setTranslation(glm::vec3(0.4f, 1.25f, 0.0f));
+	camera.movementSpeed = 5.0f;
+
+	loadAssets();
+	prepareIndirectData();
+	prepareInstanceData();
+	prepareUniformBuffers();
+	setupDescriptors();
+	preparePipelines();
+	buildCommandBuffers();
 
 	return true;
 }
 //-----------------------------------------------------------------------------
 void IndirectDrawApp::OnDestroy()
 {
-
+	if (device) {
+		vkDestroyPipeline(device, pipelines.plants, nullptr);
+		vkDestroyPipeline(device, pipelines.ground, nullptr);
+		vkDestroyPipeline(device, pipelines.skysphere, nullptr);
+		vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
+		vkDestroyDescriptorSetLayout(device, descriptorSetLayout, nullptr);
+		textures.plants.destroy();
+		textures.ground.destroy();
+		instanceBuffer.destroy();
+		indirectCommandsBuffer.destroy();
+		uniformBuffer.destroy();
+	}
 }
 //-----------------------------------------------------------------------------
 void IndirectDrawApp::OnUpdate(float deltaTime)
@@ -24,11 +43,20 @@ void IndirectDrawApp::OnUpdate(float deltaTime)
 //-----------------------------------------------------------------------------
 void IndirectDrawApp::OnFrame()
 {
+	updateUniformBuffer();
+	draw();
 }
 //-----------------------------------------------------------------------------
 void IndirectDrawApp::OnUpdateUIOverlay(vks::UIOverlay* overlay)
 {
-
+	if (!m_vulkanDevice->features.multiDrawIndirect) {
+		if (overlay->header("Info")) {
+			overlay->text("multiDrawIndirect not supported");
+		}
+	}
+	if (overlay->header("Statistics")) {
+		overlay->text("Objects: %d", objectCount);
+	}
 }
 //-----------------------------------------------------------------------------
 void IndirectDrawApp::OnWindowResize(uint32_t destWidth, uint32_t destHeight)

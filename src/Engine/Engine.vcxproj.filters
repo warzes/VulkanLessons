@@ -95,6 +95,9 @@
     <ClInclude Include="Benchmark.h">
       <Filter>Other</Filter>
     </ClInclude>
+    <ClInclude Include="ThreadPool.h">
+      <Filter>Other</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Base">

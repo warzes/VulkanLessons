@@ -3,18 +3,49 @@
 //-----------------------------------------------------------------------------
 bool PBRTextureApp::OnCreate()
 {
-	camera.type = Camera::CameraType::lookat;
-	camera.setPosition(glm::vec3(0.0f, 0.0f, -4.0f));
-	camera.setRotation(glm::vec3(0.0f));
-	camera.setRotationSpeed(0.25f);
+	camera.type = Camera::CameraType::firstperson;
+	camera.movementSpeed = 4.0f;
 	camera.setPerspective(60.0f, (float)destWidth / (float)destHeight, 0.1f, 256.0f);
+	camera.rotationSpeed = 0.25f;
+
+	camera.setRotation({ -7.75f, 150.25f, 0.0f });
+	camera.setPosition({ 0.7f, 0.1f, 1.7f });
+
+	loadAssets();
+	generateBRDFLUT();
+	generateIrradianceCube();
+	generatePrefilteredCube();
+	prepareUniformBuffers();
+	setupDescriptors();
+	preparePipelines();
+	buildCommandBuffers();
 
 	return true;
 }
 //-----------------------------------------------------------------------------
 void PBRTextureApp::OnDestroy()
 {
+	if (device) {
+		vkDestroyPipeline(device, pipelines.skybox, nullptr);
+		vkDestroyPipeline(device, pipelines.pbr, nullptr);
 
+		vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
+		vkDestroyDescriptorSetLayout(device, descriptorSetLayout, nullptr);
+
+		uniformBuffers.object.destroy();
+		uniformBuffers.skybox.destroy();
+		uniformBuffers.params.destroy();
+
+		textures.environmentCube.destroy();
+		textures.irradianceCube.destroy();
+		textures.prefilteredCube.destroy();
+		textures.lutBrdf.destroy();
+		textures.albedoMap.destroy();
+		textures.normalMap.destroy();
+		textures.aoMap.destroy();
+		textures.metallicMap.destroy();
+		textures.roughnessMap.destroy();
+	}
 }
 //-----------------------------------------------------------------------------
 void PBRTextureApp::OnUpdate(float deltaTime)
@@ -24,11 +55,23 @@ void PBRTextureApp::OnUpdate(float deltaTime)
 //-----------------------------------------------------------------------------
 void PBRTextureApp::OnFrame()
 {
+	updateUniformBuffers();
+	draw();
 }
 //-----------------------------------------------------------------------------
 void PBRTextureApp::OnUpdateUIOverlay(vks::UIOverlay* overlay)
 {
-
+	if (overlay->header("Settings")) {
+		if (overlay->inputFloat("Exposure", &uboParams.exposure, 0.1f, 2)) {
+			updateParams();
+		}
+		if (overlay->inputFloat("Gamma", &uboParams.gamma, 0.1f, 2)) {
+			updateParams();
+		}
+		if (overlay->checkBox("Skybox", &displaySkybox)) {
+			buildCommandBuffers();
+		}
+	}
 }
 //-----------------------------------------------------------------------------
 void PBRTextureApp::OnWindowResize(uint32_t destWidth, uint32_t destHeight)

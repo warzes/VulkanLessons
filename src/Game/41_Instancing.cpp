@@ -4,17 +4,34 @@
 bool InstancingApp::OnCreate()
 {
 	camera.type = Camera::CameraType::lookat;
-	camera.setPosition(glm::vec3(0.0f, 0.0f, -4.0f));
-	camera.setRotation(glm::vec3(0.0f));
-	camera.setRotationSpeed(0.25f);
-	camera.setPerspective(60.0f, (float)destWidth / (float)destHeight, 0.1f, 256.0f);
+	camera.setPosition(glm::vec3(5.5f, -1.85f, -18.5f));
+	camera.setRotation(glm::vec3(-17.2f, -4.7f, 0.0f));
+	camera.setPerspective(60.0f, (float)destWidth / (float)destHeight, 1.0f, 256.0f);
+
+	loadAssets();
+	prepareInstanceData();
+	prepareUniformBuffers();
+	setupDescriptors();
+	preparePipelines();
+	buildCommandBuffers();
 
 	return true;
 }
 //-----------------------------------------------------------------------------
 void InstancingApp::OnDestroy()
 {
-
+	if (device) {
+		vkDestroyPipeline(device, pipelines.instancedRocks, nullptr);
+		vkDestroyPipeline(device, pipelines.planet, nullptr);
+		vkDestroyPipeline(device, pipelines.starfield, nullptr);
+		vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
+		vkDestroyDescriptorSetLayout(device, descriptorSetLayout, nullptr);
+		vkDestroyBuffer(device, instanceBuffer.buffer, nullptr);
+		vkFreeMemory(device, instanceBuffer.memory, nullptr);
+		textures.rocks.destroy();
+		textures.planet.destroy();
+		uniformBuffer.destroy();
+	}
 }
 //-----------------------------------------------------------------------------
 void InstancingApp::OnUpdate(float deltaTime)
@@ -24,12 +41,15 @@ void InstancingApp::OnUpdate(float deltaTime)
 //-----------------------------------------------------------------------------
 void InstancingApp::OnFrame()
 {
-
+	updateUniformBuffer();
+	draw();
 }
 //-----------------------------------------------------------------------------
 void InstancingApp::OnUpdateUIOverlay(vks::UIOverlay* overlay)
 {
-
+	if (overlay->header("Statistics")) {
+		overlay->text("Instances: %d", INSTANCE_COUNT);
+	}
 }
 //-----------------------------------------------------------------------------
 void InstancingApp::OnWindowResize(uint32_t destWidth, uint32_t destHeight)

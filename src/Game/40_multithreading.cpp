@@ -4,17 +4,45 @@
 bool MultithreadingApp::OnCreate()
 {
 	camera.type = Camera::CameraType::lookat;
-	camera.setPosition(glm::vec3(0.0f, 0.0f, -4.0f));
+	camera.setPosition(glm::vec3(0.0f, -0.0f, -32.5f));
 	camera.setRotation(glm::vec3(0.0f));
-	camera.setRotationSpeed(0.25f);
+	camera.setRotationSpeed(0.5f);
 	camera.setPerspective(60.0f, (float)destWidth / (float)destHeight, 0.1f, 256.0f);
+	// Get number of max. concurrent threads
+	numThreads = std::thread::hardware_concurrency();
+	assert(numThreads > 0);
+#if defined(__ANDROID__)
+	LOGD("numThreads = %d", numThreads);
+#else
+	std::cout << "numThreads = " << numThreads << std::endl;
+#endif
+	threadPool.setThreadCount(numThreads);
+	numObjectsPerThread = 512 / numThreads;
+	rndEngine.seed(benchmark.active ? 0 : (unsigned)time(nullptr));
+
+	// Create a fence for synchronization
+	VkFenceCreateInfo fenceCreateInfo = vks::initializers::fenceCreateInfo(VK_FENCE_CREATE_SIGNALED_BIT);
+	vkCreateFence(device, &fenceCreateInfo, nullptr, &renderFence);
+	loadAssets();
+	preparePipelines();
+	prepareMultiThreadedRenderer();
+	updateMatrices();
 
 	return true;
 }
 //-----------------------------------------------------------------------------
 void MultithreadingApp::OnDestroy()
 {
-
+	if (device) {
+		vkDestroyPipeline(device, pipelines.phong, nullptr);
+		vkDestroyPipeline(device, pipelines.starsphere, nullptr);
+		vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
+		for (auto& thread : threadData) {
+			vkFreeCommandBuffers(device, thread.commandPool, static_cast<uint32_t>(thread.commandBuffer.size()), thread.commandBuffer.data());
+			vkDestroyCommandPool(device, thread.commandPool, nullptr);
+		}
+		vkDestroyFence(device, renderFence, nullptr);
+	}
 }
 //-----------------------------------------------------------------------------
 void MultithreadingApp::OnUpdate(float deltaTime)
@@ -24,12 +52,18 @@ void MultithreadingApp::OnUpdate(float deltaTime)
 //-----------------------------------------------------------------------------
 void MultithreadingApp::OnFrame()
 {
-
+	updateMatrices();
+	draw();
 }
 //-----------------------------------------------------------------------------
 void MultithreadingApp::OnUpdateUIOverlay(vks::UIOverlay* overlay)
 {
-
+	if (overlay->header("Statistics")) {
+		overlay->text("Active threads: %d", numThreads);
+	}
+	if (overlay->header("Settings")) {
+		overlay->checkBox("Stars", &displayStarSphere);
+	}
 }
 //-----------------------------------------------------------------------------
 void MultithreadingApp::OnWindowResize(uint32_t destWidth, uint32_t destHeight)

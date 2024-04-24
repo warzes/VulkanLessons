@@ -119,6 +119,7 @@
     <ClInclude Include="KeyCodes.h" />
     <ClInclude Include="Log.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="ThreadPool.h" />
     <ClInclude Include="VulkanBuffer.h" />
     <ClInclude Include="VulkanDebug.h" />
     <ClInclude Include="VulkanDevice.h" />

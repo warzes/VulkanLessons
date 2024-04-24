@@ -18,6 +18,11 @@
 #include <algorithm>
 #include <numeric>
 #include <random>
+#include <thread>
+#include <queue>
+#include <mutex>
+#include <condition_variable>
+#include <functional>
 
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
@@ -41,6 +46,8 @@
 #include "Engine/EngineApp.h"
 #include "Engine/Camera.h"
 #include "Engine/KeyCodes.h"
+#include "Engine/Frustum.h"
+#include "Engine/ThreadPool.h"
 
 
 #if defined(_MSC_VER)

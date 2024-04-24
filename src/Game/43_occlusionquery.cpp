@@ -4,17 +4,37 @@
 bool OcclusionQueryApp::OnCreate()
 {
 	camera.type = Camera::CameraType::lookat;
-	camera.setPosition(glm::vec3(0.0f, 0.0f, -4.0f));
-	camera.setRotation(glm::vec3(0.0f));
-	camera.setRotationSpeed(0.25f);
-	camera.setPerspective(60.0f, (float)destWidth / (float)destHeight, 0.1f, 256.0f);
+	camera.setPosition(glm::vec3(0.0f, 0.0f, -7.5f));
+	camera.setRotation(glm::vec3(0.0f, -123.75f, 0.0f));
+	camera.setRotationSpeed(0.5f);
+	camera.setPerspective(60.0f, (float)destWidth / (float)destHeight, 1.0f, 256.0f);
+
+	loadAssets();
+	setupQueryPool();
+	prepareUniformBuffers();
+	setupDescriptors();
+	preparePipelines();
+	buildCommandBuffers();
 
 	return true;
 }
 //-----------------------------------------------------------------------------
 void OcclusionQueryApp::OnDestroy()
 {
+	// Clean up used Vulkan resources
+		// Note : Inherited destructor cleans up resources stored in base class
+	vkDestroyPipeline(device, pipelines.solid, nullptr);
+	vkDestroyPipeline(device, pipelines.occluder, nullptr);
+	vkDestroyPipeline(device, pipelines.simple, nullptr);
 
+	vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
+	vkDestroyDescriptorSetLayout(device, descriptorSetLayout, nullptr);
+
+	vkDestroyQueryPool(device, queryPool, nullptr);
+
+	uniformBuffers.occluder.destroy();
+	uniformBuffers.sphere.destroy();
+	uniformBuffers.teapot.destroy();
 }
 //-----------------------------------------------------------------------------
 void OcclusionQueryApp::OnUpdate(float deltaTime)
@@ -24,11 +44,15 @@ void OcclusionQueryApp::OnUpdate(float deltaTime)
 //-----------------------------------------------------------------------------
 void OcclusionQueryApp::OnFrame()
 {
+	draw();
 }
 //-----------------------------------------------------------------------------
 void OcclusionQueryApp::OnUpdateUIOverlay(vks::UIOverlay* overlay)
 {
-
+	if (overlay->header("Occlusion query results")) {
+		overlay->text("Teapot: %d samples passed", passedSamples[0]);
+		overlay->text("Sphere: %d samples passed", passedSamples[1]);
+	}
 }
 //-----------------------------------------------------------------------------
 void OcclusionQueryApp::OnWindowResize(uint32_t destWidth, uint32_t destHeight)

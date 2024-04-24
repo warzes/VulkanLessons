@@ -99,7 +99,7 @@ int main(
 	//ShadowMappingOmniApp app;
 	//TextureMipmapgenApp app;
 	//ScreenshotApp app;
-	OITApp app;
+	//OITApp app;
 		
 	//MultithreadingApp app;
 	//InstancingApp app;
@@ -109,11 +109,12 @@ int main(
 	
 	//PBRBasicApp app;
 	//PBRIBLApp app;
-	//PBRTextureApp app;
+	PBRTextureApp app;
 	//DefferedApp app;
 	//DeferredMultisamplingApp app;
 	//DeferredShadowsApp app;
 	//SSAOApp app;
+	
 	//ComputeShaderApp app;
 	//ComputeParticlesApp app;
 	//ComputeNBodyApp app;
