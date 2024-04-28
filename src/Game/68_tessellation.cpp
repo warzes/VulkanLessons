@@ -5,16 +5,37 @@ bool TessellationApp::OnCreate()
 {
 	camera.type = Camera::CameraType::lookat;
 	camera.setPosition(glm::vec3(0.0f, 0.0f, -4.0f));
-	camera.setRotation(glm::vec3(0.0f));
-	camera.setRotationSpeed(0.25f);
-	camera.setPerspective(60.0f, (float)destWidth / (float)destHeight, 0.1f, 256.0f);
+	camera.setRotation(glm::vec3(-350.0f, 60.0f, 0.0f));
+	camera.setPerspective(45.0f, (float)(destWidth * ((splitScreen) ? 0.5f : 1.0f)) / (float)destHeight, 0.1f, 256.0f);
+
+	loadAssets();
+	prepareUniformBuffers();
+	setupDescriptors();
+	preparePipelines();
+	buildCommandBuffers();
 
 	return true;
 }
 //-----------------------------------------------------------------------------
 void TessellationApp::OnDestroy()
 {
+	if (device) {
+		// Clean up used Vulkan resources
+		// Note : Inherited destructor cleans up resources stored in base class
+		vkDestroyPipeline(device, pipelines.solid, nullptr);
+		if (pipelines.wire != VK_NULL_HANDLE) {
+			vkDestroyPipeline(device, pipelines.wire, nullptr);
+		};
+		vkDestroyPipeline(device, pipelines.solidPassThrough, nullptr);
+		if (pipelines.wirePassThrough != VK_NULL_HANDLE) {
+			vkDestroyPipeline(device, pipelines.wirePassThrough, nullptr);
+		};
 
+		vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
+		vkDestroyDescriptorSetLayout(device, descriptorSetLayout, nullptr);
+
+		uniformBuffer.destroy();
+	}
 }
 //-----------------------------------------------------------------------------
 void TessellationApp::OnUpdate(float deltaTime)
@@ -24,12 +45,28 @@ void TessellationApp::OnUpdate(float deltaTime)
 //-----------------------------------------------------------------------------
 void TessellationApp::OnFrame()
 {
-
+	updateUniformBuffers();
+	draw();
 }
 //-----------------------------------------------------------------------------
 void TessellationApp::OnUpdateUIOverlay(vks::UIOverlay* overlay)
 {
-
+	if (overlay->header("Settings")) {
+		if (overlay->inputFloat("Tessellation level", &uniformData.tessLevel, 0.25f, 2)) {
+			updateUniformBuffers();
+		}
+		if (deviceFeatures.fillModeNonSolid) {
+			if (overlay->checkBox("Wireframe", &wireframe)) {
+				updateUniformBuffers();
+				buildCommandBuffers();
+			}
+			if (overlay->checkBox("Splitscreen", &splitScreen)) {
+				camera.setPerspective(45.0f, (float)(destWidth * ((splitScreen) ? 0.5f : 1.0f)) / (float)destHeight, 0.1f, 256.0f);
+				updateUniformBuffers();
+				buildCommandBuffers();
+			}
+		}
+	}
 }
 //-----------------------------------------------------------------------------
 void TessellationApp::OnWindowResize(uint32_t destWidth, uint32_t destHeight)

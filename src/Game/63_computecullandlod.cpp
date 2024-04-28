@@ -3,18 +3,40 @@
 //-----------------------------------------------------------------------------
 bool ComputeCullAndLodApp::OnCreate()
 {
-	camera.type = Camera::CameraType::lookat;
-	camera.setPosition(glm::vec3(0.0f, 0.0f, -4.0f));
-	camera.setRotation(glm::vec3(0.0f));
-	camera.setRotationSpeed(0.25f);
-	camera.setPerspective(60.0f, (float)destWidth / (float)destHeight, 0.1f, 256.0f);
+	camera.type = Camera::CameraType::firstperson;
+	camera.setPerspective(60.0f, (float)destWidth / (float)destHeight, 0.1f, 512.0f);
+	camera.setTranslation(glm::vec3(0.5f, 0.0f, 0.0f));
+	camera.movementSpeed = 5.0f;
+	memset(&indirectStats, 0, sizeof(indirectStats));
+
+	loadAssets();
+	prepareBuffers();
+	setupDescriptors();
+	preparePipelines();
+	prepareCompute();
+	buildCommandBuffers();
 
 	return true;
 }
 //-----------------------------------------------------------------------------
 void ComputeCullAndLodApp::OnDestroy()
 {
-
+	if (device) {
+		vkDestroyPipeline(device, pipelines.plants, nullptr);
+		vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
+		vkDestroyDescriptorSetLayout(device, descriptorSetLayout, nullptr);
+		instanceBuffer.destroy();
+		indirectCommandsBuffer.destroy();
+		uniformData.scene.destroy();
+		indirectDrawCountBuffer.destroy();
+		compute.lodLevelsBuffers.destroy();
+		vkDestroyPipelineLayout(device, compute.pipelineLayout, nullptr);
+		vkDestroyDescriptorSetLayout(device, compute.descriptorSetLayout, nullptr);
+		vkDestroyPipeline(device, compute.pipeline, nullptr);
+		vkDestroyFence(device, compute.fence, nullptr);
+		vkDestroyCommandPool(device, compute.commandPool, nullptr);
+		vkDestroySemaphore(device, compute.semaphore, nullptr);
+	}
 }
 //-----------------------------------------------------------------------------
 void ComputeCullAndLodApp::OnUpdate(float deltaTime)
@@ -24,12 +46,21 @@ void ComputeCullAndLodApp::OnUpdate(float deltaTime)
 //-----------------------------------------------------------------------------
 void ComputeCullAndLodApp::OnFrame()
 {
-
+	updateUniformBuffer();
+	draw();
 }
 //-----------------------------------------------------------------------------
 void ComputeCullAndLodApp::OnUpdateUIOverlay(vks::UIOverlay* overlay)
 {
-
+	if (overlay->header("Settings")) {
+		overlay->checkBox("Freeze frustum", &fixedFrustum);
+	}
+	if (overlay->header("Statistics")) {
+		overlay->text("Visible objects: %d", indirectStats.drawCount);
+		for (uint32_t i = 0; i < MAX_LOD_LEVEL + 1; i++) {
+			overlay->text("LOD %d: %d", i, indirectStats.lodCount[i]);
+		}
+	}
 }
 //-----------------------------------------------------------------------------
 void ComputeCullAndLodApp::OnWindowResize(uint32_t destWidth, uint32_t destHeight)

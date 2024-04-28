@@ -115,7 +115,7 @@ int main(
 	//DeferredShadowsApp app;
 	//SSAOApp app;
 	
-	ComputeShaderApp app;
+	//ComputeShaderApp app;
 	//ComputeParticlesApp app;
 	//ComputeNBodyApp app;
 	//ComputeCullAndLodApp app;
@@ -125,7 +125,7 @@ int main(
 	//TerrainTessellationApp app;
 	//TessellationApp app;
 	
-	//TextOverlayApp app;
+	TextOverlayApp app;
 	//DistanceFieldFontsApp app;
 	//ImguiApp app;
 	
@@ -133,6 +133,7 @@ int main(
 	//BloomApp app;
 	//ParallaxMappingApp app;
 	//SphericalEnvMappingApp app;
+
 	//ConservativerasterApp app;
 
 	app.Run();

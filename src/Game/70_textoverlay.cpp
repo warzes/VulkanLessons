@@ -4,17 +4,30 @@
 bool TextOverlayApp::OnCreate()
 {
 	camera.type = Camera::CameraType::lookat;
-	camera.setPosition(glm::vec3(0.0f, 0.0f, -4.0f));
-	camera.setRotation(glm::vec3(0.0f));
-	camera.setRotationSpeed(0.25f);
+	camera.setPosition(glm::vec3(0.0f, 0.0f, -2.5f));
+	camera.setRotation(glm::vec3(-25.0f, -0.0f, 0.0f));
 	camera.setPerspective(60.0f, (float)destWidth / (float)destHeight, 0.1f, 256.0f);
+	//settings.overlay = false;
+
+	loadAssets();
+	prepareUniformBuffers();
+	setupDescriptors();
+	preparePipelines();
+	prepareTextOverlay();
+	buildCommandBuffers();
 
 	return true;
 }
 //-----------------------------------------------------------------------------
 void TextOverlayApp::OnDestroy()
 {
-
+	if (device) {
+		vkDestroyPipeline(device, pipeline, nullptr);
+		vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
+		vkDestroyDescriptorSetLayout(device, descriptorSetLayout, nullptr);
+		uniformBuffer.destroy();
+		delete(textOverlay);
+	}
 }
 //-----------------------------------------------------------------------------
 void TextOverlayApp::OnUpdate(float deltaTime)
@@ -24,7 +37,10 @@ void TextOverlayApp::OnUpdate(float deltaTime)
 //-----------------------------------------------------------------------------
 void TextOverlayApp::OnFrame()
 {
-
+	updateUniformBuffers();
+	//if (camera.updated)
+		updateTextOverlay();
+	draw();
 }
 //-----------------------------------------------------------------------------
 void TextOverlayApp::OnUpdateUIOverlay(vks::UIOverlay* overlay)

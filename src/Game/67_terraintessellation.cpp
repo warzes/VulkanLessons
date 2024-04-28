@@ -3,18 +3,58 @@
 //-----------------------------------------------------------------------------
 bool TerrainTessellationApp::OnCreate()
 {
-	camera.type = Camera::CameraType::lookat;
-	camera.setPosition(glm::vec3(0.0f, 0.0f, -4.0f));
-	camera.setRotation(glm::vec3(0.0f));
-	camera.setRotationSpeed(0.25f);
-	camera.setPerspective(60.0f, (float)destWidth / (float)destHeight, 0.1f, 256.0f);
+	camera.type = Camera::CameraType::firstperson;
+	camera.setPerspective(60.0f, (float)destWidth / (float)destHeight, 0.1f, 512.0f);
+	camera.setRotation(glm::vec3(-12.0f, 159.0f, 0.0f));
+	camera.setTranslation(glm::vec3(18.0f, 22.5f, 57.5f));
+	camera.movementSpeed = 10.0f;
+
+	loadAssets();
+	generateTerrain();
+	if (deviceFeatures.pipelineStatisticsQuery) {
+		setupQueryResultBuffer();
+	}
+	prepareUniformBuffers();
+	setupDescriptors();
+	preparePipelines();
+	buildCommandBuffers();
 
 	return true;
 }
 //-----------------------------------------------------------------------------
 void TerrainTessellationApp::OnDestroy()
 {
+	if (device) {
+		vkDestroyPipeline(device, pipelines.terrain, nullptr);
+		if (pipelines.wireframe != VK_NULL_HANDLE) {
+			vkDestroyPipeline(device, pipelines.wireframe, nullptr);
+		}
+		vkDestroyPipeline(device, pipelines.skysphere, nullptr);
 
+		vkDestroyPipelineLayout(device, pipelineLayouts.skysphere, nullptr);
+		vkDestroyPipelineLayout(device, pipelineLayouts.terrain, nullptr);
+
+		vkDestroyDescriptorSetLayout(device, descriptorSetLayouts.terrain, nullptr);
+		vkDestroyDescriptorSetLayout(device, descriptorSetLayouts.skysphere, nullptr);
+
+		uniformBuffers.skysphereVertex.destroy();
+		uniformBuffers.terrainTessellation.destroy();
+
+		textures.heightMap.destroy();
+		textures.skySphere.destroy();
+		textures.terrainArray.destroy();
+
+		vkDestroyBuffer(device, terrain.vertices.buffer, nullptr);
+		vkFreeMemory(device, terrain.vertices.memory, nullptr);
+		vkDestroyBuffer(device, terrain.indices.buffer, nullptr);
+		vkFreeMemory(device, terrain.indices.memory, nullptr);
+
+		if (queryPool != VK_NULL_HANDLE) {
+			vkDestroyQueryPool(device, queryPool, nullptr);
+			vkDestroyBuffer(device, queryResult.buffer, nullptr);
+			vkFreeMemory(device, queryResult.memory, nullptr);
+		}
+	}
 }
 //-----------------------------------------------------------------------------
 void TerrainTessellationApp::OnUpdate(float deltaTime)
@@ -24,12 +64,33 @@ void TerrainTessellationApp::OnUpdate(float deltaTime)
 //-----------------------------------------------------------------------------
 void TerrainTessellationApp::OnFrame()
 {
-
+	updateUniformBuffers();
+	draw();
 }
 //-----------------------------------------------------------------------------
 void TerrainTessellationApp::OnUpdateUIOverlay(vks::UIOverlay* overlay)
 {
 
+	if (overlay->header("Settings")) {
+
+		if (overlay->checkBox("Tessellation", &tessellation)) {
+			updateUniformBuffers();
+		}
+		if (overlay->inputFloat("Factor", &uniformDataTessellation.tessellationFactor, 0.05f, 2)) {
+			updateUniformBuffers();
+		}
+		if (deviceFeatures.fillModeNonSolid) {
+			if (overlay->checkBox("Wireframe", &wireframe)) {
+				buildCommandBuffers();
+			}
+		}
+	}
+	if (deviceFeatures.pipelineStatisticsQuery) {
+		if (overlay->header("Pipeline statistics")) {
+			overlay->text("VS invocations: %d", pipelineStats[0]);
+			overlay->text("TE invocations: %d", pipelineStats[1]);
+		}
+	}
 }
 //-----------------------------------------------------------------------------
 void TerrainTessellationApp::OnWindowResize(uint32_t destWidth, uint32_t destHeight)

@@ -3,18 +3,28 @@
 //-----------------------------------------------------------------------------
 bool ViewportArrayApp::OnCreate()
 {
-	camera.type = Camera::CameraType::lookat;
-	camera.setPosition(glm::vec3(0.0f, 0.0f, -4.0f));
-	camera.setRotation(glm::vec3(0.0f));
-	camera.setRotationSpeed(0.25f);
-	camera.setPerspective(60.0f, (float)destWidth / (float)destHeight, 0.1f, 256.0f);
+	camera.type = Camera::CameraType::firstperson;
+	camera.setRotation(glm::vec3(0.0f, 90.0f, 0.0f));
+	camera.setTranslation(glm::vec3(7.0f, 3.2f, 0.0f));
+	camera.setMovementSpeed(5.0f);
+
+	loadAssets();
+	prepareUniformBuffers();
+	setupDescriptors();
+	preparePipelines();
+	buildCommandBuffers();
 
 	return true;
 }
 //-----------------------------------------------------------------------------
 void ViewportArrayApp::OnDestroy()
 {
-
+	if (device) {
+		vkDestroyPipeline(device, pipeline, nullptr);
+		vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
+		vkDestroyDescriptorSetLayout(device, descriptorSetLayout, nullptr);
+		uniformBufferGS.destroy();
+	}
 }
 //-----------------------------------------------------------------------------
 void ViewportArrayApp::OnUpdate(float deltaTime)
@@ -24,12 +34,17 @@ void ViewportArrayApp::OnUpdate(float deltaTime)
 //-----------------------------------------------------------------------------
 void ViewportArrayApp::OnFrame()
 {
-
+	updateUniformBuffers();
+	draw();
 }
 //-----------------------------------------------------------------------------
 void ViewportArrayApp::OnUpdateUIOverlay(vks::UIOverlay* overlay)
 {
-
+	if (overlay->header("Settings")) {
+		if (overlay->sliderFloat("Eye separation", &eyeSeparation, -1.0f, 1.0f)) {
+			updateUniformBuffers();
+		}
+	}
 }
 //-----------------------------------------------------------------------------
 void ViewportArrayApp::OnWindowResize(uint32_t destWidth, uint32_t destHeight)

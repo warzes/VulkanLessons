@@ -4,17 +4,47 @@
 bool ComputeNBodyApp::OnCreate()
 {
 	camera.type = Camera::CameraType::lookat;
-	camera.setPosition(glm::vec3(0.0f, 0.0f, -4.0f));
-	camera.setRotation(glm::vec3(0.0f));
-	camera.setRotationSpeed(0.25f);
-	camera.setPerspective(60.0f, (float)destWidth / (float)destHeight, 0.1f, 256.0f);
+	camera.setPerspective(60.0f, (float)destWidth / (float)destHeight, 0.1f, 512.0f);
+	camera.setRotation(glm::vec3(-26.0f, 75.0f, 0.0f));
+	camera.setTranslation(glm::vec3(0.0f, 0.0f, -14.0f));
+	camera.movementSpeed = 2.5f;
+
+	// We will be using the queue family indices to check if graphics and compute queue families differ
+		// If that's the case, we need additional barriers for acquiring and releasing resources
+	graphics.queueFamilyIndex = m_vulkanDevice->queueFamilyIndices.graphics;
+	compute.queueFamilyIndex = m_vulkanDevice->queueFamilyIndices.compute;
+	loadAssets();
+	prepareStorageBuffers();
+	prepareGraphics();
+	prepareCompute();
 
 	return true;
 }
 //-----------------------------------------------------------------------------
 void ComputeNBodyApp::OnDestroy()
 {
+	if (device) {
+		// Graphics
+		graphics.uniformBuffer.destroy();
+		vkDestroyPipeline(device, graphics.pipeline, nullptr);
+		vkDestroyPipelineLayout(device, graphics.pipelineLayout, nullptr);
+		vkDestroyDescriptorSetLayout(device, graphics.descriptorSetLayout, nullptr);
+		vkDestroySemaphore(device, graphics.semaphore, nullptr);
 
+		// Compute
+		compute.uniformBuffer.destroy();
+		vkDestroyPipelineLayout(device, compute.pipelineLayout, nullptr);
+		vkDestroyDescriptorSetLayout(device, compute.descriptorSetLayout, nullptr);
+		vkDestroyPipeline(device, compute.pipelineCalculate, nullptr);
+		vkDestroyPipeline(device, compute.pipelineIntegrate, nullptr);
+		vkDestroySemaphore(device, compute.semaphore, nullptr);
+		vkDestroyCommandPool(device, compute.commandPool, nullptr);
+
+		storageBuffer.destroy();
+
+		textures.particle.destroy();
+		textures.gradient.destroy();
+	}
 }
 //-----------------------------------------------------------------------------
 void ComputeNBodyApp::OnUpdate(float deltaTime)
@@ -24,7 +54,9 @@ void ComputeNBodyApp::OnUpdate(float deltaTime)
 //-----------------------------------------------------------------------------
 void ComputeNBodyApp::OnFrame()
 {
-
+	updateComputeUniformBuffers();
+	updateGraphicsUniformBuffers();
+	draw();
 }
 //-----------------------------------------------------------------------------
 void ComputeNBodyApp::OnUpdateUIOverlay(vks::UIOverlay* overlay)

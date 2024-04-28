@@ -4,17 +4,28 @@
 bool GeometryShaderApp::OnCreate()
 {
 	camera.type = Camera::CameraType::lookat;
-	camera.setPosition(glm::vec3(0.0f, 0.0f, -4.0f));
-	camera.setRotation(glm::vec3(0.0f));
-	camera.setRotationSpeed(0.25f);
-	camera.setPerspective(60.0f, (float)destWidth / (float)destHeight, 0.1f, 256.0f);
+	camera.setPosition(glm::vec3(0.0f, 0.0f, -1.0f));
+	camera.setRotation(glm::vec3(0.0f, -25.0f, 0.0f));
+	camera.setPerspective(60.0f, (float)destWidth / (float)destHeight, 0.1f, 128.0f);
+
+	loadAssets();
+	prepareUniformBuffers();
+	setupDescriptors();
+	preparePipelines();
+	buildCommandBuffers();
 
 	return true;
 }
 //-----------------------------------------------------------------------------
 void GeometryShaderApp::OnDestroy()
 {
-
+	if (device) {
+		vkDestroyPipeline(device, pipelines.solid, nullptr);
+		vkDestroyPipeline(device, pipelines.normals, nullptr);
+		vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
+		vkDestroyDescriptorSetLayout(device, descriptorSetLayout, nullptr);
+		uniformBuffer.destroy();
+	}
 }
 //-----------------------------------------------------------------------------
 void GeometryShaderApp::OnUpdate(float deltaTime)
@@ -24,12 +35,17 @@ void GeometryShaderApp::OnUpdate(float deltaTime)
 //-----------------------------------------------------------------------------
 void GeometryShaderApp::OnFrame()
 {
-
+	updateUniformBuffers();
+	draw();
 }
 //-----------------------------------------------------------------------------
 void GeometryShaderApp::OnUpdateUIOverlay(vks::UIOverlay* overlay)
 {
-
+	if (overlay->header("Settings")) {
+		if (overlay->checkBox("Display normals", &displayNormals)) {
+			buildCommandBuffers();
+		}
+	}
 }
 //-----------------------------------------------------------------------------
 void GeometryShaderApp::OnWindowResize(uint32_t destWidth, uint32_t destHeight)

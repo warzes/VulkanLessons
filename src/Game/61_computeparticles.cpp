@@ -9,12 +9,40 @@ bool ComputeParticlesApp::OnCreate()
 	camera.setRotationSpeed(0.25f);
 	camera.setPerspective(60.0f, (float)destWidth / (float)destHeight, 0.1f, 256.0f);
 
+	// We will be using the queue family indices to check if graphics and compute queue families differ
+		// If that's the case, we need additional barriers for acquiring and releasing resources
+	graphics.queueFamilyIndex = m_vulkanDevice->queueFamilyIndices.graphics;
+	compute.queueFamilyIndex = m_vulkanDevice->queueFamilyIndices.compute;
+	loadAssets();
+	setupDescriptorPool();
+	prepareGraphics();
+	prepareCompute();
+	buildCommandBuffers();
+
 	return true;
 }
 //-----------------------------------------------------------------------------
 void ComputeParticlesApp::OnDestroy()
 {
+	if (device) {
+		// Graphics
+		vkDestroyPipeline(device, graphics.pipeline, nullptr);
+		vkDestroyPipelineLayout(device, graphics.pipelineLayout, nullptr);
+		vkDestroyDescriptorSetLayout(device, graphics.descriptorSetLayout, nullptr);
+		vkDestroySemaphore(device, graphics.semaphore, nullptr);
 
+		// Compute
+		compute.uniformBuffer.destroy();
+		vkDestroyPipelineLayout(device, compute.pipelineLayout, nullptr);
+		vkDestroyDescriptorSetLayout(device, compute.descriptorSetLayout, nullptr);
+		vkDestroyPipeline(device, compute.pipeline, nullptr);
+		vkDestroySemaphore(device, compute.semaphore, nullptr);
+		vkDestroyCommandPool(device, compute.commandPool, nullptr);
+
+		storageBuffer.destroy();
+		textures.particle.destroy();
+		textures.gradient.destroy();
+	}
 }
 //-----------------------------------------------------------------------------
 void ComputeParticlesApp::OnUpdate(float deltaTime)
@@ -24,12 +52,30 @@ void ComputeParticlesApp::OnUpdate(float deltaTime)
 //-----------------------------------------------------------------------------
 void ComputeParticlesApp::OnFrame()
 {
+	draw();
 
+	if (!attachToCursor)
+	{
+		if (animStart > 0.0f)
+		{
+			animStart -= frameTimer * 5.0f;
+		}
+		else if (animStart <= 0.0f)
+		{
+			timer += frameTimer * 0.04f;
+			if (timer > 1.f)
+				timer = 0.f;
+		}
+	}
+
+	updateUniformBuffers();
 }
 //-----------------------------------------------------------------------------
 void ComputeParticlesApp::OnUpdateUIOverlay(vks::UIOverlay* overlay)
 {
-
+	if (overlay->header("Settings")) {
+		overlay->checkBox("Attach attractor to cursor", &attachToCursor);
+	}
 }
 //-----------------------------------------------------------------------------
 void ComputeParticlesApp::OnWindowResize(uint32_t destWidth, uint32_t destHeight)
