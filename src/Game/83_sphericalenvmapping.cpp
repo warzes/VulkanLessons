@@ -4,17 +4,29 @@
 bool SphericalEnvMappingApp::OnCreate()
 {
 	camera.type = Camera::CameraType::lookat;
-	camera.setPosition(glm::vec3(0.0f, 0.0f, -4.0f));
-	camera.setRotation(glm::vec3(0.0f));
-	camera.setRotationSpeed(0.25f);
+	camera.setPosition(glm::vec3(0.0f, 0.0f, -3.5f));
+	camera.setRotation(glm::vec3(-25.0f, 23.75f, 0.0f));
+	camera.setRotationSpeed(0.75f);
 	camera.setPerspective(60.0f, (float)destWidth / (float)destHeight, 0.1f, 256.0f);
+
+	loadAssets();
+	prepareUniformBuffers();
+	setupDescriptors();
+	preparePipelines();
+	buildCommandBuffers();
 
 	return true;
 }
 //-----------------------------------------------------------------------------
 void SphericalEnvMappingApp::OnDestroy()
 {
-
+	if (device) {
+		vkDestroyPipeline(device, pipeline, nullptr);
+		vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
+		vkDestroyDescriptorSetLayout(device, descriptorSetLayout, nullptr);
+		uniformBuffer.destroy();
+		matCapTextureArray.destroy();
+	}
 }
 //-----------------------------------------------------------------------------
 void SphericalEnvMappingApp::OnUpdate(float deltaTime)
@@ -24,12 +36,15 @@ void SphericalEnvMappingApp::OnUpdate(float deltaTime)
 //-----------------------------------------------------------------------------
 void SphericalEnvMappingApp::OnFrame()
 {
-
+	updateUniformBuffers();
+	draw();
 }
 //-----------------------------------------------------------------------------
 void SphericalEnvMappingApp::OnUpdateUIOverlay(vks::UIOverlay* overlay)
 {
-
+	if (overlay->header("Settings")) {
+		overlay->sliderInt("Material cap", &uniformData.texIndex, 0, matCapTextureArray.layerCount);
+	}
 }
 //-----------------------------------------------------------------------------
 void SphericalEnvMappingApp::OnWindowResize(uint32_t destWidth, uint32_t destHeight)

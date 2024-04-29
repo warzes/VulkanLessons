@@ -4,17 +4,30 @@
 bool ConditionalRenderApp::OnCreate()
 {
 	camera.type = Camera::CameraType::lookat;
-	camera.setPosition(glm::vec3(0.0f, 0.0f, -4.0f));
-	camera.setRotation(glm::vec3(0.0f));
-	camera.setRotationSpeed(0.25f);
-	camera.setPerspective(60.0f, (float)destWidth / (float)destHeight, 0.1f, 256.0f);
+	camera.setPerspective(45.0f, (float)destWidth / (float)destHeight, 0.1f, 512.0f);
+	camera.setRotation(glm::vec3(-2.25f, -52.0f, 0.0f));
+	camera.setTranslation(glm::vec3(1.9f, -2.05f, -18.0f));
+	camera.rotationSpeed *= 0.25f;
+
+	loadAssets();
+	prepareConditionalRendering();
+	prepareUniformBuffers();
+	setupDescriptors();
+	preparePipelines();
+	buildCommandBuffers();
 
 	return true;
 }
 //-----------------------------------------------------------------------------
 void ConditionalRenderApp::OnDestroy()
 {
-
+	if (device) {
+		vkDestroyPipeline(device, pipeline, nullptr);
+		vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
+		vkDestroyDescriptorSetLayout(device, descriptorSetLayout, nullptr);
+		uniformBuffer.destroy();
+		conditionalBuffer.destroy();
+	}
 }
 //-----------------------------------------------------------------------------
 void ConditionalRenderApp::OnUpdate(float deltaTime)
@@ -24,12 +37,41 @@ void ConditionalRenderApp::OnUpdate(float deltaTime)
 //-----------------------------------------------------------------------------
 void ConditionalRenderApp::OnFrame()
 {
-
+	updateUniformBuffers();
+	draw();
 }
 //-----------------------------------------------------------------------------
 void ConditionalRenderApp::OnUpdateUIOverlay(vks::UIOverlay* overlay)
 {
+	if (overlay->header("Visibility")) {
 
+		if (overlay->button("All")) {
+			for (auto i = 0; i < conditionalVisibility.size(); i++) {
+				conditionalVisibility[i] = 1;
+			}
+			updateConditionalBuffer();
+		}
+		ImGui::SameLine();
+		if (overlay->button("None")) {
+			for (auto i = 0; i < conditionalVisibility.size(); i++) {
+				conditionalVisibility[i] = 0;
+			}
+			updateConditionalBuffer();
+		}
+		ImGui::NewLine();
+
+		ImGui::BeginChild("InnerRegion", ImVec2(200.0f * overlay->scale, 400.0f * overlay->scale), false);
+		for (auto node : scene.linearNodes) {
+			// Add visibility toggle checkboxes for all model nodes with a mesh
+			if (node->mesh) {
+				if (overlay->checkBox(("[" + std::to_string(node->index) + "] " + node->mesh->name).c_str(), &conditionalVisibility[node->index])) {
+					updateConditionalBuffer();
+				}
+			}
+		}
+		ImGui::EndChild();
+
+	}
 }
 //-----------------------------------------------------------------------------
 void ConditionalRenderApp::OnWindowResize(uint32_t destWidth, uint32_t destHeight)

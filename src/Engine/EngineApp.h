@@ -204,6 +204,7 @@ private:
 	void setupDPIAwareness();
 	bool initWindow(const WindowSystemCreateInfo& createInfo);
 	bool initVulkan(const RenderSystemCreateInfo& createInfo);
+	virtual void setEnabledInstanceExtensions() {} // TODO: все эти опции передавать через CreateInfo.
 	VkResult createInstance(bool enableValidation);
 	bool selectPhysicalDevice();
 	/** @brief (Virtual) Called after the physical device features have been read, can be used to set features to enable on the device */

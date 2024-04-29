@@ -4,17 +4,56 @@
 bool RadialBlurApp::OnCreate()
 {
 	camera.type = Camera::CameraType::lookat;
-	camera.setPosition(glm::vec3(0.0f, 0.0f, -4.0f));
-	camera.setRotation(glm::vec3(0.0f));
-	camera.setRotationSpeed(0.25f);
-	camera.setPerspective(60.0f, (float)destWidth / (float)destHeight, 0.1f, 256.0f);
+	camera.setPosition(glm::vec3(0.0f, 0.0f, -17.5f));
+	camera.setRotation(glm::vec3(-16.25f, -28.75f, 0.0f));
+	camera.setPerspective(45.0f, (float)destWidth / (float)destHeight, 1.0f, 256.0f);
+	timerSpeed *= 0.5f;
+
+	loadAssets();
+	prepareOffscreen();
+	prepareUniformBuffers();
+	setupDescriptors();
+	preparePipelines();
+	buildCommandBuffers();
 
 	return true;
 }
 //-----------------------------------------------------------------------------
 void RadialBlurApp::OnDestroy()
 {
+	if (device) {
+		// Frame buffer
 
+		// Color attachment
+		vkDestroyImageView(device, offscreenPass.color.view, nullptr);
+		vkDestroyImage(device, offscreenPass.color.image, nullptr);
+		vkFreeMemory(device, offscreenPass.color.mem, nullptr);
+
+		// Depth attachment
+		vkDestroyImageView(device, offscreenPass.depth.view, nullptr);
+		vkDestroyImage(device, offscreenPass.depth.image, nullptr);
+		vkFreeMemory(device, offscreenPass.depth.mem, nullptr);
+
+		vkDestroyRenderPass(device, offscreenPass.renderPass, nullptr);
+		vkDestroySampler(device, offscreenPass.sampler, nullptr);
+		vkDestroyFramebuffer(device, offscreenPass.frameBuffer, nullptr);
+
+		vkDestroyPipeline(device, pipelines.radialBlur, nullptr);
+		vkDestroyPipeline(device, pipelines.phongPass, nullptr);
+		vkDestroyPipeline(device, pipelines.colorPass, nullptr);
+		vkDestroyPipeline(device, pipelines.offscreenDisplay, nullptr);
+
+		vkDestroyPipelineLayout(device, pipelineLayouts.radialBlur, nullptr);
+		vkDestroyPipelineLayout(device, pipelineLayouts.scene, nullptr);
+
+		vkDestroyDescriptorSetLayout(device, descriptorSetLayouts.scene, nullptr);
+		vkDestroyDescriptorSetLayout(device, descriptorSetLayouts.radialBlur, nullptr);
+
+		uniformBuffers.scene.destroy();
+		uniformBuffers.blurParams.destroy();
+
+		gradientTexture.destroy();
+	}
 }
 //-----------------------------------------------------------------------------
 void RadialBlurApp::OnUpdate(float deltaTime)
@@ -24,12 +63,32 @@ void RadialBlurApp::OnUpdate(float deltaTime)
 //-----------------------------------------------------------------------------
 void RadialBlurApp::OnFrame()
 {
-
+	updateUniformBuffers();
+	draw();
 }
 //-----------------------------------------------------------------------------
 void RadialBlurApp::OnUpdateUIOverlay(vks::UIOverlay* overlay)
 {
-
+	if (overlay->header("Settings")) {
+		if (overlay->checkBox("Radial blur", &blur)) {
+			buildCommandBuffers();
+		}
+		if (overlay->checkBox("Display render target only", &displayTexture)) {
+			buildCommandBuffers();
+		}
+		if (blur) {
+			if (overlay->header("Blur parameters")) {
+				bool updateParams = false;
+				updateParams |= overlay->sliderFloat("Scale", &uniformDataBlurParams.radialBlurScale, 0.1f, 1.0f);
+				updateParams |= overlay->sliderFloat("Strength", &uniformDataBlurParams.radialBlurStrength, 0.1f, 2.0f);
+				updateParams |= overlay->sliderFloat("Horiz. origin", &uniformDataBlurParams.radialOrigin.x, 0.0f, 1.0f);
+				updateParams |= overlay->sliderFloat("Vert. origin", &uniformDataBlurParams.radialOrigin.y, 0.0f, 1.0f);
+				if (updateParams) {
+					updateUniformBuffersBlurParams();
+				}
+			}
+		}
+	}
 }
 //-----------------------------------------------------------------------------
 void RadialBlurApp::OnWindowResize(uint32_t destWidth, uint32_t destHeight)

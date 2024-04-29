@@ -44,14 +44,14 @@
 #include "61_computeparticles.h"
 #include "62_computenbody.h"
 #include "63_computecullandlod.h"
-#include "64_geometryshader.h"
-#include "65_viewportarray.h"
-#include "66_displacement.h"
-#include "67_terraintessellation.h"
-#include "68_tessellation.h"
+#include "64_computeraytracing.h"
+#include "65_geometryshader.h"
+#include "66_viewportarray.h"
+#include "67_displacement.h"
+#include "68_terraintessellation.h"
+#include "69_tessellation.h"
 #include "70_textoverlay.h"
 #include "71_distancefieldfonts.h"
-#include "72_imgui.h"
 #include "80_radialblur.h"
 #include "81_bloom.h"
 #include "82_parallaxmapping.h"
@@ -59,6 +59,15 @@
 #include "90_conservativeraster.h"
 #include "91_pushdescriptors.h"
 #include "92_inlineuniformblocks.h"
+#include "93_multiview.h"
+#include "94_conditionalrender.h"
+#include "95_debugprintf.h"
+#include "96_debugutils.h"
+#include "97_negativeviewportheight.h"
+#include "98_descriptorindexing.h"
+#include "99_dynamicrendering.h"
+#include "100_texturesparseresidency.h"
+#include "101_dynamicstate.h"
 //-----------------------------------------------------------------------------
 #if defined(_MSC_VER)
 #	pragma comment( lib, "3rdparty.lib" )
@@ -119,15 +128,15 @@ int main(
 	//ComputeParticlesApp app;
 	//ComputeNBodyApp app;
 	//ComputeCullAndLodApp app;
+	ComputeRayTracingApp app;
 	//GeometryShaderApp app;
 	//ViewportArrayApp app;
 	//DisplacementApp app;
 	//TerrainTessellationApp app;
 	//TessellationApp app;
 	
-	TextOverlayApp app;
+	//TextOverlayApp app;
 	//DistanceFieldFontsApp app;
-	//ImguiApp app;
 	
 	//RadialBlurApp app;
 	//BloomApp app;
@@ -135,6 +144,17 @@ int main(
 	//SphericalEnvMappingApp app;
 
 	//ConservativerasterApp app;
+	//PushDescriptorsApp app;
+	//InlineUniformBlocksApp app;
+	//MultiviewApp app;
+	//ConditionalRenderApp app;
+	//DebugPrintfApp app;
+	//DebugUtilsApp app;
+	//NegativeViewportHeightApp app;
+	//DescriptorIndexingApp app;
+	//DynamicRenderingApp app;
+	//TextureSparseResidencyApp app;
+	//DynamicStateApp app;
 
 	app.Run();
 

@@ -3,18 +3,22 @@
 //-----------------------------------------------------------------------------
 bool NegativeViewportHeightApp::OnCreate()
 {
-	camera.type = Camera::CameraType::lookat;
-	camera.setPosition(glm::vec3(0.0f, 0.0f, -4.0f));
-	camera.setRotation(glm::vec3(0.0f));
-	camera.setRotationSpeed(0.25f);
-	camera.setPerspective(60.0f, (float)destWidth / (float)destHeight, 0.1f, 256.0f);
+	loadAssets();
+	setupDescriptors();
+	preparePipelines();
+	buildCommandBuffers();
 
 	return true;
 }
 //-----------------------------------------------------------------------------
 void NegativeViewportHeightApp::OnDestroy()
 {
-
+	vkDestroyPipeline(device, pipeline, nullptr);
+	vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
+	vkDestroyDescriptorSetLayout(device, descriptorSetLayout, nullptr);
+	textures.CW.destroy();
+	textures.CCW.destroy();
+	quad.destroy();
 }
 //-----------------------------------------------------------------------------
 void NegativeViewportHeightApp::OnUpdate(float deltaTime)
@@ -24,12 +28,39 @@ void NegativeViewportHeightApp::OnUpdate(float deltaTime)
 //-----------------------------------------------------------------------------
 void NegativeViewportHeightApp::OnFrame()
 {
-
+	draw();
 }
 //-----------------------------------------------------------------------------
 void NegativeViewportHeightApp::OnUpdateUIOverlay(vks::UIOverlay* overlay)
 {
+	if (overlay->header("Scene")) {
+		overlay->text("Quad type");
+		if (overlay->comboBox("##quadtype", &quadType, { "VK (y negative)", "GL (y positive)" })) {
+			buildCommandBuffers();
+		}
+	}
 
+	if (overlay->header("Viewport")) {
+		if (overlay->checkBox("Negative viewport height", &negativeViewport)) {
+			buildCommandBuffers();
+		}
+		if (overlay->sliderFloat("offset x", &offsetx, -(float)destWidth, (float)destWidth)) {
+			buildCommandBuffers();
+		}
+		if (overlay->sliderFloat("offset y", &offsety, -(float)destHeight, (float)destHeight)) {
+			buildCommandBuffers();
+		}
+	}
+	if (overlay->header("Pipeline")) {
+		overlay->text("Winding order");
+		if (overlay->comboBox("##windingorder", &windingOrder, { "clock wise", "counter clock wise" })) {
+			preparePipelines();
+		}
+		overlay->text("Cull mode");
+		if (overlay->comboBox("##cullmode", &cullMode, { "none", "front face", "back face" })) {
+			preparePipelines();
+		}
+	}
 }
 //-----------------------------------------------------------------------------
 void NegativeViewportHeightApp::OnWindowResize(uint32_t destWidth, uint32_t destHeight)

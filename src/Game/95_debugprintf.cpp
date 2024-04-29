@@ -3,18 +3,28 @@
 //-----------------------------------------------------------------------------
 bool DebugPrintfApp::OnCreate()
 {
-	camera.type = Camera::CameraType::lookat;
-	camera.setPosition(glm::vec3(0.0f, 0.0f, -4.0f));
-	camera.setRotation(glm::vec3(0.0f));
-	camera.setRotationSpeed(0.25f);
+	camera.setRotation(glm::vec3(-4.35f, 16.25f, 0.0f));
+	camera.setRotationSpeed(0.5f);
+	camera.setPosition(glm::vec3(0.1f, 1.1f, -8.5f));
 	camera.setPerspective(60.0f, (float)destWidth / (float)destHeight, 0.1f, 256.0f);
+
+	loadAssets();
+	prepareUniformBuffers();
+	setupDescriptors();
+	preparePipelines();
+	buildCommandBuffers();
 
 	return true;
 }
 //-----------------------------------------------------------------------------
 void DebugPrintfApp::OnDestroy()
 {
-
+	if (device) {
+		vkDestroyPipeline(device, pipeline, nullptr);
+		vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
+		vkDestroyDescriptorSetLayout(device, descriptorSetLayout, nullptr);
+		uniformBuffer.destroy();
+	}
 }
 //-----------------------------------------------------------------------------
 void DebugPrintfApp::OnUpdate(float deltaTime)
@@ -24,12 +34,15 @@ void DebugPrintfApp::OnUpdate(float deltaTime)
 //-----------------------------------------------------------------------------
 void DebugPrintfApp::OnFrame()
 {
-
+	updateUniformBuffers();
+	draw();
 }
 //-----------------------------------------------------------------------------
 void DebugPrintfApp::OnUpdateUIOverlay(vks::UIOverlay* overlay)
 {
-
+	if (overlay->header("Info")) {
+		overlay->text("Please run this sample with a graphics debugger attached");
+	}
 }
 //-----------------------------------------------------------------------------
 void DebugPrintfApp::OnWindowResize(uint32_t destWidth, uint32_t destHeight)

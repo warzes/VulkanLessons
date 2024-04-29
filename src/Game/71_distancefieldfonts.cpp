@@ -4,17 +4,34 @@
 bool DistanceFieldFontsApp::OnCreate()
 {
 	camera.type = Camera::CameraType::lookat;
-	camera.setPosition(glm::vec3(0.0f, 0.0f, -4.0f));
+	camera.setPosition(glm::vec3(0.0f, 0.0f, -2.0f));
 	camera.setRotation(glm::vec3(0.0f));
-	camera.setRotationSpeed(0.25f);
-	camera.setPerspective(60.0f, (float)destWidth / (float)destHeight, 0.1f, 256.0f);
+	camera.setPerspective(splitScreen ? 30.0f : 45.0f, (float)destWidth / (float)(destHeight * ((splitScreen) ? 0.5f : 1.0f)), 1.0f, 256.0f);
+
+	parsebmFont();
+	loadAssets();
+	generateText("Vulkan");
+	prepareUniformBuffers();
+	setupDescriptors();
+	preparePipelines();
+	buildCommandBuffers();
 
 	return true;
 }
 //-----------------------------------------------------------------------------
 void DistanceFieldFontsApp::OnDestroy()
 {
-
+	if (device) {
+		textures.fontSDF.destroy();
+		textures.fontBitmap.destroy();
+		vkDestroyPipeline(device, pipelines.sdf, nullptr);
+		vkDestroyPipeline(device, pipelines.bitmap, nullptr);
+		vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
+		vkDestroyDescriptorSetLayout(device, descriptorSetLayout, nullptr);
+		vertexBuffer.destroy();
+		indexBuffer.destroy();
+		uniformBuffer.destroy();
+	}
 }
 //-----------------------------------------------------------------------------
 void DistanceFieldFontsApp::OnUpdate(float deltaTime)
@@ -24,12 +41,22 @@ void DistanceFieldFontsApp::OnUpdate(float deltaTime)
 //-----------------------------------------------------------------------------
 void DistanceFieldFontsApp::OnFrame()
 {
-
+	updateUniformBuffers();
+	draw();
 }
 //-----------------------------------------------------------------------------
 void DistanceFieldFontsApp::OnUpdateUIOverlay(vks::UIOverlay* overlay)
 {
-
+	if (overlay->header("Settings")) {
+		bool outline = (uniformData.outline == 1.0f);
+		if (overlay->checkBox("Outline", &outline)) {
+			uniformData.outline = outline ? 1.0f : 0.0f;
+		}
+		if (overlay->checkBox("Splitscreen", &splitScreen)) {
+			camera.setPerspective(splitScreen ? 30.0f : 45.0f, (float)destWidth / (float)(destHeight * ((splitScreen) ? 0.5f : 1.0f)), 1.0f, 256.0f);
+			buildCommandBuffers();
+		}
+	}
 }
 //-----------------------------------------------------------------------------
 void DistanceFieldFontsApp::OnWindowResize(uint32_t destWidth, uint32_t destHeight)

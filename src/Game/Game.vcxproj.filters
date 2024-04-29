@@ -138,28 +138,25 @@
     <ClCompile Include="63_computecullandlod.cpp">
       <Filter>App\Examples\6_Compute&amp;Geometry&amp;Tessellation</Filter>
     </ClCompile>
-    <ClCompile Include="64_geometryshader.cpp">
+    <ClCompile Include="65_geometryshader.cpp">
       <Filter>App\Examples\6_Compute&amp;Geometry&amp;Tessellation</Filter>
     </ClCompile>
-    <ClCompile Include="65_viewportarray.cpp">
+    <ClCompile Include="66_viewportarray.cpp">
       <Filter>App\Examples\6_Compute&amp;Geometry&amp;Tessellation</Filter>
     </ClCompile>
-    <ClCompile Include="66_displacement.cpp">
+    <ClCompile Include="67_displacement.cpp">
       <Filter>App\Examples\6_Compute&amp;Geometry&amp;Tessellation</Filter>
     </ClCompile>
-    <ClCompile Include="67_terraintessellation.cpp">
+    <ClCompile Include="68_terraintessellation.cpp">
       <Filter>App\Examples\6_Compute&amp;Geometry&amp;Tessellation</Filter>
     </ClCompile>
-    <ClCompile Include="68_tessellation.cpp">
+    <ClCompile Include="69_tessellation.cpp">
       <Filter>App\Examples\6_Compute&amp;Geometry&amp;Tessellation</Filter>
     </ClCompile>
     <ClCompile Include="70_textoverlay.cpp">
       <Filter>App\Examples\7_UI</Filter>
     </ClCompile>
     <ClCompile Include="71_distancefieldfonts.cpp">
-      <Filter>App\Examples\7_UI</Filter>
-    </ClCompile>
-    <ClCompile Include="72_imgui.cpp">
       <Filter>App\Examples\7_UI</Filter>
     </ClCompile>
     <ClCompile Include="80_radialblur.cpp">
@@ -198,26 +195,20 @@
     <ClCompile Include="97_negativeviewportheight.cpp">
       <Filter>App\Examples\9_Extensions</Filter>
     </ClCompile>
-    <ClCompile Include="98_variablerateshading.cpp">
+    <ClCompile Include="98_descriptorindexing.cpp">
       <Filter>App\Examples\9_Extensions</Filter>
     </ClCompile>
-    <ClCompile Include="99_descriptorindexing.cpp">
+    <ClCompile Include="99_dynamicrendering.cpp">
       <Filter>App\Examples\9_Extensions</Filter>
     </ClCompile>
-    <ClCompile Include="100_dynamicrendering.cpp">
+    <ClCompile Include="100_texturesparseresidency.cpp">
       <Filter>App\Examples\9_Extensions</Filter>
     </ClCompile>
-    <ClCompile Include="101_graphicspipelinelibrary.cpp">
+    <ClCompile Include="101_dynamicstate.cpp">
       <Filter>App\Examples\9_Extensions</Filter>
     </ClCompile>
-    <ClCompile Include="102_meshshader.cpp">
-      <Filter>App\Examples\9_Extensions</Filter>
-    </ClCompile>
-    <ClCompile Include="103_descriptorbuffer.cpp">
-      <Filter>App\Examples\9_Extensions</Filter>
-    </ClCompile>
-    <ClCompile Include="104_shaderobjects.cpp">
-      <Filter>App\Examples\9_Extensions</Filter>
+    <ClCompile Include="64_computeraytracing.cpp">
+      <Filter>App\Examples\6_Compute&amp;Geometry&amp;Tessellation</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -357,28 +348,25 @@
     <ClInclude Include="63_computecullandlod.h">
       <Filter>App\Examples\6_Compute&amp;Geometry&amp;Tessellation</Filter>
     </ClInclude>
-    <ClInclude Include="64_geometryshader.h">
+    <ClInclude Include="65_geometryshader.h">
       <Filter>App\Examples\6_Compute&amp;Geometry&amp;Tessellation</Filter>
     </ClInclude>
-    <ClInclude Include="65_viewportarray.h">
+    <ClInclude Include="66_viewportarray.h">
       <Filter>App\Examples\6_Compute&amp;Geometry&amp;Tessellation</Filter>
     </ClInclude>
-    <ClInclude Include="66_displacement.h">
+    <ClInclude Include="67_displacement.h">
       <Filter>App\Examples\6_Compute&amp;Geometry&amp;Tessellation</Filter>
     </ClInclude>
-    <ClInclude Include="67_terraintessellation.h">
+    <ClInclude Include="68_terraintessellation.h">
       <Filter>App\Examples\6_Compute&amp;Geometry&amp;Tessellation</Filter>
     </ClInclude>
-    <ClInclude Include="68_tessellation.h">
+    <ClInclude Include="69_tessellation.h">
       <Filter>App\Examples\6_Compute&amp;Geometry&amp;Tessellation</Filter>
     </ClInclude>
     <ClInclude Include="70_textoverlay.h">
       <Filter>App\Examples\7_UI</Filter>
     </ClInclude>
     <ClInclude Include="71_distancefieldfonts.h">
-      <Filter>App\Examples\7_UI</Filter>
-    </ClInclude>
-    <ClInclude Include="72_imgui.h">
       <Filter>App\Examples\7_UI</Filter>
     </ClInclude>
     <ClInclude Include="80_radialblur.h">
@@ -417,26 +405,20 @@
     <ClInclude Include="97_negativeviewportheight.h">
       <Filter>App\Examples\9_Extensions</Filter>
     </ClInclude>
-    <ClInclude Include="98_variablerateshading.h">
+    <ClInclude Include="98_descriptorindexing.h">
       <Filter>App\Examples\9_Extensions</Filter>
     </ClInclude>
-    <ClInclude Include="99_descriptorindexing.h">
+    <ClInclude Include="99_dynamicrendering.h">
       <Filter>App\Examples\9_Extensions</Filter>
     </ClInclude>
-    <ClInclude Include="100_dynamicrendering.h">
+    <ClInclude Include="100_texturesparseresidency.h">
       <Filter>App\Examples\9_Extensions</Filter>
     </ClInclude>
-    <ClInclude Include="101_graphicspipelinelibrary.h">
+    <ClInclude Include="101_dynamicstate.h">
       <Filter>App\Examples\9_Extensions</Filter>
     </ClInclude>
-    <ClInclude Include="102_meshshader.h">
-      <Filter>App\Examples\9_Extensions</Filter>
-    </ClInclude>
-    <ClInclude Include="103_descriptorbuffer.h">
-      <Filter>App\Examples\9_Extensions</Filter>
-    </ClInclude>
-    <ClInclude Include="104_shaderobjects.h">
-      <Filter>App\Examples\9_Extensions</Filter>
+    <ClInclude Include="64_computeraytracing.h">
+      <Filter>App\Examples\6_Compute&amp;Geometry&amp;Tessellation</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
