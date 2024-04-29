@@ -32,6 +32,18 @@
     <ClCompile Include="VulkanUIOverlay.cpp">
       <Filter>Render\Vulkan</Filter>
     </ClCompile>
+    <ClCompile Include="FileSystem.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="BaseApp.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="PlatformApp.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="VulkanApp.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -97,6 +109,18 @@
     </ClInclude>
     <ClInclude Include="ThreadPool.h">
       <Filter>Other</Filter>
+    </ClInclude>
+    <ClInclude Include="FileSystem.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseApp.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="PlatformApp.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="VulkanApp.h">
+      <Filter>Render</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

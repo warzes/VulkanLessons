@@ -3,121 +3,31 @@
 #include "Log.h"
 #include "KeyCodes.h"
 //-----------------------------------------------------------------------------
-#if defined(_WIN32)
-constexpr const wchar_t* ClassName = L"EngineApp";
-#endif // _WIN32
 bool IsExit = false;
 //-----------------------------------------------------------------------------
 struct EngineAppImpl
 {
-#if defined(_WIN32)
-	HINSTANCE hInstance = nullptr;
-	HWND hwnd = nullptr;
-	MSG msg{};
-	uint32_t frameWidth = 0;
-	uint32_t frameHeight = 0;
-#endif // _WIN32
-
 	float deltaTime = 0.01f;
 };
 //-----------------------------------------------------------------------------
 EngineAppImpl* currentEngineAppImpl; // TODO: временно
 EngineApp* currentEngineApp; // TODO: временно
 //-----------------------------------------------------------------------------
-#if defined(_WIN32)
-LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
+void EngineExit()
 {
-	switch (message)
-	{
-	case WM_CLOSE:
-		IsExit = true;
-		currentEngineApp->RenderPrepared() = false;
-		PostQuitMessage(0);
-		break;
-	//case WM_DESTROY:
-	//	PostQuitMessage(0);
-	//	return 0;
-	case WM_PAINT:
-		ValidateRect(hwnd, nullptr);
-		break;
-	case WM_KEYDOWN:
-		switch (wParam)
-		{
-		case KEY_P:
-			currentEngineApp->Paused() = !currentEngineApp->Paused();
-			break;
-		case KEY_F1:
-			currentEngineApp->GetUIOverlay().visible = !currentEngineApp->GetUIOverlay().visible;
-			currentEngineApp->GetUIOverlay().updated = true;
-			break;
-		case KEY_ESCAPE:
-			IsExit = true;
-			break;
-		}
-		currentEngineApp->OnKeyPressed((uint32_t)wParam);
-		break;
-	case WM_KEYUP:
-		currentEngineApp->OnKeyUp((uint32_t)wParam);
-		break;
-	case WM_LBUTTONDOWN:
-		currentEngineApp->mouseState.position = glm::vec2((float)LOWORD(lParam), (float)HIWORD(lParam));
-		currentEngineApp->mouseState.buttons.left = true;
-		break;
-	case WM_RBUTTONDOWN:
-		currentEngineApp->mouseState.position = glm::vec2((float)LOWORD(lParam), (float)HIWORD(lParam));
-		currentEngineApp->mouseState.buttons.right = true;
-		break;
-	case WM_MBUTTONDOWN:
-		currentEngineApp->mouseState.position = glm::vec2((float)LOWORD(lParam), (float)HIWORD(lParam));
-		currentEngineApp->mouseState.buttons.middle = true;
-		break;
-	case WM_LBUTTONUP:
-		currentEngineApp->mouseState.buttons.left = false;
-		break;
-	case WM_RBUTTONUP:
-		currentEngineApp->mouseState.buttons.right = false;
-		break;
-	case WM_MBUTTONUP:
-		currentEngineApp->mouseState.buttons.middle = false;
-		break;
-	//case WM_MOUSEWHEEL:
-	//{
-	//	short wheelDelta = GET_WHEEL_DELTA_WPARAM(wParam);
-	//	break;
-	//}
-	case WM_MOUSEMOVE:
-		currentEngineApp->handleMouseMove(LOWORD(lParam), HIWORD(lParam));
-		break;
-	case WM_SIZE:
-		if ((currentEngineApp->RenderPrepared()) && (wParam != SIZE_MINIMIZED))
-		{
-			if ((currentEngineApp->resizing) || ((wParam == SIZE_MAXIMIZED) || (wParam == SIZE_RESTORED)))
-			{
-				currentEngineApp->destWidth = LOWORD(lParam);
-				currentEngineApp->destHeight = HIWORD(lParam);
-				currentEngineApp->windowResize(currentEngineApp->destWidth, currentEngineApp->destHeight);
-			}
-		}
-		break;
-	case WM_GETMINMAXINFO:
-		{
-			LPMINMAXINFO minMaxInfo = (LPMINMAXINFO)lParam;
-			minMaxInfo->ptMinTrackSize.x = 64;
-			minMaxInfo->ptMinTrackSize.y = 64;
-			break;
-		}
-	case WM_ENTERSIZEMOVE:
-		currentEngineApp->resizing = true;
-		break;
-	case WM_EXITSIZEMOVE:
-		currentEngineApp->resizing = false;
-		break;
-	default:
-		break;
-	}
-	return DefWindowProc(hwnd, message, wParam, lParam);
+	IsExit = true;
+	currentEngineApp->RenderPrepared() = false;
 }
-#endif // _WIN32
+//-----------------------------------------------------------------------------
+bool GetRenderPrepared()
+{
+	return currentEngineApp->RenderPrepared();
+}
+//-----------------------------------------------------------------------------
+void EngineResize(uint32_t destWidth, uint32_t destHeight)
+{
+	currentEngineApp->resize(destWidth, destHeight);
+}
 //-----------------------------------------------------------------------------
 EngineApp::EngineApp()
 	: m_data(new EngineAppImpl)
@@ -145,6 +55,7 @@ void EngineApp::Run()
 			{
 				frame();
 			}
+			RenderPrepared() = false;
 			renderFinal();
 			OnDestroy();
 		}
@@ -187,14 +98,12 @@ uint32_t EngineApp::GetMemoryTypeIndex(uint32_t typeBits, VkMemoryPropertyFlags 
 bool EngineApp::create()
 {
 	EngineCreateInfo createInfo = GetCreateInfo();
-	m_data->hInstance = GetModuleHandle(nullptr);
 
-	setupDPIAwareness();
-
-	if (!initWindow(createInfo.window))
+	if (!initPlatformApp(createInfo.window))
 		return false;
-	destWidth = m_data->frameWidth;
-	destHeight = m_data->frameHeight;
+
+	destWidth = GetFrameWidth();
+	destHeight = GetFrameHeight();
 
 	if (!initVulkan(createInfo.render) ||
 		!prepareRender(createInfo.render, createInfo.window.fullscreen))
@@ -206,123 +115,6 @@ bool EngineApp::create()
 	lastTimestamp = std::chrono::high_resolution_clock::now();
 	tPrevEnd = lastTimestamp;
 	IsExit = false;
-	return true;
-}
-//-----------------------------------------------------------------------------
-void EngineApp::setupDPIAwareness()
-{
-	typedef HRESULT* (__stdcall* SetProcessDpiAwarenessFunc)(PROCESS_DPI_AWARENESS);
-	HMODULE shCore = LoadLibrary(L"Shcore.dll");
-	if (shCore)
-	{
-		SetProcessDpiAwarenessFunc setProcessDpiAwareness = (SetProcessDpiAwarenessFunc)GetProcAddress(shCore, "SetProcessDpiAwareness");
-
-		if (setProcessDpiAwareness != nullptr)
-			setProcessDpiAwareness(PROCESS_PER_MONITOR_DPI_AWARE);
-
-		FreeLibrary(shCore);
-	}
-}
-//-----------------------------------------------------------------------------
-bool EngineApp::initWindow(const WindowSystemCreateInfo& createInfo)
-{
-	m_fullscreen = createInfo.fullscreen;
-
-	WNDCLASSEX wndClass{};
-	wndClass.cbSize = sizeof(WNDCLASSEX);
-	wndClass.style = CS_HREDRAW | CS_VREDRAW;
-	wndClass.lpfnWndProc = WndProc;
-	wndClass.hInstance = m_data->hInstance;
-	wndClass.hIcon = LoadIcon(nullptr, IDI_APPLICATION);
-	wndClass.hIconSm = LoadIcon(nullptr, IDI_WINLOGO);
-	wndClass.hCursor = LoadCursor(nullptr, IDC_ARROW);
-	wndClass.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
-	wndClass.lpszClassName = ClassName;
-	if (!RegisterClassEx(&wndClass))
-	{
-		Fatal("RegisterClassEx failed.");
-		return false;
-	}
-
-	int screenWidth = GetSystemMetrics(SM_CXSCREEN);
-	int screenHeight = GetSystemMetrics(SM_CYSCREEN);
-
-	if (m_fullscreen)
-	{
-		if ((createInfo.width != (uint32_t)screenWidth) && (createInfo.height != (uint32_t)screenHeight))
-		{
-			DEVMODE dmScreenSettings;
-			memset(&dmScreenSettings, 0, sizeof(dmScreenSettings));
-			dmScreenSettings.dmSize = sizeof(dmScreenSettings);
-			dmScreenSettings.dmPelsWidth = createInfo.width;
-			dmScreenSettings.dmPelsHeight = createInfo.height;
-			dmScreenSettings.dmBitsPerPel = 32;
-			dmScreenSettings.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT;
-			if (ChangeDisplaySettings(&dmScreenSettings, CDS_FULLSCREEN) != DISP_CHANGE_SUCCESSFUL)
-			{
-				if (MessageBox(NULL, L"Fullscreen Mode not supported!\n Switch to window mode?", L"Error", MB_YESNO | MB_ICONEXCLAMATION) == IDYES)
-				{
-					m_fullscreen = false;
-				}
-				else
-				{
-					return false;
-				}
-			}
-			screenWidth = createInfo.width;
-			screenHeight = createInfo.height;
-		}
-	}
-
-	DWORD dwExStyle;
-	DWORD dwStyle;
-
-	if (m_fullscreen)
-	{
-		dwExStyle = WS_EX_APPWINDOW;
-		dwStyle = WS_POPUP | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
-	}
-	else
-	{
-		dwExStyle = WS_EX_APPWINDOW | WS_EX_WINDOWEDGE;
-		dwStyle = WS_OVERLAPPEDWINDOW | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
-	}
-
-	RECT windowRect;
-	windowRect.left = 0L;
-	windowRect.top = 0L;
-	windowRect.right = createInfo.fullscreen ? (long)screenWidth : (long)createInfo.width;
-	windowRect.bottom = createInfo.fullscreen ? (long)screenHeight : (long)createInfo.height;
-
-	AdjustWindowRectEx(&windowRect, dwStyle, FALSE, dwExStyle);
-
-	m_data->hwnd = CreateWindowEx(0, ClassName, createInfo.title, dwStyle | WS_CLIPSIBLINGS | WS_CLIPCHILDREN,
-		0, 0, windowRect.right - windowRect.left, windowRect.bottom - windowRect.top,
-		nullptr, nullptr, m_data->hInstance, nullptr);
-
-	if (!m_data->hwnd)
-	{
-		Fatal("Could not create window!");
-		return false;
-	}
-
-	if (!m_fullscreen)
-	{
-		// Center on screen
-		uint32_t x = (GetSystemMetrics(SM_CXSCREEN) - windowRect.right) / 2;
-		uint32_t y = (GetSystemMetrics(SM_CYSCREEN) - windowRect.bottom) / 2;
-		SetWindowPos(m_data->hwnd, 0, x, y, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
-	}
-
-	ShowWindow(m_data->hwnd, SW_SHOW);
-	SetForegroundWindow(m_data->hwnd);
-	SetFocus(m_data->hwnd);
-
-	// TODO: вычислить реальный размер окна
-	m_data->frameWidth = createInfo.width;
-	m_data->frameHeight = createInfo.height;
-	// TODO: также рендер может менять размер, проверить что там и как это использовать
-
 	return true;
 }
 //-----------------------------------------------------------------------------
@@ -594,13 +386,13 @@ bool EngineApp::prepareRender(const RenderSystemCreateInfo& createInfo, bool ful
 
 	initSwapchain();
 	createCommandPool();
-	setupSwapChain(createInfo.vsync, &m_data->frameWidth, &m_data->frameHeight, fullscreen);
+	setupSwapChain(createInfo.vsync, &destWidth, &destHeight, fullscreen);
 	createCommandBuffers();
 	createSynchronizationPrimitives();
-	setupDepthStencil(m_data->frameWidth, m_data->frameHeight);
+	setupDepthStencil(destWidth, destHeight);
 	setupRenderPass();
 	createPipelineCache();
-	setupFrameBuffer(m_data->frameWidth, m_data->frameHeight);
+	setupFrameBuffer(destWidth, destHeight);
 	overlay = overlay && (!benchmark.active);
 	if (overlay)
 	{
@@ -619,7 +411,7 @@ bool EngineApp::prepareRender(const RenderSystemCreateInfo& createInfo, bool ful
 //-----------------------------------------------------------------------------
 void EngineApp::initSwapchain()
 {
-	swapChain.initSurface(m_data->hInstance, m_data->hwnd);
+	swapChain.initSurface(GetHINSTANCE(), GetHWND());
 }
 //-----------------------------------------------------------------------------
 void EngineApp::createCommandPool()
@@ -824,17 +616,13 @@ bool EngineApp::isEnd() const
 //-----------------------------------------------------------------------------
 void EngineApp::frame()
 {
-	while (PeekMessage(&m_data->msg, nullptr, 0, 0, PM_REMOVE))
+	if (!windowFrame())
 	{
-		TranslateMessage(&m_data->msg);
-		DispatchMessage(&m_data->msg);
-		if (m_data->msg.message == WM_QUIT)
-		{
-			IsExit = true;
-			break;
-		}
+		IsExit = true;
+		return;
 	}
-	if (RenderPrepared() && !IsIconic(m_data->hwnd)) // TODO: может все таки обрабатывать события даже в свернутом окне?
+
+	if (RenderPrepared() && !isIconic()) // TODO: может все таки обрабатывать события даже в свернутом окне?
 	{
 		nextFrame();
 	}
@@ -865,10 +653,9 @@ void EngineApp::nextFrame()
 	if (fpsTimer > 1000.0f)
 	{
 		lastFPS = static_cast<uint32_t>((float)frameCounter * (1000.0f / fpsTimer));
-#if defined(_WIN32)
 		std::string windowTitle = getWindowTitle();
-		SetWindowTextA(m_data->hwnd, windowTitle.c_str());
-#endif
+		SetTitle(windowTitle);
+
 		frameCounter = 0;
 		lastTimestamp = tEnd;
 	}
@@ -884,76 +671,6 @@ void EngineApp::render()
 		OnFrame();
 }
 //-----------------------------------------------------------------------------
-void EngineApp::windowResize(uint32_t destWidth, uint32_t destHeight)
-{
-	if (!prepared)
-		return;
-
-	prepared = false;
-	resized = true;
-
-	// Ensure all operations on the device have been finished before destroying resources
-	vkDeviceWaitIdle(device);
-
-	// Recreate swap chain
-	m_data->frameWidth = destWidth;
-	m_data->frameHeight = destHeight;
-	setupSwapChain(m_vsync, &destWidth, &destHeight, m_fullscreen);
-
-	// Recreate the frame buffers
-	vkDestroyImageView(device, depthStencil.view, nullptr);
-	vkDestroyImage(device, depthStencil.image, nullptr);
-	vkFreeMemory(device, depthStencil.memory, nullptr);
-	setupDepthStencil(destWidth, destHeight);
-	for (uint32_t i = 0; i < frameBuffers.size(); i++)
-		vkDestroyFramebuffer(device, frameBuffers[i], nullptr);
-
-	setupFrameBuffer(destWidth, destHeight);
-
-	if ((destWidth > 0.0f) && (destHeight > 0.0f))
-	{
-		if (overlay) 
-		{
-			UIOverlay.resize(destWidth, destHeight);
-		}
-	}
-
-	// Command buffers need to be recreated as they may store references to the recreated frame buffer
-	destroyCommandBuffers();
-	createCommandBuffers();
-	buildCommandBuffers();
-
-	// SRS - Recreate fences in case number of swapchain images has changed on resize
-	for (auto& fence : waitFences)
-		vkDestroyFence(device, fence, nullptr);
-
-	createSynchronizationPrimitives();
-
-	vkDeviceWaitIdle(device);
-
-	OnWindowResize(destWidth, destHeight);
-
-	prepared = true;
-}
-//-----------------------------------------------------------------------------
-void EngineApp::handleMouseMove(int32_t x, int32_t y)
-{
-	int32_t dx = (int32_t)mouseState.position.x - x;
-	int32_t dy = (int32_t)mouseState.position.y - y;
-
-	bool handled = false;
-
-	if (overlay) 
-	{
-		ImGuiIO& io = ImGui::GetIO();
-		handled = io.WantCaptureMouse && UIOverlay.visible;
-	}
-	if (!handled)
-		OnMouseMoved(x, y, dx, dy);
-
-	mouseState.position = glm::vec2((float)x, (float)y);
-}
-//-----------------------------------------------------------------------------
 void EngineApp::updateOverlay()
 {
 	if (!overlay)
@@ -961,7 +678,7 @@ void EngineApp::updateOverlay()
 
 	ImGuiIO& io = ImGui::GetIO();
 
-	io.DisplaySize = ImVec2((float)m_data->frameWidth, (float)m_data->frameHeight);
+	io.DisplaySize = ImVec2((float)destWidth, (float)destHeight);
 	io.DeltaTime = frameTimer;
 
 	io.MousePos = ImVec2(mouseState.position.x, mouseState.position.y);
@@ -1012,16 +729,7 @@ void EngineApp::renderFinal()
 void EngineApp::destroy()
 {
 	renderDestroy();
-	if (m_data->hwnd)
-	{
-		DestroyWindow(m_data->hwnd);
-		m_data->hwnd = nullptr;
-	}
-	if (m_data->hInstance)
-	{
-		UnregisterClass(ClassName, m_data->hInstance);
-		m_data->hInstance = nullptr;
-	}
+	closePlatformApp();
 }
 //-----------------------------------------------------------------------------
 void EngineApp::renderDestroy()
@@ -1093,6 +801,53 @@ VkPipelineShaderStageCreateInfo EngineApp::loadShader(std::string fileName, VkSh
 	assert(shaderStage.module != VK_NULL_HANDLE);
 	shaderModules.push_back(shaderStage.module);
 	return shaderStage;
+}
+//-----------------------------------------------------------------------------
+void EngineApp::resize(uint32_t destWidth, uint32_t destHeight)
+{
+	prepared = false;
+	resized = true;
+	this->destWidth = destWidth;
+	this->destHeight = destHeight;
+
+	// Ensure all operations on the device have been finished before destroying resources
+	vkDeviceWaitIdle(device);
+
+	// Recreate swap chain
+	setupSwapChain(m_vsync, &destWidth, &destHeight, m_fullscreen);
+
+	// Recreate the frame buffers
+	vkDestroyImageView(device, depthStencil.view, nullptr);
+	vkDestroyImage(device, depthStencil.image, nullptr);
+	vkFreeMemory(device, depthStencil.memory, nullptr);
+	setupDepthStencil(destWidth, destHeight);
+	for (uint32_t i = 0; i < frameBuffers.size(); i++)
+		vkDestroyFramebuffer(device, frameBuffers[i], nullptr);
+
+	setupFrameBuffer(destWidth, destHeight);
+
+	if ((destWidth > 0.0f) && (destHeight > 0.0f))
+	{
+		if (overlay)
+		{
+			UIOverlay.resize(destWidth, destHeight);
+		}
+	}
+
+	// Command buffers need to be recreated as they may store references to the recreated frame buffer
+	destroyCommandBuffers();
+	createCommandBuffers();
+	buildCommandBuffers();
+
+	// SRS - Recreate fences in case number of swapchain images has changed on resize
+	for (auto& fence : waitFences)
+		vkDestroyFence(device, fence, nullptr);
+
+	createSynchronizationPrimitives();
+
+	vkDeviceWaitIdle(device);
+
+	prepared = true;
 }
 //-----------------------------------------------------------------------------
 void EngineApp::drawUI(const VkCommandBuffer commandBuffer)

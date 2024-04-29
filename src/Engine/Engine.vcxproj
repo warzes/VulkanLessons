@@ -93,12 +93,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BaseApp.cpp" />
     <ClCompile Include="EngineApp.cpp" />
+    <ClCompile Include="FileSystem.cpp" />
     <ClCompile Include="Log.cpp" />
+    <ClCompile Include="PlatformApp.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="VulkanApp.cpp" />
     <ClCompile Include="VulkanBuffer.cpp" />
     <ClCompile Include="VulkanDebug.cpp" />
     <ClCompile Include="VulkanDevice.cpp" />
@@ -109,17 +113,21 @@
     <ClCompile Include="VulkanUIOverlay.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BaseApp.h" />
     <ClInclude Include="BaseFunc.h" />
     <ClInclude Include="BaseMacros.h" />
     <ClInclude Include="Benchmark.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="EngineApp.h" />
     <ClInclude Include="ExampleClass.h" />
+    <ClInclude Include="FileSystem.h" />
     <ClInclude Include="Frustum.h" />
     <ClInclude Include="KeyCodes.h" />
     <ClInclude Include="Log.h" />
+    <ClInclude Include="PlatformApp.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="ThreadPool.h" />
+    <ClInclude Include="VulkanApp.h" />
     <ClInclude Include="VulkanBuffer.h" />
     <ClInclude Include="VulkanDebug.h" />
     <ClInclude Include="VulkanDevice.h" />

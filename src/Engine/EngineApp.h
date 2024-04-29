@@ -1,19 +1,11 @@
 #pragma once
 
+#include "VulkanApp.h"
 #include "VulkanSwapChain.h"
 #include "VulkanDevice.h"
-#include "VulkanUIOverlay.h"
 #include "VulkanglTFModel.h"
 #include "VulkanTexture.h"
 #include "Benchmark.h"
-
-struct WindowSystemCreateInfo final
-{
-	int width = 1024;
-	int height = 768;
-	const wchar_t* title = L"Game";
-	bool fullscreen = false;
-};
 
 struct RenderSystemCreateInfo final
 {
@@ -36,7 +28,7 @@ struct EngineCreateInfo final
 
 struct EngineAppImpl;
 
-class EngineApp
+class EngineApp : public VulkanApp
 {
 public:
 	EngineApp();
@@ -49,12 +41,8 @@ public:
 	virtual void OnDestroy() = 0;
 	virtual void OnUpdate(float deltaTime) = 0;
 	virtual void OnFrame() = 0;
-	virtual void OnWindowResize(uint32_t destWidth, uint32_t destHeight) {}
-	/** @brief (Virtual) Called after a key was pressed, can be used to do custom key handling */
-	virtual void OnKeyPressed(uint32_t) {}
-	virtual void OnKeyUp(uint32_t) {}
-	/** @brief (Virtual) Called after the mouse cursor moved and before internal events (like camera rotation) is handled */
-	virtual void OnMouseMoved(int32_t x, int32_t y, int32_t dx, int32_t dy) {}
+
+
 	/** @brief (Virtual) Called when the UI overlay is updating, can be used to add custom elements to the overlay */
 	virtual void OnUpdateUIOverlay(vks::UIOverlay* /*overlay*/) {}
 
@@ -80,20 +68,9 @@ public:
 	bool& Paused() { return paused; }
 	vks::UIOverlay& GetUIOverlay() { return UIOverlay; }
 
-	/** @brief State of mouse/touch input */
-	struct {
-		struct {
-			bool left = false;
-			bool right = false;
-			bool middle = false;
-		} buttons;
-		glm::vec2 position;
-	} mouseState; // TODO: временно паблик
-	void handleMouseMove(int32_t x, int32_t y);// TODO: временно паблик
-	bool resizing = false;// TODO: временно
 	uint32_t destWidth;// TODO: временно
 	uint32_t destHeight;// TODO: временно
-	void windowResize(uint32_t destWidth, uint32_t destHeight);
+	void resize(uint32_t destWidth, uint32_t destHeight);
 
 protected:
 	/** @brief Adds the drawing commands for the ImGui overlay to the given command buffer */
@@ -201,8 +178,8 @@ protected:
 
 private:
 	bool create();
-	void setupDPIAwareness();
-	bool initWindow(const WindowSystemCreateInfo& createInfo);
+
+
 	bool initVulkan(const RenderSystemCreateInfo& createInfo);
 	virtual void setEnabledInstanceExtensions() {} // TODO: все эти опции передавать через CreateInfo.
 	VkResult createInstance(bool enableValidation);
@@ -248,10 +225,8 @@ private:
 	bool prepared = false;
 
 	bool validation = false;
-	bool overlay = true;
 
-	vks::UIOverlay UIOverlay;
 
 	bool m_vsync = false;
-	bool m_fullscreen = false;
+
 };
