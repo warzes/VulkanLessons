@@ -58,7 +58,6 @@ private:
 	void setEnabledInstanceExtensions() final
 	{
 		// Enable extension required for push descriptors
-		enabledInstanceExtensions.push_back(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME);
 		enabledDeviceExtensions.push_back(VK_KHR_PUSH_DESCRIPTOR_EXTENSION_NAME);
 	}
 

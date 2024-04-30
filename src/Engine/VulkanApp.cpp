@@ -61,7 +61,11 @@ bool VulkanApp::initVulkan(const RenderSystemCreateInfo& createInfo)
 #endif
 	requiresStencil = createInfo.requiresStencil;
 
+	for (const char* ext : createInfo.enabledInstanceExtensions)
+		enabledInstanceExtensions.push_back(ext);
+
 	setEnabledInstanceExtensions();
+
 	VulkanInstance vulkanInstance;
 	m_instance = vulkanInstance.Create(m_validationLayers, enabledInstanceExtensions);
 	if (!m_instance)

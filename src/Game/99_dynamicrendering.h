@@ -44,8 +44,6 @@ private:
 
 	void setEnabledInstanceExtensions()
 	{
-		enabledInstanceExtensions.push_back(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME);
-
 		// The sample uses the extension (instead of Vulkan 1.2, where dynamic rendering is core)
 		enabledDeviceExtensions.push_back(VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME);
 		enabledDeviceExtensions.push_back(VK_KHR_MAINTENANCE2_EXTENSION_NAME);

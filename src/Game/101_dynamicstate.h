@@ -79,12 +79,6 @@ private:
 		bool colorBlendEnable = false;
 	} dynamicState3;
 
-	void setEnabledInstanceExtensions()
-	{
-		// Note: We enable the dynamic state extensions dynamically, based on which ones the device supports see getEnabledExtensions
-		enabledInstanceExtensions.push_back(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME);
-	}
-
 	void getEnabledExtensions()
 	{
 		// Check what dynamic states are supported by the current implementation

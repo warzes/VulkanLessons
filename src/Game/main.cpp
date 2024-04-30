@@ -132,7 +132,7 @@ int main(
 	//GeometryShaderApp app;
 	//ViewportArrayApp app;
 	//DisplacementApp app;
-	TerrainTessellationApp app;
+	//TerrainTessellationApp app;
 	//TessellationApp app;
 	
 	//TextOverlayApp app;
@@ -149,7 +149,7 @@ int main(
 	//MultiviewApp app;
 	//ConditionalRenderApp app;
 	//DebugPrintfApp app;
-	//DebugUtilsApp app;
+	DebugUtilsApp app;
 	//NegativeViewportHeightApp app;
 	//DescriptorIndexingApp app;
 	//DynamicRenderingApp app;
