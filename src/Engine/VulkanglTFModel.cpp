@@ -807,7 +807,7 @@ void vkglTF::Model::loadNode(vkglTF::Node* parent, const tinygltf::Node& node, u
 				const float* bufferTexCoords = nullptr;
 				const float* bufferColors = nullptr;
 				const float* bufferTangents = nullptr;
-				uint32_t numColorComponents;
+				uint32_t numColorComponents = 0;
 				const uint16_t* bufferJoints = nullptr;
 				const float* bufferWeights = nullptr;
 
