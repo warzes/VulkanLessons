@@ -194,7 +194,7 @@ private:
 			vkCmdBindDescriptorSets(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSet, 0, NULL);
 			models.plane.draw(drawCmdBuffers[i]);
 
-			drawUI(drawCmdBuffers[i]);
+			DrawUI(drawCmdBuffers[i]);
 
 			vkCmdEndRenderPass(drawCmdBuffers[i]);
 

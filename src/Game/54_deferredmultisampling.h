@@ -247,7 +247,7 @@ private:
 			vkCmdBindPipeline(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, useMSAA ? pipelines.deferred : pipelines.deferredNoMSAA);
 			vkCmdDraw(drawCmdBuffers[i], 3, 1, 0, 0);
 
-			drawUI(drawCmdBuffers[i]);
+			DrawUI(drawCmdBuffers[i]);
 
 			vkCmdEndRenderPass(drawCmdBuffers[i]);
 

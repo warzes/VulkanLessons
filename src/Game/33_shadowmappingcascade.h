@@ -400,7 +400,7 @@ private:
 				vkCmdBindPipeline(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, (filterPCF) ? pipelines.sceneShadowPCF : pipelines.sceneShadow);
 				renderScene(drawCmdBuffers[i], pipelineLayout, descriptorSet);
 
-				drawUI(drawCmdBuffers[i]);
+				DrawUI(drawCmdBuffers[i]);
 
 				vkCmdEndRenderPass(drawCmdBuffers[i]);
 			}

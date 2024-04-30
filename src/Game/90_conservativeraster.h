@@ -357,7 +357,7 @@ private:
 				vkCmdBindDescriptorSets(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayouts.scene, 0, 1, &descriptorSets.scene, 0, nullptr);
 				vkCmdDraw(drawCmdBuffers[i], 3, 1, 0, 0);
 
-				drawUI(drawCmdBuffers[i]);
+				DrawUI(drawCmdBuffers[i]);
 
 				vkCmdEndRenderPass(drawCmdBuffers[i]);
 			}

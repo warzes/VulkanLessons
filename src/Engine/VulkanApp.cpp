@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "VulkanApp.h"
 #include "Log.h"
+#include "VulkanInstance.h"
 //-----------------------------------------------------------------------------
 std::string VulkanApp::GetDeviceName() const
 {
@@ -25,6 +26,19 @@ uint32_t VulkanApp::GetMemoryTypeIndex(uint32_t typeBits, VkMemoryPropertyFlags 
 	throw "Could not find a suitable memory type!";
 }
 //-----------------------------------------------------------------------------
+void VulkanApp::DrawUI(const VkCommandBuffer commandBuffer)
+{
+	if (overlay && UIOverlay.visible)
+	{
+		const VkViewport viewport = vks::initializers::viewport((float)destWidth, (float)destHeight, 0.0f, 1.0f);
+		const VkRect2D scissor = vks::initializers::rect2D(destWidth, destHeight, 0, 0);
+		vkCmdSetViewport(commandBuffer, 0, 1, &viewport);
+		vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
+
+		UIOverlay.draw(commandBuffer);
+	}
+}
+//-----------------------------------------------------------------------------
 bool VulkanApp::initVulkanApp(const RenderSystemCreateInfo& createInfo, bool fullscreen)
 {
 	destWidth = GetFrameWidth();
@@ -41,25 +55,20 @@ bool VulkanApp::initVulkanApp(const RenderSystemCreateInfo& createInfo, bool ful
 //-----------------------------------------------------------------------------
 bool VulkanApp::initVulkan(const RenderSystemCreateInfo& createInfo)
 {
-	validation = createInfo.validation;
+	m_validationLayers = createInfo.validationLayers;
 #if defined(_DEBUG)
-	validation = true;
+	m_validationLayers = true;
 #endif
 	requiresStencil = createInfo.requiresStencil;
 
 	setEnabledInstanceExtensions();
-
-	// Vulkan instance
-	VkResult result = createInstance(validation);
-	if (result)
-	{
-		Fatal("Could not create Vulkan instance : \n" + std::string(string_VkResult(result)));
+	VulkanInstance vulkanInstance;
+	m_instance = vulkanInstance.Create(m_validationLayers, enabledInstanceExtensions);
+	if (!m_instance)
 		return false;
-	}
-
-	// If requested, we enable the default validation layers for debugging
-	if (validation)
-		vks::debug::setupDebugging(m_instance);
+	hasDeviceFeatures2 = vulkanInstance.hasDeviceFeatures2;
+	hasDebugUtilsExtension = vulkanInstance.hasDebugUtilsExtension;
+	hasDebugReportExtension = vulkanInstance.hasDebugReportExtension;
 
 	if (!selectPhysicalDevice())
 	{
@@ -82,7 +91,7 @@ bool VulkanApp::initVulkan(const RenderSystemCreateInfo& createInfo)
 	// Derived examples can enable extensions based on the list of supported extensions read from the physical device
 	getEnabledExtensions();
 
-	result = m_vulkanDevice->createLogicalDevice(enabledFeatures, enabledDeviceExtensions, deviceCreatepNextChain);
+	VkResult result = m_vulkanDevice->createLogicalDevice(enabledFeatures, enabledDeviceExtensions, deviceCreatepNextChain);
 	if (result != VK_SUCCESS)
 	{
 		Fatal("Could not create Vulkan device: \n" + std::string(string_VkResult(result)));
@@ -333,7 +342,7 @@ void VulkanApp::closeVulkanApp()
 
 	delete m_vulkanDevice;
 
-	if (validation)
+	if (m_validationLayers)
 		vks::debug::freeDebugCallback(m_instance);
 
 	vkDestroyInstance(m_instance, nullptr);
@@ -429,111 +438,6 @@ void VulkanApp::renderFrame()
 	submitInfo.pCommandBuffers = &drawCmdBuffers[currentBuffer];
 	VK_CHECK_RESULT(vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE));
 	submitFrame();
-}
-//-----------------------------------------------------------------------------
-VkResult VulkanApp::createInstance(bool enableValidation)
-{
-	VkApplicationInfo appInfo = {};
-	appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-	appInfo.pApplicationName = "GameApp"; // TODO:
-	appInfo.pEngineName = "VulkanEngine"; // TODO:
-	appInfo.apiVersion = VK_API_VERSION_1_3;
-
-	std::vector<const char*> instanceExtensions = { VK_KHR_SURFACE_EXTENSION_NAME };
-	// Enable surface extensions depending on os
-#if defined(_WIN32)
-	instanceExtensions.push_back(VK_KHR_WIN32_SURFACE_EXTENSION_NAME);
-#endif
-
-	// Get extensions supported by the instance and store for later use
-	uint32_t extCount = 0;
-	vkEnumerateInstanceExtensionProperties(nullptr, &extCount, nullptr);
-	if (extCount > 0)
-	{
-		std::vector<VkExtensionProperties> extensions(extCount);
-		if (vkEnumerateInstanceExtensionProperties(nullptr, &extCount, &extensions.front()) == VK_SUCCESS)
-		{
-			for (VkExtensionProperties& extension : extensions)
-			{
-				m_supportedInstanceExtensions.push_back(extension.extensionName);
-			}
-		}
-	}
-
-	// Enabled requested instance extensions
-	if (enabledInstanceExtensions.size() > 0)
-	{
-		for (const char* enabledExtension : enabledInstanceExtensions)
-		{
-			// Output message if requested extension is not available
-			if (std::find(m_supportedInstanceExtensions.begin(), m_supportedInstanceExtensions.end(), enabledExtension) == m_supportedInstanceExtensions.end())
-			{
-				Fatal("Enabled instance extension '" + std::string(enabledExtension) + "' is not present at instance level");
-			}
-			instanceExtensions.push_back(enabledExtension);
-		}
-	}
-
-	VkInstanceCreateInfo instanceCreateInfo = {};
-	instanceCreateInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-	instanceCreateInfo.pNext = nullptr;
-	instanceCreateInfo.pApplicationInfo = &appInfo;
-
-	if (enableValidation)
-	{
-		VkDebugUtilsMessengerCreateInfoEXT debugUtilsMessengerCI{};
-		vks::debug::setupDebugingMessengerCreateInfo(debugUtilsMessengerCI);
-		debugUtilsMessengerCI.pNext = instanceCreateInfo.pNext;
-		instanceCreateInfo.pNext = &debugUtilsMessengerCI;
-	}
-
-	// Enable the debug utils extension if available (e.g. when debugging tools are present)
-	if (enableValidation || std::find(m_supportedInstanceExtensions.begin(), m_supportedInstanceExtensions.end(), VK_EXT_DEBUG_UTILS_EXTENSION_NAME) != m_supportedInstanceExtensions.end())
-	{
-		instanceExtensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
-	}
-
-	if (instanceExtensions.size() > 0)
-	{
-		instanceCreateInfo.enabledExtensionCount = (uint32_t)instanceExtensions.size();
-		instanceCreateInfo.ppEnabledExtensionNames = instanceExtensions.data();
-	}
-
-	if (enableValidation)
-	{
-		// The VK_LAYER_KHRONOS_validation contains all current validation functionality.
-		const char* validationLayerName = "VK_LAYER_KHRONOS_validation";
-		// Check if this layer is available at instance level
-		uint32_t instanceLayerCount;
-		vkEnumerateInstanceLayerProperties(&instanceLayerCount, nullptr);
-		std::vector<VkLayerProperties> instanceLayerProperties(instanceLayerCount);
-		vkEnumerateInstanceLayerProperties(&instanceLayerCount, instanceLayerProperties.data());
-		bool validationLayerPresent = false;
-		for (VkLayerProperties& layer : instanceLayerProperties) {
-			if (strcmp(layer.layerName, validationLayerName) == 0) {
-				validationLayerPresent = true;
-				break;
-			}
-		}
-		if (validationLayerPresent)
-		{
-			instanceCreateInfo.ppEnabledLayerNames = &validationLayerName;
-			instanceCreateInfo.enabledLayerCount = 1;
-		}
-		else
-		{
-			Fatal("Validation layer VK_LAYER_KHRONOS_validation not present, validation is disabled");
-		}
-	}
-	VkResult result = vkCreateInstance(&instanceCreateInfo, nullptr, &m_instance);
-
-	// If the debug utils extension is present we set up debug functions, so samples can label objects for debugging
-	if (std::find(m_supportedInstanceExtensions.begin(), m_supportedInstanceExtensions.end(), VK_EXT_DEBUG_UTILS_EXTENSION_NAME) != m_supportedInstanceExtensions.end())
-	{
-		vks::debugutils::setup(m_instance);
-	}
-
-	return result;
 }
 //-----------------------------------------------------------------------------
 bool VulkanApp::selectPhysicalDevice()

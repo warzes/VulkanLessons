@@ -172,7 +172,7 @@ private:
 				}
 			}
 
-			drawUI(drawCmdBuffers[i]);
+			DrawUI(drawCmdBuffers[i]);
 
 			vkCmdEndRenderPass(drawCmdBuffers[i]);
 

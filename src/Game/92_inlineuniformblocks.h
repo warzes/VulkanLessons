@@ -142,7 +142,7 @@ private:
 				vkCmdPushConstants(drawCmdBuffers[i], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(glm::vec3), &pos);
 				model.draw(drawCmdBuffers[i]);
 			}
-			drawUI(drawCmdBuffers[i]);
+			DrawUI(drawCmdBuffers[i]);
 
 			vkCmdEndRenderPass(drawCmdBuffers[i]);
 

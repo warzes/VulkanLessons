@@ -164,7 +164,7 @@ private:
 			vkCmdBindVertexBuffers(drawCmdBuffers[i], 0, 1, &particles.buffer, offsets);
 			vkCmdDraw(drawCmdBuffers[i], static_cast<uint32_t>(particles.size), 1, 0, 0);
 
-			drawUI(drawCmdBuffers[i]);
+			DrawUI(drawCmdBuffers[i]);
 
 			vkCmdEndRenderPass(drawCmdBuffers[i]);
 

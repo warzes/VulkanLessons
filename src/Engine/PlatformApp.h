@@ -44,6 +44,8 @@ public:
 	void* GetHWND(); // TODO: временно
 	void* GetHINSTANCE(); // TODO: временно
 
+	vks::UIOverlay& GetUIOverlay() { return UIOverlay; }
+
 	MouseState mouseState; // TODO: временно паблик
 	void handleMouseMove(int32_t x, int32_t y);// TODO: временно паблик
 	bool resizing = false; // TODO: временно

@@ -10,7 +10,7 @@
 struct RenderSystemCreateInfo final
 {
 	std::vector<const char*> enabledInstanceExtensions;
-	bool validation = false;
+	bool validationLayers = false;
 	bool vsync = false;
 
 	struct
@@ -45,6 +45,8 @@ public:
 
 	bool& RenderPrepared() { return prepared; }
 
+	void DrawUI(const VkCommandBuffer commandBuffer);
+
 protected:
 	bool initVulkanApp(const RenderSystemCreateInfo& createInfo, bool fullscreen);
 	virtual void setEnabledInstanceExtensions() {} // TODO: все эти опции передавать через CreateInfo.
@@ -68,10 +70,11 @@ protected:
 	/** @brief (Virtual) Default image acquire + submission and command buffer submission function */
 	virtual void renderFrame();
 
+	VkInstance m_instance{ VK_NULL_HANDLE }; // Vulkan instance, stores all per-application states
+	bool hasDeviceFeatures2 = false;
+	bool hasDebugUtilsExtension = false;
+	bool hasDebugReportExtension = false;
 
-	// Vulkan instance, stores all per-application states
-	VkInstance m_instance{ VK_NULL_HANDLE };
-	std::vector<std::string> m_supportedInstanceExtensions;
 	// Physical device (GPU) that Vulkan will use
 	VkPhysicalDevice m_physicalDevice{ VK_NULL_HANDLE };
 	/** @brief Encapsulated physical and logical vulkan device */
@@ -144,7 +147,6 @@ protected:
 
 private:
 	bool initVulkan(const RenderSystemCreateInfo& createInfo);
-	VkResult createInstance(bool enableValidation);
 	bool selectPhysicalDevice();
 	bool prepareRender(const RenderSystemCreateInfo& createInfo, bool fullscreen);
 	void initSwapchain();
@@ -155,7 +157,7 @@ private:
 	void createPipelineCache();
 	void destroyCommandBuffers();
 
-	bool validation = false;
+	bool m_validationLayers = false;
 	bool m_vsync = false;
 	bool prepared = false;
 };

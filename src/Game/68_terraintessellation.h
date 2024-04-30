@@ -289,7 +289,7 @@ private:
 				vkCmdEndQuery(drawCmdBuffers[i], queryPool, 0);
 			}
 
-			drawUI(drawCmdBuffers[i]);
+			DrawUI(drawCmdBuffers[i]);
 
 			vkCmdEndRenderPass(drawCmdBuffers[i]);
 

@@ -136,7 +136,7 @@ private:
 				renderNode(node, drawCmdBuffers[i]);
 			}
 
-			drawUI(drawCmdBuffers[i]);
+			DrawUI(drawCmdBuffers[i]);
 
 			vkCmdEndRenderPass(drawCmdBuffers[i]);
 

@@ -159,7 +159,7 @@ private:
 
 			model.draw(drawCmdBuffers[i], vkglTF::RenderFlags::BindImages, pipelineLayout);
 
-			drawUI(drawCmdBuffers[i]);
+			DrawUI(drawCmdBuffers[i]);
 
 			// End dynamic rendering
 			vkCmdEndRenderingKHR(drawCmdBuffers[i]);

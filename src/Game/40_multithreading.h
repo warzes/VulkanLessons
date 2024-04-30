@@ -285,7 +285,7 @@ private:
 
 		vkCmdBindPipeline(secondaryCommandBuffers.ui, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines.starsphere);
 
-		drawUI(secondaryCommandBuffers.ui);
+		DrawUI(secondaryCommandBuffers.ui);
 
 		VK_CHECK_RESULT(vkEndCommandBuffer(secondaryCommandBuffers.ui));
 	}

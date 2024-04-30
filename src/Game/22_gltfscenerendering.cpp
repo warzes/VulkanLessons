@@ -450,7 +450,7 @@ void GLTFSceneApp::buildCommandBuffers()
 		// POI: Draw the glTF scene
 		glTFScene.draw(drawCmdBuffers[i], pipelineLayout);
 
-		drawUI(drawCmdBuffers[i]);
+		DrawUI(drawCmdBuffers[i]);
 		vkCmdEndRenderPass(drawCmdBuffers[i]);
 		VK_CHECK_RESULT(vkEndCommandBuffer(drawCmdBuffers[i]));
 	}

@@ -193,23 +193,9 @@ std::string EngineApp::getWindowTitle()
 	windowTitle += " - " + std::to_string(frameCounter) + " fps";
 	return windowTitle;
 }
-
 //-----------------------------------------------------------------------------
 void EngineApp::resize(uint32_t destWidth, uint32_t destHeight)
 {
 	resizeRender(destWidth, destHeight);	
-}
-//-----------------------------------------------------------------------------
-void EngineApp::drawUI(const VkCommandBuffer commandBuffer)
-{
-	if (overlay && UIOverlay.visible)
-	{
-		const VkViewport viewport = vks::initializers::viewport((float)destWidth, (float)destHeight, 0.0f, 1.0f);
-		const VkRect2D scissor = vks::initializers::rect2D(destWidth, destHeight, 0, 0);
-		vkCmdSetViewport(commandBuffer, 0, 1, &viewport);
-		vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
-
-		UIOverlay.draw(commandBuffer);
-	}
 }
 //-----------------------------------------------------------------------------

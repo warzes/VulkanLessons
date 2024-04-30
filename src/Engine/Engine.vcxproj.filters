@@ -44,6 +44,9 @@
     <ClCompile Include="VulkanApp.cpp">
       <Filter>Render</Filter>
     </ClCompile>
+    <ClCompile Include="VulkanInstance.cpp">
+      <Filter>Render\Vulkan</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -121,6 +124,9 @@
     </ClInclude>
     <ClInclude Include="VulkanApp.h">
       <Filter>Render</Filter>
+    </ClInclude>
+    <ClInclude Include="VulkanInstance.h">
+      <Filter>Render\Vulkan</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

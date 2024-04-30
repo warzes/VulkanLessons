@@ -351,7 +351,7 @@ void TextureArraysApp::buildCommandBuffers()
 
 		vkCmdDrawIndexed(drawCmdBuffers[i], indexCount, layerCount, 0, 0, 0);
 
-		drawUI(drawCmdBuffers[i]);
+		DrawUI(drawCmdBuffers[i]);
 
 		vkCmdEndRenderPass(drawCmdBuffers[i]);
 

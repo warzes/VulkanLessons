@@ -524,7 +524,7 @@ private:
 				}
 
 				cmdBeginLabel(drawCmdBuffers[i], "UI overlay", { 0.23f, 0.65f, 0.28f, 1.0f });
-				drawUI(drawCmdBuffers[i]);
+				DrawUI(drawCmdBuffers[i]);
 				cmdEndLabel(drawCmdBuffers[i]);
 
 				vkCmdEndRenderPass(drawCmdBuffers[i]);

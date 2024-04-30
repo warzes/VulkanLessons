@@ -90,7 +90,7 @@ private:
 
 			model.draw(drawCmdBuffers[i]);
 
-			drawUI(drawCmdBuffers[i]);
+			DrawUI(drawCmdBuffers[i]);
 
 			vkCmdEndRenderPass(drawCmdBuffers[i]);
 

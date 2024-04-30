@@ -365,7 +365,7 @@ void VertexAttributesApp::buildCommandBuffers()
 			drawSceneNode(drawCmdBuffers[i], node);
 		}
 
-		drawUI(drawCmdBuffers[i]);
+		DrawUI(drawCmdBuffers[i]);
 		vkCmdEndRenderPass(drawCmdBuffers[i]);
 		VK_CHECK_RESULT(vkEndCommandBuffer(drawCmdBuffers[i]));
 	}
