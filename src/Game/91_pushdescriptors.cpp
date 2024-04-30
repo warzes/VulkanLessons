@@ -27,7 +27,7 @@ bool PushDescriptorsApp::OnCreate()
 	pushDescriptorProps.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PUSH_DESCRIPTOR_PROPERTIES_KHR;
 	deviceProps2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2_KHR;
 	deviceProps2.pNext = &pushDescriptorProps;
-	vkGetPhysicalDeviceProperties2KHR(m_physicalDevice, &deviceProps2);
+	vkGetPhysicalDeviceProperties2KHR(m_physicalDevice.physicalDevice, &deviceProps2);
 
 	/*
 		End of extension specific functions

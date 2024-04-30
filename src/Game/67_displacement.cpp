@@ -54,7 +54,7 @@ void DisplacementApp::OnUpdateUIOverlay(vks::UIOverlay* overlay)
 		if (overlay->inputFloat("Level", &uniformData.tessLevel, 0.5f, 2)) {
 			updateUniformBuffers();
 		}
-		if (deviceFeatures.fillModeNonSolid) {
+		if (m_physicalDevice.deviceFeatures.fillModeNonSolid) {
 			if (overlay->checkBox("Splitscreen", &splitScreen)) {
 				buildCommandBuffers();
 				updateUniformBuffers();

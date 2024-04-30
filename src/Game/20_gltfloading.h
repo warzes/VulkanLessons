@@ -410,7 +410,7 @@ private:
 	virtual void getEnabledFeatures()
 	{
 		// Fill mode non solid is required for wireframe display
-		if (deviceFeatures.fillModeNonSolid) {
+		if (m_physicalDevice.deviceFeatures.fillModeNonSolid) {
 			enabledFeatures.fillModeNonSolid = VK_TRUE;
 		};
 	}
@@ -660,7 +660,7 @@ private:
 		VK_CHECK_RESULT(vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCI, nullptr, &pipelines.solid));
 
 		// Wire frame rendering pipeline
-		if (deviceFeatures.fillModeNonSolid) {
+		if (m_physicalDevice.deviceFeatures.fillModeNonSolid) {
 			rasterizationStateCI.polygonMode = VK_POLYGON_MODE_LINE;
 			rasterizationStateCI.lineWidth = 1.0f;
 			VK_CHECK_RESULT(vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCI, nullptr, &pipelines.wireframe));

@@ -72,7 +72,7 @@ void DebugUtilsApp::OnUpdateUIOverlay(vks::UIOverlay* overlay)
 		if (overlay->checkBox("Glow", &glow)) {
 			buildCommandBuffers();
 		}
-		if (deviceFeatures.fillModeNonSolid) {
+		if (m_physicalDevice.deviceFeatures.fillModeNonSolid) {
 			if (overlay->checkBox("Wireframe", &wireframe)) {
 				buildCommandBuffers();
 			}

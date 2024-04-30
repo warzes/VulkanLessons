@@ -46,7 +46,7 @@ private:
 	virtual void getEnabledFeatures()
 	{
 		// Geometry shader support is required for this example
-		if (deviceFeatures.geometryShader) {
+		if (m_physicalDevice.deviceFeatures.geometryShader) {
 			enabledFeatures.geometryShader = VK_TRUE;
 		}
 		else {

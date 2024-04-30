@@ -162,7 +162,7 @@ void EngineApp::updateOverlay()
 	ImGui::SetNextWindowSize(ImVec2(0, 0), ImGuiSetCond_FirstUseEver);
 	ImGui::Begin("Game", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
 	ImGui::TextUnformatted("Game");
-	ImGui::TextUnformatted(deviceProperties.deviceName);
+	ImGui::TextUnformatted(m_physicalDevice.deviceProperties.deviceName);
 	ImGui::Text("%.2f ms/frame (%.1d fps)", (1000.0f / lastFPS), lastFPS);
 	ImGui::PushItemWidth(110.0f * UIOverlay.scale);
 	OnUpdateUIOverlay(&UIOverlay);

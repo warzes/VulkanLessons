@@ -47,6 +47,9 @@
     <ClCompile Include="VulkanUIOverlay.cpp">
       <Filter>Render\Vulkan\old</Filter>
     </ClCompile>
+    <ClCompile Include="VulkanPhysicalDevice.cpp">
+      <Filter>Render\Vulkan</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -127,6 +130,9 @@
     </ClInclude>
     <ClInclude Include="VulkanUIOverlay.h">
       <Filter>Render\Vulkan\old</Filter>
+    </ClInclude>
+    <ClInclude Include="VulkanPhysicalDevice.h">
+      <Filter>Render\Vulkan</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -142,7 +142,7 @@ void Texture3DApp::prepareNoiseTexture(uint32_t width, uint32_t height, uint32_t
 	// Format support check
 	// 3D texture support in Vulkan is mandatory (in contrast to OpenGL) so no need to check if it's supported
 	VkFormatProperties formatProperties;
-	vkGetPhysicalDeviceFormatProperties(m_physicalDevice, texture.format, &formatProperties);
+	vkGetPhysicalDeviceFormatProperties(m_physicalDevice.physicalDevice, texture.format, &formatProperties);
 	// Check if format supports transfer
 	if (!(formatProperties.optimalTilingFeatures & VK_FORMAT_FEATURE_TRANSFER_DST_BIT))
 	{

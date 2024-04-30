@@ -92,11 +92,11 @@ private:
 	virtual void getEnabledFeatures()
 	{
 		// Enable sample rate shading filtering if supported
-		if (deviceFeatures.sampleRateShading) {
+		if (m_physicalDevice.deviceFeatures.sampleRateShading) {
 			enabledFeatures.sampleRateShading = VK_TRUE;
 		}
 		// Enable anisotropic filtering if supported
-		if (deviceFeatures.samplerAnisotropy) {
+		if (m_physicalDevice.deviceFeatures.samplerAnisotropy) {
 			enabledFeatures.samplerAnisotropy = VK_TRUE;
 		}
 	};
@@ -139,7 +139,7 @@ private:
 		// Depth attachment
 		// Find a suitable depth format
 		VkFormat attDepthFormat;
-		VkBool32 validDepthFormat = vks::tools::getSupportedDepthFormat(m_physicalDevice, &attDepthFormat);
+		VkBool32 validDepthFormat = vks::tools::getSupportedDepthFormat(m_physicalDevice.physicalDevice, &attDepthFormat);
 		assert(validDepthFormat);
 
 		attachmentInfo.format = attDepthFormat;
@@ -549,7 +549,7 @@ private:
 	// Returns the maximum sample count usable by the platform
 	VkSampleCountFlagBits getMaxUsableSampleCount()
 	{
-		VkSampleCountFlags counts = std::min(deviceProperties.limits.framebufferColorSampleCounts, deviceProperties.limits.framebufferDepthSampleCounts);
+		VkSampleCountFlags counts = std::min(m_physicalDevice.deviceProperties.limits.framebufferColorSampleCounts, m_physicalDevice.deviceProperties.limits.framebufferDepthSampleCounts);
 		// Note: Vulkan offers up to 64 bits, but we don't want to go higher than 8xMSAA in this sample)
 		if (counts & VK_SAMPLE_COUNT_8_BIT) { return VK_SAMPLE_COUNT_8_BIT; }
 		if (counts & VK_SAMPLE_COUNT_4_BIT) { return VK_SAMPLE_COUNT_4_BIT; }

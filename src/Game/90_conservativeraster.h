@@ -91,8 +91,8 @@ private:
 
 	void getEnabledFeatures() final
 	{
-		enabledFeatures.fillModeNonSolid = deviceFeatures.fillModeNonSolid;
-		enabledFeatures.wideLines = deviceFeatures.wideLines;
+		enabledFeatures.fillModeNonSolid = m_physicalDevice.deviceFeatures.fillModeNonSolid;
+		enabledFeatures.wideLines = m_physicalDevice.deviceFeatures.wideLines;
 	}
 
 	/*
@@ -110,7 +110,7 @@ private:
 
 		// Find a suitable depth format
 		VkFormat fbDepthFormat;
-		VkBool32 validDepthFormat = vks::tools::getSupportedDepthFormat(m_physicalDevice, &fbDepthFormat);
+		VkBool32 validDepthFormat = vks::tools::getSupportedDepthFormat(m_physicalDevice.physicalDevice, &fbDepthFormat);
 		assert(validDepthFormat);
 
 		// Color attachment
@@ -507,7 +507,7 @@ private:
 		conservativeRasterProps.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_CONSERVATIVE_RASTERIZATION_PROPERTIES_EXT;
 		deviceProps2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2_KHR;
 		deviceProps2.pNext = &conservativeRasterProps;
-		vkGetPhysicalDeviceProperties2KHR(m_physicalDevice, &deviceProps2);
+		vkGetPhysicalDeviceProperties2KHR(m_physicalDevice.physicalDevice, &deviceProps2);
 
 		// Vertex bindings and attributes
 		std::vector<VkVertexInputBindingDescription> vertexInputBindings = {

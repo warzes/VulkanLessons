@@ -138,14 +138,14 @@ void TextureCubemapArrayApp::OnMouseMoved(int32_t x, int32_t y, int32_t dx, int3
 void TextureCubemapArrayApp::getEnabledFeatures()
 {
 	// This sample requires support for cube map arrays
-	if (deviceFeatures.imageCubeArray) {
+	if (m_physicalDevice.deviceFeatures.imageCubeArray) {
 		enabledFeatures.imageCubeArray = VK_TRUE;
 	}
 	else {
 		vks::tools::exitFatal("Selected GPU does not support cube map arrays!", VK_ERROR_FEATURE_NOT_PRESENT);
 	}
 	enabledFeatures.imageCubeArray = VK_TRUE;
-	if (deviceFeatures.samplerAnisotropy) {
+	if (m_physicalDevice.deviceFeatures.samplerAnisotropy) {
 		enabledFeatures.samplerAnisotropy = VK_TRUE;
 	}
 }

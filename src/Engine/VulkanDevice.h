@@ -2,22 +2,8 @@
 
 #include "VulkanBuffer.h"
 
-
 namespace vks
 {
-	// TODO: может в другое место?
-	struct QueueFamilyIndices
-	{
-		std::optional<uint32_t> graphicsFamily;
-		std::optional<uint32_t> presentFamily;
-		bool isComplete()
-		{
-			return graphicsFamily.has_value() && presentFamily.has_value();
-		}
-	};
-	// find a queue of the right family
-	QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);// TODO: может в другое место?
-
 	struct VulkanDevice
 	{
 		/** @brief Physical device representation */

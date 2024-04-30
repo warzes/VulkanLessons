@@ -84,10 +84,10 @@ private:
 	virtual void getEnabledFeatures()
 	{
 		// Fill mode non solid is required for wireframe display
-		if (deviceFeatures.fillModeNonSolid) {
+		if (m_physicalDevice.deviceFeatures.fillModeNonSolid) {
 			enabledFeatures.fillModeNonSolid = VK_TRUE;
 		};
-		wireframe = deviceFeatures.fillModeNonSolid;
+		wireframe = m_physicalDevice.deviceFeatures.fillModeNonSolid;
 	}
 
 	/*
@@ -228,7 +228,7 @@ private:
 
 		// Find a suitable depth format
 		VkFormat fbDepthFormat;
-		VkBool32 validDepthFormat = vks::tools::getSupportedDepthFormat(m_physicalDevice, &fbDepthFormat);
+		VkBool32 validDepthFormat = vks::tools::getSupportedDepthFormat(m_physicalDevice.physicalDevice, &fbDepthFormat);
 		assert(validDepthFormat);
 
 		// Color attachment
@@ -611,7 +611,7 @@ private:
 		VK_CHECK_RESULT(vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCI, nullptr, &pipelines.color));
 
 		// Wire frame rendering pipeline
-		if (deviceFeatures.fillModeNonSolid)
+		if (m_physicalDevice.deviceFeatures.fillModeNonSolid)
 		{
 			rasterizationStateCI.polygonMode = VK_POLYGON_MODE_LINE;
 			pipelineCI.renderPass = renderPass;
@@ -662,7 +662,7 @@ private:
 		setObjectName(device, VK_OBJECT_TYPE_PIPELINE_LAYOUT, (uint64_t)pipelineLayout, "Shared pipeline layout");
 		setObjectName(device, VK_OBJECT_TYPE_PIPELINE, (uint64_t)pipelines.toonshading, "Toon shading pipeline");
 		setObjectName(device, VK_OBJECT_TYPE_PIPELINE, (uint64_t)pipelines.color, "Color only pipeline");
-		if (deviceFeatures.fillModeNonSolid) {
+		if (m_physicalDevice.deviceFeatures.fillModeNonSolid) {
 			setObjectName(device, VK_OBJECT_TYPE_PIPELINE, (uint64_t)pipelines.wireframe, "Wireframe rendering pipeline");
 		}
 		setObjectName(device, VK_OBJECT_TYPE_PIPELINE, (uint64_t)pipelines.postprocess, "Post processing pipeline");

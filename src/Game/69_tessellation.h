@@ -58,20 +58,20 @@ private:
 	virtual void getEnabledFeatures()
 	{
 		// Example requires tessellation shaders
-		if (deviceFeatures.tessellationShader) {
+		if (m_physicalDevice.deviceFeatures.tessellationShader) {
 			enabledFeatures.tessellationShader = VK_TRUE;
 		}
 		else {
 			vks::tools::exitFatal("Selected GPU does not support tessellation shaders!", VK_ERROR_FEATURE_NOT_PRESENT);
 		}
 		// Fill mode non solid is required for wireframe display
-		if (deviceFeatures.fillModeNonSolid) {
+		if (m_physicalDevice.deviceFeatures.fillModeNonSolid) {
 			enabledFeatures.fillModeNonSolid = VK_TRUE;
 		}
 		else {
 			wireframe = false;
 		}
-		if (deviceFeatures.samplerAnisotropy) {
+		if (m_physicalDevice.deviceFeatures.samplerAnisotropy) {
 			enabledFeatures.samplerAnisotropy = VK_TRUE;
 		}
 	}
@@ -210,7 +210,7 @@ private:
 		// Solid
 		VK_CHECK_RESULT(vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCI, nullptr, &pipelines.solid));
 		// Wireframe
-		if (deviceFeatures.fillModeNonSolid) {
+		if (m_physicalDevice.deviceFeatures.fillModeNonSolid) {
 			rasterizationState.polygonMode = VK_POLYGON_MODE_LINE;
 			VK_CHECK_RESULT(vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCI, nullptr, &pipelines.wire));
 		}
@@ -224,7 +224,7 @@ private:
 		rasterizationState.polygonMode = VK_POLYGON_MODE_FILL;
 		VK_CHECK_RESULT(vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCI, nullptr, &pipelines.solidPassThrough));
 		// Wireframe
-		if (deviceFeatures.fillModeNonSolid) {
+		if (m_physicalDevice.deviceFeatures.fillModeNonSolid) {
 			rasterizationState.polygonMode = VK_POLYGON_MODE_LINE;
 			VK_CHECK_RESULT(vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCI, nullptr, &pipelines.wirePassThrough));
 		}

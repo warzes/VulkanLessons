@@ -529,7 +529,7 @@ private:
 		ss << std::fixed << std::setprecision(2) << (frameTimer * 1000.0f) << "ms (" << lastFPS << " fps)";
 		textOverlay->addText(ss.str(), 5.0f * GetUIOverlay().scale, 25.0f * GetUIOverlay().scale, TextOverlay::alignLeft);
 
-		textOverlay->addText(deviceProperties.deviceName, 5.0f * GetUIOverlay().scale, 45.0f * GetUIOverlay().scale, TextOverlay::alignLeft);
+		textOverlay->addText(m_physicalDevice.deviceProperties.deviceName, 5.0f * GetUIOverlay().scale, 45.0f * GetUIOverlay().scale, TextOverlay::alignLeft);
 
 		// Display current model view matrix
 		textOverlay->addText("model view matrix", (float)destWidth - 5.0f * GetUIOverlay().scale, 5.0f * GetUIOverlay().scale, TextOverlay::alignRight);

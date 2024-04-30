@@ -4,25 +4,7 @@
 //-----------------------------------------------------------------------------
 std::string VulkanApp::GetDeviceName() const
 {
-	return deviceProperties.deviceName;
-}
-//-----------------------------------------------------------------------------
-uint32_t VulkanApp::GetMemoryTypeIndex(uint32_t typeBits, VkMemoryPropertyFlags properties)
-{
-	// Iterate over all memory types available for the device used in this example
-	for (uint32_t i = 0; i < deviceMemoryProperties.memoryTypeCount; i++)
-	{
-		if ((typeBits & 1) == 1)
-		{
-			if ((deviceMemoryProperties.memoryTypes[i].propertyFlags & properties) == properties)
-			{
-				return i;
-			}
-		}
-		typeBits >>= 1;
-	}
-
-	throw "Could not find a suitable memory type!";
+	return m_physicalDevice.GetDeviceName();
 }
 //-----------------------------------------------------------------------------
 void VulkanApp::DrawUI(const VkCommandBuffer commandBuffer)
@@ -64,24 +46,15 @@ bool VulkanApp::initVulkan(const RenderSystemCreateInfo& createInfo)
 
 	if (!m_instance.Create(validationLayers, createInfo.enabledInstanceExtensions))
 		return false;
-
-	if (!selectPhysicalDevice())
-	{
+	if (!m_physicalDevice.Create(m_instance.vkInstance))
 		return false;
-	}
-
-	// TODO: это дублируется в VulkanDevice
-	// Store properties (including limits), features and memory properties of the physical device (so that examples can check against them)
-	vkGetPhysicalDeviceProperties(m_physicalDevice, &deviceProperties);
-	vkGetPhysicalDeviceFeatures(m_physicalDevice, &deviceFeatures);
-	vkGetPhysicalDeviceMemoryProperties(m_physicalDevice, &deviceMemoryProperties);
 
 	// Derived examples can override this to set actual features (based on above readings) to enable for logical device creation
 	getEnabledFeatures();
 
 	// Vulkan device creation
 	// This is handled by a separate class that gets a logical device representation and encapsulates functions related to a device
-	m_vulkanDevice = new vks::VulkanDevice(m_physicalDevice);
+	m_vulkanDevice = new vks::VulkanDevice(m_physicalDevice.physicalDevice);
 
 	// Derived examples can enable extensions based on the list of supported extensions read from the physical device
 	getEnabledExtensions();
@@ -102,15 +75,15 @@ bool VulkanApp::initVulkan(const RenderSystemCreateInfo& createInfo)
 	// Samples that make use of stencil will require a depth + stencil format, so we select from a different list
 	if (requiresStencil)
 	{
-		validFormat = vks::tools::getSupportedDepthStencilFormat(m_physicalDevice, &depthFormat);
+		validFormat = vks::tools::getSupportedDepthStencilFormat(m_physicalDevice.physicalDevice, &depthFormat);
 	}
 	else
 	{
-		validFormat = vks::tools::getSupportedDepthFormat(m_physicalDevice, &depthFormat);
+		validFormat = vks::tools::getSupportedDepthFormat(m_physicalDevice.physicalDevice, &depthFormat);
 	}
 	assert(validFormat);
 
-	swapChain.Connect(m_instance.vkInstance, m_physicalDevice, device);
+	swapChain.Connect(m_instance.vkInstance, m_physicalDevice.physicalDevice, device);
 
 	// Create synchronization objects
 	VkSemaphoreCreateInfo semaphoreCreateInfo = vks::initializers::semaphoreCreateInfo();
@@ -304,7 +277,6 @@ void VulkanApp::renderFinal()
 //-----------------------------------------------------------------------------
 void VulkanApp::closeVulkanApp()
 {
-	// Clean up Vulkan resources
 	swapChain.cleanup();
 	if (descriptorPool != VK_NULL_HANDLE)
 		vkDestroyDescriptorPool(device, descriptorPool, nullptr);
@@ -337,6 +309,7 @@ void VulkanApp::closeVulkanApp()
 
 	delete m_vulkanDevice;
 
+	m_physicalDevice.Destroy();
 	m_instance.Destroy();
 }
 //-----------------------------------------------------------------------------
@@ -429,72 +402,6 @@ void VulkanApp::renderFrame()
 	submitInfo.pCommandBuffers = &drawCmdBuffers[currentBuffer];
 	VK_CHECK_RESULT(vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE));
 	submitFrame();
-}
-//-----------------------------------------------------------------------------
-bool VulkanApp::selectPhysicalDevice()
-{
-	uint32_t gpuDeviceCount = 0;
-	// Get number of available physical devices
-	VK_CHECK_RESULT(vkEnumeratePhysicalDevices(m_instance.vkInstance, &gpuDeviceCount, nullptr));
-	if (gpuDeviceCount == 0)
-	{
-		Fatal("No device with Vulkan support found");
-		return false;
-	}
-	// Enumerate devices
-	std::vector<VkPhysicalDevice> physicalDevices(gpuDeviceCount);
-	VkResult result = vkEnumeratePhysicalDevices(m_instance.vkInstance, &gpuDeviceCount, physicalDevices.data());
-	if (result)
-	{
-		Fatal("Could not enumerate physical devices : \n" + std::string(string_VkResult(result)));
-		return false;
-	}
-
-	// GPU selection
-
-	VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
-
-	constexpr auto isDeviceSuitable = [](const VkPhysicalDevice device) -> bool {
-		// look for all the features we want
-		VkPhysicalDevicePushDescriptorPropertiesKHR devicePushDescriptors{
-			.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PUSH_DESCRIPTOR_PROPERTIES_KHR,
-			.pNext = nullptr
-		};
-
-		VkPhysicalDeviceProperties2 deviceProperties{
-			.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2,
-			.pNext = &devicePushDescriptors,
-		};
-		vkGetPhysicalDeviceProperties2(device, &deviceProperties);
-
-		VkPhysicalDeviceFeatures deviceFeatures;
-		vkGetPhysicalDeviceFeatures(device, &deviceFeatures);
-
-		auto queueFamilyData = vks::findQueueFamilies(device);
-
-		// right now we don't care so pick any gpu in the future implement a scoring system to pick the best device
-		return deviceProperties.properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU && queueFamilyData.isComplete();
-		};
-
-	for (const auto& device : physicalDevices)
-	{
-		if (isDeviceSuitable(device))
-		{
-			physicalDevice = device;
-			break;
-		}
-	}
-	if (physicalDevice != VK_NULL_HANDLE)
-	{
-		m_physicalDevice = physicalDevice;
-	}
-	else
-	{
-		LogWarning("failed to find a discrete GPU!");
-		m_physicalDevice = physicalDevices[0];
-	}
-
-	return true;
 }
 //-----------------------------------------------------------------------------
 bool VulkanApp::prepareRender(const RenderSystemCreateInfo& createInfo, bool fullscreen)

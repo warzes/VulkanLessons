@@ -126,7 +126,7 @@ private:
 
 	void getEnabledFeatures()
 	{
-		enabledFeatures.samplerAnisotropy = deviceFeatures.samplerAnisotropy;
+		enabledFeatures.samplerAnisotropy = m_physicalDevice.deviceFeatures.samplerAnisotropy;
 	}
 
 	// Create a frame buffer attachment
@@ -206,7 +206,7 @@ private:
 
 		// Find a suitable depth format
 		VkFormat attDepthFormat;
-		VkBool32 validDepthFormat = vks::tools::getSupportedDepthFormat(m_physicalDevice, &attDepthFormat);
+		VkBool32 validDepthFormat = vks::tools::getSupportedDepthFormat(m_physicalDevice.physicalDevice, &attDepthFormat);
 		assert(validDepthFormat);
 
 		// G-Buffer

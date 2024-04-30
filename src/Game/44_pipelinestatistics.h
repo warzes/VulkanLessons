@@ -56,16 +56,16 @@ private:
 	virtual void getEnabledFeatures()
 	{
 		// Support for pipeline statistics is optional
-		if (deviceFeatures.pipelineStatisticsQuery) {
+		if (m_physicalDevice.deviceFeatures.pipelineStatisticsQuery) {
 			enabledFeatures.pipelineStatisticsQuery = VK_TRUE;
 		}
 		else {
 			vks::tools::exitFatal("Selected GPU does not support pipeline statistics!", VK_ERROR_FEATURE_NOT_PRESENT);
 		}
-		if (deviceFeatures.fillModeNonSolid) {
+		if (m_physicalDevice.deviceFeatures.fillModeNonSolid) {
 			enabledFeatures.fillModeNonSolid = VK_TRUE;
 		}
-		if (deviceFeatures.tessellationShader) {
+		if (m_physicalDevice.deviceFeatures.tessellationShader) {
 			enabledFeatures.tessellationShader = VK_TRUE;
 		}
 	}
@@ -81,7 +81,7 @@ private:
 			"Clipping stage primitives output    ",
 			"Fragment shader invocations        "
 		};
-		if (deviceFeatures.tessellationShader) {
+		if (m_physicalDevice.deviceFeatures.tessellationShader) {
 			pipelineStatNames.push_back("Tess. control shader patches       ");
 			pipelineStatNames.push_back("Tess. eval. shader invocations     ");
 		}
@@ -99,7 +99,7 @@ private:
 			VK_QUERY_PIPELINE_STATISTIC_CLIPPING_INVOCATIONS_BIT |
 			VK_QUERY_PIPELINE_STATISTIC_CLIPPING_PRIMITIVES_BIT |
 			VK_QUERY_PIPELINE_STATISTIC_FRAGMENT_SHADER_INVOCATIONS_BIT;
-		if (deviceFeatures.tessellationShader) {
+		if (m_physicalDevice.deviceFeatures.tessellationShader) {
 			queryPoolInfo.pipelineStatistics |=
 				VK_QUERY_PIPELINE_STATISTIC_TESSELLATION_CONTROL_SHADER_PATCHES_BIT |
 				VK_QUERY_PIPELINE_STATISTIC_TESSELLATION_EVALUATION_SHADER_INVOCATIONS_BIT;

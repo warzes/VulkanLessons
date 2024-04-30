@@ -132,7 +132,7 @@ void TextureApp::OnUpdateUIOverlay(vks::UIOverlay* overlay)
 void TextureApp::getEnabledFeatures()
 {
 	// Enable anisotropic filtering if supported
-	if (deviceFeatures.samplerAnisotropy) {
+	if (m_physicalDevice.deviceFeatures.samplerAnisotropy) {
 		enabledFeatures.samplerAnisotropy = VK_TRUE;
 	};
 }
@@ -186,7 +186,7 @@ void TextureApp::loadTexture()
 		// Don't use linear if format is not supported for (linear) shader sampling
 		// Get device properties for the requested texture format
 		VkFormatProperties formatProperties;
-		vkGetPhysicalDeviceFormatProperties(m_physicalDevice, format, &formatProperties);
+		vkGetPhysicalDeviceFormatProperties(m_physicalDevice.physicalDevice, format, &formatProperties);
 		useStaging = !(formatProperties.linearTilingFeatures & VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT);
 	}
 

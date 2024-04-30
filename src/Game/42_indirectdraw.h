@@ -90,11 +90,11 @@ private:
 	virtual void getEnabledFeatures()
 	{
 		// Example uses multi draw indirect if available
-		if (deviceFeatures.multiDrawIndirect) {
+		if (m_physicalDevice.deviceFeatures.multiDrawIndirect) {
 			enabledFeatures.multiDrawIndirect = VK_TRUE;
 		}
 		// Enable anisotropic filtering if supported
-		if (deviceFeatures.samplerAnisotropy) {
+		if (m_physicalDevice.deviceFeatures.samplerAnisotropy) {
 			enabledFeatures.samplerAnisotropy = VK_TRUE;
 		}
 	};

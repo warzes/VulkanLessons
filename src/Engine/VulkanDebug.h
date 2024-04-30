@@ -4,13 +4,6 @@ namespace vks
 {
 	namespace debug
 	{
-		// Default debug callback
-		VKAPI_ATTR VkBool32 VKAPI_CALL debugUtilsMessageCallback(
-			VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
-			VkDebugUtilsMessageTypeFlagsEXT messageType,
-			const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
-			void* pUserData);
-
 		// Load debug function pointers and set debug callback
 		void setupDebugging(VkInstance instance);
 		// Clear debug callback
