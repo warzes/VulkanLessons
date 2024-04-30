@@ -463,7 +463,7 @@ private:
 		extFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_FEATURES_KHR;
 		deviceFeatures2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2_KHR;
 		deviceFeatures2.pNext = &extFeatures;
-		PFN_vkGetPhysicalDeviceFeatures2KHR vkGetPhysicalDeviceFeatures2KHR = reinterpret_cast<PFN_vkGetPhysicalDeviceFeatures2KHR>(vkGetInstanceProcAddr(m_instance, "vkGetPhysicalDeviceFeatures2KHR"));
+		PFN_vkGetPhysicalDeviceFeatures2KHR vkGetPhysicalDeviceFeatures2KHR = reinterpret_cast<PFN_vkGetPhysicalDeviceFeatures2KHR>(m_instance.GetInstanceProcAddr("vkGetPhysicalDeviceFeatures2KHR"));
 		vkGetPhysicalDeviceFeatures2KHR(m_physicalDevice, &deviceFeatures2);
 		std::cout << "Multiview features:" << std::endl;
 		std::cout << "\tmultiview = " << extFeatures.multiview << std::endl;
@@ -476,7 +476,7 @@ private:
 		extProps.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_PROPERTIES_KHR;
 		deviceProps2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2_KHR;
 		deviceProps2.pNext = &extProps;
-		PFN_vkGetPhysicalDeviceProperties2KHR vkGetPhysicalDeviceProperties2KHR = reinterpret_cast<PFN_vkGetPhysicalDeviceProperties2KHR>(vkGetInstanceProcAddr(m_instance, "vkGetPhysicalDeviceProperties2KHR"));
+		PFN_vkGetPhysicalDeviceProperties2KHR vkGetPhysicalDeviceProperties2KHR = reinterpret_cast<PFN_vkGetPhysicalDeviceProperties2KHR>(m_instance.GetInstanceProcAddr("vkGetPhysicalDeviceProperties2KHR"));
 		vkGetPhysicalDeviceProperties2KHR(m_physicalDevice, &deviceProps2);
 		std::cout << "Multiview properties:" << std::endl;
 		std::cout << "\tmaxMultiviewViewCount = " << extProps.maxMultiviewViewCount << std::endl;

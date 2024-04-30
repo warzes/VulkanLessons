@@ -6,6 +6,7 @@
 #include "VulkanglTFModel.h"
 #include "VulkanTexture.h"
 #include "Benchmark.h"
+#include "VulkanInstance.h"
 
 struct RenderSystemCreateInfo final
 {
@@ -49,7 +50,7 @@ public:
 
 protected:
 	bool initVulkanApp(const RenderSystemCreateInfo& createInfo, bool fullscreen);
-	virtual void setEnabledInstanceExtensions() {} // TODO: все эти опции передавать через CreateInfo.
+	virtual void setEnabledInstanceExtensions() {} // TODO: все эти опции передавать через CreateInfo. функцию удалить
 	// Called after the physical device features have been read, can be used to set features to enable on the device
 	virtual void getEnabledFeatures() {} // TODO: если нужно
 	// Called after the physical device extensions have been read, can be used to enable extensions based on the supported extension listing
@@ -70,10 +71,7 @@ protected:
 	/** @brief (Virtual) Default image acquire + submission and command buffer submission function */
 	virtual void renderFrame();
 
-	VkInstance m_instance{ VK_NULL_HANDLE }; // Vulkan instance, stores all per-application states
-	bool hasDeviceFeatures2 = false;
-	bool hasDebugUtilsExtension = false;
-	bool hasDebugReportExtension = false;
+	VulkanInstance m_instance;
 
 	// Physical device (GPU) that Vulkan will use
 	VkPhysicalDevice m_physicalDevice{ VK_NULL_HANDLE };
@@ -90,7 +88,6 @@ protected:
 	VkPhysicalDeviceFeatures enabledFeatures{};
 	/** @brief Set of device extensions to be enabled for this example (must be set in the derived constructor) */
 	std::vector<const char*> enabledDeviceExtensions;
-	std::vector<const char*> enabledInstanceExtensions;
 	/** @brief Optional pNext structure for passing extension structures to device creation */
 	void* deviceCreatepNextChain = nullptr;
 	/** @brief Logical device, application's view of the physical device (GPU) */
@@ -157,7 +154,6 @@ private:
 	void createPipelineCache();
 	void destroyCommandBuffers();
 
-	bool m_validationLayers = false;
 	bool m_vsync = false;
 	bool prepared = false;
 };

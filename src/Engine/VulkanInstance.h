@@ -3,11 +3,20 @@
 class VulkanInstance final
 {
 public:
-	VkInstance Create(bool enableValidationLayers, const std::vector<const char*>& enabledInstanceExtensions);
+	~VulkanInstance();
+
+	bool Create(bool enableValidationLayers, const std::vector<const char*>& enabledInstanceExtensions);
+	void Destroy();
+
+	PFN_vkVoidFunction VKAPI_CALL GetInstanceProcAddr(const char* pName);
+
+	VkInstance vkInstance{ VK_NULL_HANDLE }; // Vulkan instance, stores all per-application states
+	bool validationLayers = false;
 
 	bool hasDeviceFeatures2 = false;
 	bool hasDebugUtilsExtension = false;
 	bool hasDebugReportExtension = false;
+	bool hasSwapchainColorSpaceExtension = false;
 
 private:
 	std::vector<const char*> checkValidationLayerSupport() const;

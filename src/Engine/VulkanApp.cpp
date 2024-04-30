@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "VulkanApp.h"
 #include "Log.h"
-#include "VulkanInstance.h"
 //-----------------------------------------------------------------------------
 std::string VulkanApp::GetDeviceName() const
 {
@@ -55,24 +54,16 @@ bool VulkanApp::initVulkanApp(const RenderSystemCreateInfo& createInfo, bool ful
 //-----------------------------------------------------------------------------
 bool VulkanApp::initVulkan(const RenderSystemCreateInfo& createInfo)
 {
-	m_validationLayers = createInfo.validationLayers;
+	bool validationLayers = createInfo.validationLayers;
 #if defined(_DEBUG)
-	m_validationLayers = true;
+	validationLayers = true;
 #endif
 	requiresStencil = createInfo.requiresStencil;
 
-	for (const char* ext : createInfo.enabledInstanceExtensions)
-		enabledInstanceExtensions.push_back(ext);
-
 	setEnabledInstanceExtensions();
 
-	VulkanInstance vulkanInstance;
-	m_instance = vulkanInstance.Create(m_validationLayers, enabledInstanceExtensions);
-	if (!m_instance)
+	if (!m_instance.Create(validationLayers, createInfo.enabledInstanceExtensions))
 		return false;
-	hasDeviceFeatures2 = vulkanInstance.hasDeviceFeatures2;
-	hasDebugUtilsExtension = vulkanInstance.hasDebugUtilsExtension;
-	hasDebugReportExtension = vulkanInstance.hasDebugReportExtension;
 
 	if (!selectPhysicalDevice())
 	{
@@ -119,7 +110,7 @@ bool VulkanApp::initVulkan(const RenderSystemCreateInfo& createInfo)
 	}
 	assert(validFormat);
 
-	swapChain.Connect(m_instance, m_physicalDevice, device);
+	swapChain.Connect(m_instance.vkInstance, m_physicalDevice, device);
 
 	// Create synchronization objects
 	VkSemaphoreCreateInfo semaphoreCreateInfo = vks::initializers::semaphoreCreateInfo();
@@ -346,10 +337,7 @@ void VulkanApp::closeVulkanApp()
 
 	delete m_vulkanDevice;
 
-	if (m_validationLayers)
-		vks::debug::freeDebugCallback(m_instance);
-
-	vkDestroyInstance(m_instance, nullptr);
+	m_instance.Destroy();
 }
 //-----------------------------------------------------------------------------
 void VulkanApp::resizeRender(uint32_t destWidth, uint32_t destHeight)
@@ -398,7 +386,6 @@ void VulkanApp::resizeRender(uint32_t destWidth, uint32_t destHeight)
 
 	prepared = true;
 }
-
 //-----------------------------------------------------------------------------
 void VulkanApp::prepareFrame()
 {
@@ -448,7 +435,7 @@ bool VulkanApp::selectPhysicalDevice()
 {
 	uint32_t gpuDeviceCount = 0;
 	// Get number of available physical devices
-	VK_CHECK_RESULT(vkEnumeratePhysicalDevices(m_instance, &gpuDeviceCount, nullptr));
+	VK_CHECK_RESULT(vkEnumeratePhysicalDevices(m_instance.vkInstance, &gpuDeviceCount, nullptr));
 	if (gpuDeviceCount == 0)
 	{
 		Fatal("No device with Vulkan support found");
@@ -456,7 +443,7 @@ bool VulkanApp::selectPhysicalDevice()
 	}
 	// Enumerate devices
 	std::vector<VkPhysicalDevice> physicalDevices(gpuDeviceCount);
-	VkResult result = vkEnumeratePhysicalDevices(m_instance, &gpuDeviceCount, physicalDevices.data());
+	VkResult result = vkEnumeratePhysicalDevices(m_instance.vkInstance, &gpuDeviceCount, physicalDevices.data());
 	if (result)
 	{
 		Fatal("Could not enumerate physical devices : \n" + std::string(string_VkResult(result)));

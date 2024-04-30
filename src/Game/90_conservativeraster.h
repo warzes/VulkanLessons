@@ -501,7 +501,7 @@ private:
 			Get device properties for conservative rasterization
 			Requires VK_KHR_get_physical_device_properties2 and manual function pointer creation
 		*/
-		PFN_vkGetPhysicalDeviceProperties2KHR vkGetPhysicalDeviceProperties2KHR = reinterpret_cast<PFN_vkGetPhysicalDeviceProperties2KHR>(vkGetInstanceProcAddr(m_instance, "vkGetPhysicalDeviceProperties2KHR"));
+		PFN_vkGetPhysicalDeviceProperties2KHR vkGetPhysicalDeviceProperties2KHR = reinterpret_cast<PFN_vkGetPhysicalDeviceProperties2KHR>(m_instance.GetInstanceProcAddr("vkGetPhysicalDeviceProperties2KHR"));
 		assert(vkGetPhysicalDeviceProperties2KHR);
 		VkPhysicalDeviceProperties2KHR deviceProps2{};
 		conservativeRasterProps.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_CONSERVATIVE_RASTERIZATION_PROPERTIES_EXT;

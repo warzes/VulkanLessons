@@ -3,8 +3,15 @@
 #include "VulkanDebug.h"
 #include "Log.h"
 //-----------------------------------------------------------------------------
-VkInstance VulkanInstance::Create(bool enableValidationLayers, const std::vector<const char*>& enabledInstanceExtensions)
+VulkanInstance::~VulkanInstance()
 {
+	assert(!vkInstance);
+}
+//-----------------------------------------------------------------------------
+bool VulkanInstance::Create(bool enableValidationLayers, const std::vector<const char*>& enabledInstanceExtensions)
+{
+	validationLayers = enableValidationLayers;
+
 	std::vector<const char*> validationLayers = {};
 	if (enableValidationLayers)
 	{
@@ -48,8 +55,7 @@ VkInstance VulkanInstance::Create(bool enableValidationLayers, const std::vector
 		instanceCreateInfo.ppEnabledLayerNames = validationLayers.data();
 	}
 
-	VkInstance instance{ VK_NULL_HANDLE };
-	VkResult result = vkCreateInstance(&instanceCreateInfo, nullptr, &instance);
+	VkResult result = vkCreateInstance(&instanceCreateInfo, nullptr, &vkInstance);
 	if (result != VK_SUCCESS)
 	{
 		Fatal("Could not create Vulkan instance : \n" + std::string(string_VkResult(result)));
@@ -58,15 +64,26 @@ VkInstance VulkanInstance::Create(bool enableValidationLayers, const std::vector
 
 	// If the debug utils extension is present we set up debug functions, so samples can label objects for debugging
 	if (hasDebugUtilsExtension)
-	{
-		vks::debugutils::setup(instance);
-	}
+		vks::debugutils::setup(vkInstance);
 
 	// If requested, we enable the default validation layers for debugging
 	if (enableValidationLayers)
-		vks::debug::setupDebugging(instance);
+		vks::debug::setupDebugging(vkInstance);
 
-	return instance;
+	return true;
+}
+//-----------------------------------------------------------------------------
+void VulkanInstance::Destroy()
+{
+	if (validationLayers)
+		vks::debug::freeDebugCallback(vkInstance);
+	vkDestroyInstance(vkInstance, nullptr);
+	vkInstance = nullptr;
+}
+//-----------------------------------------------------------------------------
+PFN_vkVoidFunction VKAPI_CALL VulkanInstance::GetInstanceProcAddr(const char* pName)
+{
+	return vkGetInstanceProcAddr(vkInstance, pName);
 }
 //-----------------------------------------------------------------------------
 std::vector<const char*> VulkanInstance::checkValidationLayerSupport() const
@@ -107,6 +124,18 @@ std::vector<const char*> VulkanInstance::selectInstanceExtensions(bool enableVal
 
 	auto supportedInstanceExtensionList = getInstanceExtensionsList();
 
+	if (checkForExt(supportedInstanceExtensionList, VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME))
+	{
+		instanceExtensions.push_back(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME);
+		hasDeviceFeatures2 = true;
+	}
+
+	if (checkForExt(supportedInstanceExtensionList, VK_EXT_SWAPCHAIN_COLOR_SPACE_EXTENSION_NAME))
+	{
+		instanceExtensions.push_back(VK_EXT_SWAPCHAIN_COLOR_SPACE_EXTENSION_NAME);
+		hasSwapchainColorSpaceExtension = true;
+	}
+
 	if (enableValidationLayers)
 	{
 		// Enable the debug utils extension if available (e.g. when debugging tools are present)
@@ -122,24 +151,11 @@ std::vector<const char*> VulkanInstance::selectInstanceExtensions(bool enableVal
 		}
 	}
 
-	if (checkForExt(supportedInstanceExtensionList, VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME))
-	{
-		instanceExtensions.push_back(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME); // TODO: удалить из примеров
-		hasDeviceFeatures2 = true;
-	}
-
 	// Enabled requested instance extensions
 	if (enabledInstanceExtensions.size() > 0)
 	{
 		for (const char* enabledExtension : enabledInstanceExtensions)
 		{
-			if (std::strcmp(enabledExtension, VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME) == 0)
-				continue; // уже есть
-			if (std::strcmp(enabledExtension, VK_EXT_DEBUG_UTILS_EXTENSION_NAME) == 0)
-				continue; // уже есть
-			if (std::strcmp(enabledExtension, VK_EXT_DEBUG_REPORT_EXTENSION_NAME) == 0)
-				continue; // уже есть
-
 			if (checkForExt(supportedInstanceExtensionList, enabledExtension))
 			{
 				instanceExtensions.push_back(enabledExtension);

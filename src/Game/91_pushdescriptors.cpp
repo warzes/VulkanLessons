@@ -19,7 +19,7 @@ bool PushDescriptorsApp::OnCreate()
 	}
 
 	// Get device push descriptor properties (to display them)
-	PFN_vkGetPhysicalDeviceProperties2KHR vkGetPhysicalDeviceProperties2KHR = reinterpret_cast<PFN_vkGetPhysicalDeviceProperties2KHR>(vkGetInstanceProcAddr(m_instance, "vkGetPhysicalDeviceProperties2KHR"));
+	PFN_vkGetPhysicalDeviceProperties2KHR vkGetPhysicalDeviceProperties2KHR = reinterpret_cast<PFN_vkGetPhysicalDeviceProperties2KHR>(m_instance.GetInstanceProcAddr("vkGetPhysicalDeviceProperties2KHR"));
 	if (!vkGetPhysicalDeviceProperties2KHR) {
 		vks::tools::exitFatal("Could not get a valid function pointer for vkGetPhysicalDeviceProperties2KHR", -1);
 	}
