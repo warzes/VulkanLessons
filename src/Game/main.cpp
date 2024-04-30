@@ -128,11 +128,11 @@ int main(
 	//ComputeParticlesApp app;
 	//ComputeNBodyApp app;
 	//ComputeCullAndLodApp app;
-	ComputeRayTracingApp app;
+	//ComputeRayTracingApp app;
 	//GeometryShaderApp app;
 	//ViewportArrayApp app;
 	//DisplacementApp app;
-	//TerrainTessellationApp app;
+	TerrainTessellationApp app;
 	//TessellationApp app;
 	
 	//TextOverlayApp app;
