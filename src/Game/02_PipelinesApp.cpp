@@ -50,12 +50,12 @@ void PipelinesApp::OnFrame()
 void PipelinesApp::getEnabledFeatures()
 {
 	// Fill mode non solid is required for wireframe display
-	if (m_physicalDevice.deviceFeatures.fillModeNonSolid) {
+	if (m_adapter.deviceFeatures.fillModeNonSolid) {
 		enabledFeatures.fillModeNonSolid = VK_TRUE;
 	};
 
 	// Wide lines must be present for line width > 1.0f
-	if (m_physicalDevice.deviceFeatures.wideLines) {
+	if (m_adapter.deviceFeatures.wideLines) {
 		enabledFeatures.wideLines = VK_TRUE;
 	}
 }

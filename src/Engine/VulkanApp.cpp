@@ -4,7 +4,7 @@
 //-----------------------------------------------------------------------------
 std::string VulkanApp::GetDeviceName() const
 {
-	return m_physicalDevice.GetDeviceName();
+	return m_adapter.GetDeviceName();
 }
 //-----------------------------------------------------------------------------
 void VulkanApp::DrawUI(const VkCommandBuffer commandBuffer)
@@ -46,7 +46,7 @@ bool VulkanApp::initVulkan(const RenderSystemCreateInfo& createInfo)
 
 	if (!m_instance.Create(validationLayers, createInfo.enabledInstanceExtensions))
 		return false;
-	if (!m_physicalDevice.Create(m_instance.vkInstance))
+	if (!m_adapter.Create(m_instance.vkInstance))
 		return false;
 
 	// Derived examples can override this to set actual features (based on above readings) to enable for logical device creation
@@ -54,7 +54,7 @@ bool VulkanApp::initVulkan(const RenderSystemCreateInfo& createInfo)
 
 	// Vulkan device creation
 	// This is handled by a separate class that gets a logical device representation and encapsulates functions related to a device
-	m_vulkanDevice = new vks::VulkanDevice(m_physicalDevice.physicalDevice);
+	m_vulkanDevice = new VulkanDevice(m_adapter.physicalDevice);
 
 	// Derived examples can enable extensions based on the list of supported extensions read from the physical device
 	getEnabledExtensions();
@@ -75,15 +75,15 @@ bool VulkanApp::initVulkan(const RenderSystemCreateInfo& createInfo)
 	// Samples that make use of stencil will require a depth + stencil format, so we select from a different list
 	if (requiresStencil)
 	{
-		validFormat = vks::tools::getSupportedDepthStencilFormat(m_physicalDevice.physicalDevice, &depthFormat);
+		validFormat = vks::tools::getSupportedDepthStencilFormat(m_adapter.physicalDevice, &depthFormat);
 	}
 	else
 	{
-		validFormat = vks::tools::getSupportedDepthFormat(m_physicalDevice.physicalDevice, &depthFormat);
+		validFormat = vks::tools::getSupportedDepthFormat(m_adapter.physicalDevice, &depthFormat);
 	}
 	assert(validFormat);
 
-	swapChain.Connect(m_instance.vkInstance, m_physicalDevice.physicalDevice, device);
+	swapChain.Connect(m_instance.vkInstance, m_adapter.physicalDevice, device);
 
 	// Create synchronization objects
 	VkSemaphoreCreateInfo semaphoreCreateInfo = vks::initializers::semaphoreCreateInfo();
@@ -308,8 +308,9 @@ void VulkanApp::closeVulkanApp()
 		UIOverlay.freeResources();
 
 	delete m_vulkanDevice;
+	m_vulkanDevice = nullptr;
 
-	m_physicalDevice.Destroy();
+	m_adapter.Destroy();
 	m_instance.Destroy();
 }
 //-----------------------------------------------------------------------------

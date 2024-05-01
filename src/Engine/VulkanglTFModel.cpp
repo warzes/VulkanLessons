@@ -56,7 +56,7 @@ void vkglTF::Texture::destroy()
 	}
 }
 
-void vkglTF::Texture::fromglTfImage(tinygltf::Image& gltfimage, std::string path, vks::VulkanDevice* device, VkQueue copyQueue)
+void vkglTF::Texture::fromglTfImage(tinygltf::Image& gltfimage, std::string path, VulkanDevice* device, VkQueue copyQueue)
 {
 	this->device = device;
 
@@ -472,7 +472,7 @@ void vkglTF::Primitive::setDimensions(glm::vec3 min, glm::vec3 max) {
 /*
 	glTF mesh
 */
-vkglTF::Mesh::Mesh(vks::VulkanDevice* device, glm::mat4 matrix) {
+vkglTF::Mesh::Mesh(VulkanDevice* device, glm::mat4 matrix) {
 	this->device = device;
 	this->uniformBlock.matrix = matrix;
 	VK_CHECK_RESULT(device->createBuffer(
@@ -978,7 +978,7 @@ void vkglTF::Model::loadSkins(tinygltf::Model& gltfModel)
 	}
 }
 
-void vkglTF::Model::loadImages(tinygltf::Model& gltfModel, vks::VulkanDevice* device, VkQueue transferQueue)
+void vkglTF::Model::loadImages(tinygltf::Model& gltfModel, VulkanDevice* device, VkQueue transferQueue)
 {
 	for (tinygltf::Image& image : gltfModel.images) {
 		vkglTF::Texture texture;
@@ -1155,7 +1155,7 @@ void vkglTF::Model::loadAnimations(tinygltf::Model& gltfModel)
 	}
 }
 
-void vkglTF::Model::loadFromFile(std::string filename, vks::VulkanDevice* device, VkQueue transferQueue, uint32_t fileLoadingFlags, float scale)
+void vkglTF::Model::loadFromFile(std::string filename, VulkanDevice* device, VkQueue transferQueue, uint32_t fileLoadingFlags, float scale)
 {
 	tinygltf::Model gltfModel;
 	tinygltf::TinyGLTF gltfContext;

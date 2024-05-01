@@ -1,9 +1,9 @@
 #pragma once
 
-class VulkanPhysicalDevice final
+class VulkanAdapter final
 {
 public:
-	~VulkanPhysicalDevice();
+	~VulkanAdapter();
 
 	bool Create(VkInstance vkInstance);
 	void Destroy();

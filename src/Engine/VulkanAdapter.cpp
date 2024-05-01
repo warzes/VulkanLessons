@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "VulkanPhysicalDevice.h"
+#include "VulkanAdapter.h"
 #include "Log.h"
 //-----------------------------------------------------------------------------
 struct QueueFamilyIndices
@@ -23,30 +23,25 @@ QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device)
 	std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
 	vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, queueFamilies.data());
 
-	int i = 0;
-	for (const auto& queueFamily : queueFamilies) {
-		if ((queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT) && (queueFamily.queueFlags & VK_QUEUE_COMPUTE_BIT)) {
+	uint32_t i = 0;
+	for (const auto& queueFamily : queueFamilies) 
+	{
+		if ((queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT) && (queueFamily.queueFlags & VK_QUEUE_COMPUTE_BIT)) 
+		{
 			indices.graphicsFamily = i;
-			indices.presentFamily = i;  // note: to do this properly, one should use vkGetPhysicalDeviceSurfaceSupportKHR and check surface support, but we don't have a surface
-			// in general graphics queues are able to present. if the use has different needs, they should not use the default device.
+			indices.presentFamily = i;  // note: to do this properly, one should use vkGetPhysicalDeviceSurfaceSupportKHR and check surface support, but we don't have a surface in general graphics queues are able to present. if the use has different needs, they should not use the default device.
 		}
-
-		/*VkBool32 presentSupport = false;
-		vkGetPhysicalDeviceSurfaceSupportKHR(device, i, surface, &presentSupport);
-		if (presentSupport) {
-			indices.presentFamily = i;
-		}*/
 		i++;
 	}
 	return indices;
 }
 //-----------------------------------------------------------------------------
-VulkanPhysicalDevice::~VulkanPhysicalDevice()
+VulkanAdapter::~VulkanAdapter()
 {
 	assert(!physicalDevice);
 }
 //-----------------------------------------------------------------------------
-bool VulkanPhysicalDevice::Create(VkInstance vkInstance)
+bool VulkanAdapter::Create(VkInstance vkInstance)
 {
 	uint32_t gpuDeviceCount = 0;
 	// Get number of available physical devices
@@ -122,17 +117,17 @@ bool VulkanPhysicalDevice::Create(VkInstance vkInstance)
 	return true;
 }
 //-----------------------------------------------------------------------------
-void VulkanPhysicalDevice::Destroy()
+void VulkanAdapter::Destroy()
 {
 	physicalDevice = nullptr;
 }
 //-----------------------------------------------------------------------------
-std::string VulkanPhysicalDevice::GetDeviceName() const
+std::string VulkanAdapter::GetDeviceName() const
 {
 	return deviceProperties.deviceName;
 }
 //-----------------------------------------------------------------------------
-uint32_t VulkanPhysicalDevice::GetMemoryTypeIndex(uint32_t typeBits, VkMemoryPropertyFlags properties)
+uint32_t VulkanAdapter::GetMemoryTypeIndex(uint32_t typeBits, VkMemoryPropertyFlags properties)
 {
 	// Iterate over all memory types available for the device used in this example
 	for (uint32_t i = 0; i < deviceMemoryProperties.memoryTypeCount; i++)

@@ -111,22 +111,22 @@ private:
 	virtual void getEnabledFeatures()
 	{
 		// Tessellation shader support is required for this example
-		if (m_physicalDevice.deviceFeatures.tessellationShader) {
+		if (m_adapter.deviceFeatures.tessellationShader) {
 			enabledFeatures.tessellationShader = VK_TRUE;
 		}
 		else {
 			vks::tools::exitFatal("Selected GPU does not support tessellation shaders!", VK_ERROR_FEATURE_NOT_PRESENT);
 		}
 		// Fill mode non solid is required for wireframe display
-		if (m_physicalDevice.deviceFeatures.fillModeNonSolid) {
+		if (m_adapter.deviceFeatures.fillModeNonSolid) {
 			enabledFeatures.fillModeNonSolid = VK_TRUE;
 		};
 		// Enable pipeline statistics if supported (to display them in the UI)
-		if (m_physicalDevice.deviceFeatures.pipelineStatisticsQuery) {
+		if (m_adapter.deviceFeatures.pipelineStatisticsQuery) {
 			enabledFeatures.pipelineStatisticsQuery = VK_TRUE;
 		};
 		// Enable anisotropic filtering if supported
-		if (m_physicalDevice.deviceFeatures.samplerAnisotropy) {
+		if (m_adapter.deviceFeatures.samplerAnisotropy) {
 			enabledFeatures.samplerAnisotropy = VK_TRUE;
 		}
 	}
@@ -152,7 +152,7 @@ private:
 		VK_CHECK_RESULT(vkBindBufferMemory(device, queryResult.buffer, queryResult.memory, 0));
 
 		// Create query pool
-		if (m_physicalDevice.deviceFeatures.pipelineStatisticsQuery) {
+		if (m_adapter.deviceFeatures.pipelineStatisticsQuery) {
 			VkQueryPoolCreateInfo queryPoolInfo = {};
 			queryPoolInfo.sType = VK_STRUCTURE_TYPE_QUERY_POOL_CREATE_INFO;
 			queryPoolInfo.queryType = VK_QUERY_TYPE_PIPELINE_STATISTICS;
@@ -221,7 +221,7 @@ private:
 		samplerInfo.minLod = 0.0f;
 		samplerInfo.maxLod = (float)textures.terrainArray.mipLevels;
 		samplerInfo.borderColor = VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE;
-		if (m_physicalDevice.deviceFeatures.samplerAnisotropy) {
+		if (m_adapter.deviceFeatures.samplerAnisotropy) {
 			samplerInfo.maxAnisotropy = 4.0f;
 			samplerInfo.anisotropyEnable = VK_TRUE;
 		}
@@ -252,7 +252,7 @@ private:
 
 			VK_CHECK_RESULT(vkBeginCommandBuffer(drawCmdBuffers[i], &cmdBufInfo));
 
-			if (m_physicalDevice.deviceFeatures.pipelineStatisticsQuery) {
+			if (m_adapter.deviceFeatures.pipelineStatisticsQuery) {
 				vkCmdResetQueryPool(drawCmdBuffers[i], queryPool, 0, 2);
 			}
 
@@ -274,7 +274,7 @@ private:
 			models.skysphere.draw(drawCmdBuffers[i]);
 
 			// Tessellated terrain
-			if (m_physicalDevice.deviceFeatures.pipelineStatisticsQuery) {
+			if (m_adapter.deviceFeatures.pipelineStatisticsQuery) {
 				// Begin pipeline statistics query
 				vkCmdBeginQuery(drawCmdBuffers[i], queryPool, 0, 0);
 			}
@@ -284,7 +284,7 @@ private:
 			vkCmdBindVertexBuffers(drawCmdBuffers[i], 0, 1, &terrain.vertices.buffer, offsets);
 			vkCmdBindIndexBuffer(drawCmdBuffers[i], terrain.indices.buffer, 0, VK_INDEX_TYPE_UINT32);
 			vkCmdDrawIndexed(drawCmdBuffers[i], terrain.indices.count, 1, 0, 0, 0);
-			if (m_physicalDevice.deviceFeatures.pipelineStatisticsQuery) {
+			if (m_adapter.deviceFeatures.pipelineStatisticsQuery) {
 				// End pipeline statistics query
 				vkCmdEndQuery(drawCmdBuffers[i], queryPool, 0);
 			}
@@ -587,7 +587,7 @@ private:
 		VK_CHECK_RESULT(vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCI, nullptr, &pipelines.terrain));
 
 		// Terrain wireframe pipeline (if devie supports it)
-		if (m_physicalDevice.deviceFeatures.fillModeNonSolid) {
+		if (m_adapter.deviceFeatures.fillModeNonSolid) {
 			rasterizationState.polygonMode = VK_POLYGON_MODE_LINE;
 			VK_CHECK_RESULT(vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCI, nullptr, &pipelines.wireframe));
 		};
@@ -659,7 +659,7 @@ private:
 		submitInfo.pCommandBuffers = &drawCmdBuffers[currentBuffer];
 		VK_CHECK_RESULT(vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE));
 		// Read query results for displaying in next frame (if the device supports pipeline statistics)
-		if (m_physicalDevice.deviceFeatures.pipelineStatisticsQuery) {
+		if (m_adapter.deviceFeatures.pipelineStatisticsQuery) {
 			getQueryResults();
 		}
 		submitFrame();

@@ -52,7 +52,7 @@ private:
 
 	virtual void getEnabledFeatures()
 	{
-		if (m_physicalDevice.deviceFeatures.samplerAnisotropy) {
+		if (m_adapter.deviceFeatures.samplerAnisotropy) {
 			enabledFeatures.samplerAnisotropy = VK_TRUE;
 		}
 	}
@@ -81,7 +81,7 @@ private:
 
 		// Get device properties for the requested texture format
 		VkFormatProperties formatProperties;
-		vkGetPhysicalDeviceFormatProperties(m_physicalDevice.physicalDevice, format, &formatProperties);
+		vkGetPhysicalDeviceFormatProperties(m_adapter.physicalDevice, format, &formatProperties);
 		// Mip-chain generation requires support for blit source and destination
 		assert(formatProperties.optimalTilingFeatures & VK_FORMAT_FEATURE_BLIT_SRC_BIT);
 		assert(formatProperties.optimalTilingFeatures & VK_FORMAT_FEATURE_BLIT_DST_BIT);

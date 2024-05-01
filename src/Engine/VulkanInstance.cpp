@@ -8,9 +8,9 @@ VulkanInstance::~VulkanInstance()
 	assert(!vkInstance);
 }
 //-----------------------------------------------------------------------------
-bool VulkanInstance::Create(bool enableValidationLayers, const std::vector<const char*>& enabledInstanceExtensions)
+bool VulkanInstance::Create(bool enableValidation, const std::vector<const char*>& enabledInstanceExtensions)
 {
-	validationLayers = enableValidationLayers;
+	enableValidationLayers = enableValidation;
 
 	std::vector<const char*> validationLayers = {};
 	if (enableValidationLayers)
@@ -23,7 +23,7 @@ bool VulkanInstance::Create(bool enableValidationLayers, const std::vector<const
 		}
 	}
 
-	std::vector<const char*> instanceExtensions = selectInstanceExtensions(enableValidationLayers, enabledInstanceExtensions);
+	std::vector<const char*> instanceExtensions = selectInstanceExtensions(enabledInstanceExtensions);
 
 	VkApplicationInfo appInfo = { .sType = VK_STRUCTURE_TYPE_APPLICATION_INFO };
 	appInfo.pApplicationName = "GameApp"; // TODO:
@@ -75,7 +75,7 @@ bool VulkanInstance::Create(bool enableValidationLayers, const std::vector<const
 //-----------------------------------------------------------------------------
 void VulkanInstance::Destroy()
 {
-	if (validationLayers)
+	if (enableValidationLayers)
 		vks::debug::FreeDebugCallback(vkInstance);
 	vkDestroyInstance(vkInstance, nullptr);
 	vkInstance = nullptr;
@@ -113,7 +113,7 @@ std::vector<const char*> VulkanInstance::checkValidationLayerSupport() const
 	return {};
 }
 //-----------------------------------------------------------------------------
-std::vector<const char*> VulkanInstance::selectInstanceExtensions(bool enableValidationLayers, const std::vector<const char*>& enabledInstanceExtensions)
+std::vector<const char*> VulkanInstance::selectInstanceExtensions(const std::vector<const char*>& enabledInstanceExtensions)
 {
 	std::vector<const char*> instanceExtensions = {
 		VK_KHR_SURFACE_EXTENSION_NAME,

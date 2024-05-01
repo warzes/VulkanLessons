@@ -11,7 +11,7 @@ namespace vks
 	class UIOverlay
 	{
 	public:
-		vks::VulkanDevice* device{ nullptr };
+		VulkanDevice* device{ nullptr };
 		VkQueue queue{ VK_NULL_HANDLE };
 
 		VkSampleCountFlagBits rasterizationSamples{ VK_SAMPLE_COUNT_1_BIT };

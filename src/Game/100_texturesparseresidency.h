@@ -99,7 +99,7 @@ private:
 
 	void getEnabledFeatures()
 	{
-		if (m_physicalDevice.deviceFeatures.sparseBinding && m_physicalDevice.deviceFeatures.sparseResidencyImage2D) {
+		if (m_adapter.deviceFeatures.sparseBinding && m_adapter.deviceFeatures.sparseResidencyImage2D) {
 			enabledFeatures.shaderResourceResidency = VK_TRUE;
 			enabledFeatures.sparseBinding = VK_TRUE;
 			enabledFeatures.sparseResidencyImage2D = VK_TRUE;
@@ -130,7 +130,7 @@ private:
 		texture.subRange = { VK_IMAGE_ASPECT_COLOR_BIT, 0, texture.mipLevels, 0, 1 };
 		// Get device properties for the requested texture format
 		VkFormatProperties formatProperties;
-		vkGetPhysicalDeviceFormatProperties(m_physicalDevice.physicalDevice, format, &formatProperties);
+		vkGetPhysicalDeviceFormatProperties(m_adapter.physicalDevice, format, &formatProperties);
 
 		const VkImageType imageType = VK_IMAGE_TYPE_2D;
 		const VkSampleCountFlagBits sampleCount = VK_SAMPLE_COUNT_1_BIT;
@@ -141,7 +141,7 @@ private:
 		std::vector<VkSparseImageFormatProperties> sparseProperties;
 		// Sparse properties count for the desired format
 		uint32_t sparsePropertiesCount;
-		vkGetPhysicalDeviceSparseImageFormatProperties(m_physicalDevice.physicalDevice, format, imageType, sampleCount, imageUsage, imageTiling, &sparsePropertiesCount, nullptr);
+		vkGetPhysicalDeviceSparseImageFormatProperties(m_adapter.physicalDevice, format, imageType, sampleCount, imageUsage, imageTiling, &sparsePropertiesCount, nullptr);
 		// Check if sparse is supported for this format
 		if (sparsePropertiesCount == 0)
 		{
@@ -151,7 +151,7 @@ private:
 
 		// Get actual image format properties
 		sparseProperties.resize(sparsePropertiesCount);
-		vkGetPhysicalDeviceSparseImageFormatProperties(m_physicalDevice.physicalDevice, format, imageType, sampleCount, imageUsage, imageTiling, &sparsePropertiesCount, sparseProperties.data());
+		vkGetPhysicalDeviceSparseImageFormatProperties(m_adapter.physicalDevice, format, imageType, sampleCount, imageUsage, imageTiling, &sparsePropertiesCount, sparseProperties.data());
 
 		std::cout << "Sparse image format properties: " << sparsePropertiesCount << std::endl;
 		for (auto props : sparseProperties)

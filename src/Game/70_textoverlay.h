@@ -44,7 +44,7 @@ private:
 	// Passed from the sample
 	VkRenderPass renderPass;
 	VkQueue queue;
-	vks::VulkanDevice* vulkanDevice;
+	VulkanDevice* vulkanDevice;
 	uint32_t* frameBufferWidth;
 	uint32_t* frameBufferHeight;
 	std::vector<VkPipelineShaderStageCreateInfo> shaderStages;
@@ -61,7 +61,7 @@ public:
 	bool visible = true;
 
 	TextOverlay(
-		vks::VulkanDevice* vulkanDevice,
+		VulkanDevice* vulkanDevice,
 		VkQueue queue,
 		VkRenderPass renderPass,
 		uint32_t* framebufferwidth,
@@ -529,7 +529,7 @@ private:
 		ss << std::fixed << std::setprecision(2) << (frameTimer * 1000.0f) << "ms (" << lastFPS << " fps)";
 		textOverlay->addText(ss.str(), 5.0f * GetUIOverlay().scale, 25.0f * GetUIOverlay().scale, TextOverlay::alignLeft);
 
-		textOverlay->addText(m_physicalDevice.deviceProperties.deviceName, 5.0f * GetUIOverlay().scale, 45.0f * GetUIOverlay().scale, TextOverlay::alignLeft);
+		textOverlay->addText(m_adapter.deviceProperties.deviceName, 5.0f * GetUIOverlay().scale, 45.0f * GetUIOverlay().scale, TextOverlay::alignLeft);
 
 		// Display current model view matrix
 		textOverlay->addText("model view matrix", (float)destWidth - 5.0f * GetUIOverlay().scale, 5.0f * GetUIOverlay().scale, TextOverlay::alignRight);

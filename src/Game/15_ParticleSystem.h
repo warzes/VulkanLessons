@@ -114,7 +114,7 @@ private:
 	virtual void getEnabledFeatures()
 	{
 		// Enable anisotropic filtering if supported
-		if (m_physicalDevice.deviceFeatures.samplerAnisotropy) {
+		if (m_adapter.deviceFeatures.samplerAnisotropy) {
 			enabledFeatures.samplerAnisotropy = VK_TRUE;
 		};
 	}

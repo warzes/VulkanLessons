@@ -63,7 +63,7 @@ private:
 
 	virtual void getEnabledFeatures()
 	{
-		if (m_physicalDevice.deviceFeatures.samplerAnisotropy) {
+		if (m_adapter.deviceFeatures.samplerAnisotropy) {
 			enabledFeatures.samplerAnisotropy = VK_TRUE;
 		};
 	}

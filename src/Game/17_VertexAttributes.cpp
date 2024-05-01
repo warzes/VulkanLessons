@@ -281,7 +281,7 @@ void VertexAttributesApp::loadSceneNode(const tinygltf::Node& inputNode, const t
 }
 void VertexAttributesApp::getEnabledFeatures()
 {
-	enabledFeatures.samplerAnisotropy = m_physicalDevice.deviceFeatures.samplerAnisotropy;
+	enabledFeatures.samplerAnisotropy = m_adapter.deviceFeatures.samplerAnisotropy;
 }
 
 void VertexAttributesApp::drawSceneNode(VkCommandBuffer commandBuffer, Node node)

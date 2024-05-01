@@ -88,7 +88,7 @@ private:
 	virtual void getEnabledFeatures()
 	{
 		// Enable multi draw indirect if supported
-		if (m_physicalDevice.deviceFeatures.multiDrawIndirect) {
+		if (m_adapter.deviceFeatures.multiDrawIndirect) {
 			enabledFeatures.multiDrawIndirect = VK_TRUE;
 		}
 	}

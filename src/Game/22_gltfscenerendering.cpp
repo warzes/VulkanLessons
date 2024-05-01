@@ -413,7 +413,7 @@ void VulkanglTFScene::draw(VkCommandBuffer commandBuffer, VkPipelineLayout pipel
 
 void GLTFSceneApp::getEnabledFeatures()
 {
-	enabledFeatures.samplerAnisotropy = m_physicalDevice.deviceFeatures.samplerAnisotropy;
+	enabledFeatures.samplerAnisotropy = m_adapter.deviceFeatures.samplerAnisotropy;
 }
 
 void GLTFSceneApp::buildCommandBuffers()

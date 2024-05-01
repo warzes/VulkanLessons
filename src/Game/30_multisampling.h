@@ -66,11 +66,11 @@ private:
 	void getEnabledFeatures() final
 	{
 		// Enable sample rate shading filtering if supported
-		if (m_physicalDevice.deviceFeatures.sampleRateShading) {
+		if (m_adapter.deviceFeatures.sampleRateShading) {
 			enabledFeatures.sampleRateShading = VK_TRUE;
 		}
 		// Enable anisotropic filtering if supported
-		if (m_physicalDevice.deviceFeatures.samplerAnisotropy) {
+		if (m_adapter.deviceFeatures.samplerAnisotropy) {
 			enabledFeatures.samplerAnisotropy = VK_TRUE;
 		}
 
@@ -83,7 +83,7 @@ private:
 	void setupMultisampleTarget()
 	{
 		// Check if device supports requested sample count for color and depth frame buffer
-		assert((m_physicalDevice.deviceProperties.limits.framebufferColorSampleCounts & sampleCount) && (m_physicalDevice.deviceProperties.limits.framebufferDepthSampleCounts & sampleCount));
+		assert((m_adapter.deviceProperties.limits.framebufferColorSampleCounts & sampleCount) && (m_adapter.deviceProperties.limits.framebufferDepthSampleCounts & sampleCount));
 
 		// Color target
 		VkImageCreateInfo info = vks::initializers::imageCreateInfo();
@@ -479,7 +479,7 @@ private:
 	// In a realworld application, this would be a user setting instead
 	VkSampleCountFlagBits getMaxAvailableSampleCount() const
 	{
-		VkSampleCountFlags supportedSampleCount = std::min(m_physicalDevice.deviceProperties.limits.framebufferColorSampleCounts, m_physicalDevice.deviceProperties.limits.framebufferDepthSampleCounts);
+		VkSampleCountFlags supportedSampleCount = std::min(m_adapter.deviceProperties.limits.framebufferColorSampleCounts, m_adapter.deviceProperties.limits.framebufferDepthSampleCounts);
 		std::vector< VkSampleCountFlagBits> possibleSampleCounts{
 			VK_SAMPLE_COUNT_64_BIT, VK_SAMPLE_COUNT_32_BIT, VK_SAMPLE_COUNT_16_BIT, VK_SAMPLE_COUNT_8_BIT, VK_SAMPLE_COUNT_4_BIT, VK_SAMPLE_COUNT_2_BIT
 		};

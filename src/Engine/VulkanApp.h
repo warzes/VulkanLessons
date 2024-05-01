@@ -2,7 +2,7 @@
 
 #include "PlatformApp.h"
 #include "VulkanInstance.h"
-#include "VulkanPhysicalDevice.h"
+#include "VulkanAdapter.h"
 
 
 #include "VulkanSwapChain.h"
@@ -71,10 +71,8 @@ protected:
 	virtual void renderFrame();
 
 	VulkanInstance m_instance;
-	VulkanPhysicalDevice m_physicalDevice;
-
-	/** @brief Encapsulated physical and logical vulkan device */
-	vks::VulkanDevice* m_vulkanDevice;
+	VulkanAdapter m_adapter;
+	VulkanDevice* m_vulkanDevice;
 
 
 	/** @brief Set of physical device features to be enabled for this example (must be set in the derived constructor) */

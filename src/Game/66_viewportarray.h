@@ -48,14 +48,14 @@ private:
 	virtual void getEnabledFeatures()
 	{
 		// Geometry shader support is required for this example
-		if (m_physicalDevice.deviceFeatures.geometryShader) {
+		if (m_adapter.deviceFeatures.geometryShader) {
 			enabledFeatures.geometryShader = VK_TRUE;
 		}
 		else {
 			vks::tools::exitFatal("Selected GPU does not support geometry shaders!", VK_ERROR_FEATURE_NOT_PRESENT);
 		}
 		// Multiple viewports must be supported
-		if (m_physicalDevice.deviceFeatures.multiViewport) {
+		if (m_adapter.deviceFeatures.multiViewport) {
 			enabledFeatures.multiViewport = VK_TRUE;
 		}
 		else {

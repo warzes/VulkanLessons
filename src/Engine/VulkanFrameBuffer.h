@@ -77,7 +77,7 @@ namespace vks
 	struct Framebuffer
 	{
 	private:
-		vks::VulkanDevice* vulkanDevice;
+		VulkanDevice* vulkanDevice;
 	public:
 		uint32_t width, height;
 		VkFramebuffer framebuffer;
@@ -90,7 +90,7 @@ namespace vks
 		*
 		* @param vulkanDevice Pointer to a valid VulkanDevice
 		*/
-		Framebuffer(vks::VulkanDevice* vulkanDevice)
+		Framebuffer(VulkanDevice* vulkanDevice)
 		{
 			assert(vulkanDevice);
 			this->vulkanDevice = vulkanDevice;

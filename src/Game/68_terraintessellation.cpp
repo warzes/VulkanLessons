@@ -11,7 +11,7 @@ bool TerrainTessellationApp::OnCreate()
 
 	loadAssets();
 	generateTerrain();
-	if (m_physicalDevice.deviceFeatures.pipelineStatisticsQuery) {
+	if (m_adapter.deviceFeatures.pipelineStatisticsQuery) {
 		setupQueryResultBuffer();
 	}
 	prepareUniformBuffers();
@@ -79,13 +79,13 @@ void TerrainTessellationApp::OnUpdateUIOverlay(vks::UIOverlay* overlay)
 		if (overlay->inputFloat("Factor", &uniformDataTessellation.tessellationFactor, 0.05f, 2)) {
 			updateUniformBuffers();
 		}
-		if (m_physicalDevice.deviceFeatures.fillModeNonSolid) {
+		if (m_adapter.deviceFeatures.fillModeNonSolid) {
 			if (overlay->checkBox("Wireframe", &wireframe)) {
 				buildCommandBuffers();
 			}
 		}
 	}
-	if (m_physicalDevice.deviceFeatures.pipelineStatisticsQuery) {
+	if (m_adapter.deviceFeatures.pipelineStatisticsQuery) {
 		if (overlay->header("Pipeline statistics")) {
 			overlay->text("VS invocations: %d", pipelineStats[0]);
 			overlay->text("TE invocations: %d", pipelineStats[1]);

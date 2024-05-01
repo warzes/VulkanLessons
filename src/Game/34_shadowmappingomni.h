@@ -188,7 +188,7 @@ private:
 		VkAttachmentDescription osAttachments[2] = {};
 
 		// Find a suitable depth format for
-		VkBool32 validDepthFormat = vks::tools::getSupportedDepthFormat(m_physicalDevice.physicalDevice, &offscreenDepthFormat);
+		VkBool32 validDepthFormat = vks::tools::getSupportedDepthFormat(m_adapter.physicalDevice, &offscreenDepthFormat);
 		assert(validDepthFormat);
 
 		osAttachments[0].format = offscreenImageFormat;

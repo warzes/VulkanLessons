@@ -53,14 +53,14 @@ private:
 	virtual void getEnabledFeatures()
 	{
 		// Tessellation shader support is required for this example
-		if (m_physicalDevice.deviceFeatures.tessellationShader) {
+		if (m_adapter.deviceFeatures.tessellationShader) {
 			enabledFeatures.tessellationShader = VK_TRUE;
 		}
 		else {
 			vks::tools::exitFatal("Selected GPU does not support tessellation shaders!", VK_ERROR_FEATURE_NOT_PRESENT);
 		}
 		// Fill mode non solid is required for wireframe display
-		if (m_physicalDevice.deviceFeatures.fillModeNonSolid) {
+		if (m_adapter.deviceFeatures.fillModeNonSolid) {
 			enabledFeatures.fillModeNonSolid = VK_TRUE;
 		}
 		else {
@@ -205,7 +205,7 @@ private:
 		// Tessellation pipelines
 		// Solid pipeline
 		VK_CHECK_RESULT(vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCI, nullptr, &pipelines.solid));
-		if (m_physicalDevice.deviceFeatures.fillModeNonSolid) {
+		if (m_adapter.deviceFeatures.fillModeNonSolid) {
 			// Wireframe pipeline
 			rasterizationState.polygonMode = VK_POLYGON_MODE_LINE;
 			rasterizationState.cullMode = VK_CULL_MODE_NONE;

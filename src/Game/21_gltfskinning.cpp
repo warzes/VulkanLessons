@@ -755,7 +755,7 @@ void VulkanglTFModel2::draw(VkCommandBuffer commandBuffer, VkPipelineLayout pipe
 void GLTFSkinningApp::getEnabledFeatures()
 {
 	// Fill mode non solid is required for wireframe display
-	if (m_physicalDevice.deviceFeatures.fillModeNonSolid)
+	if (m_adapter.deviceFeatures.fillModeNonSolid)
 	{
 		enabledFeatures.fillModeNonSolid = VK_TRUE;
 	};
@@ -1033,7 +1033,7 @@ void GLTFSkinningApp::preparePipelines()
 	VK_CHECK_RESULT(vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCI, nullptr, &pipelines.solid));
 
 	// Wire frame rendering pipeline
-	if (m_physicalDevice.deviceFeatures.fillModeNonSolid)
+	if (m_adapter.deviceFeatures.fillModeNonSolid)
 	{
 		rasterizationStateCI.polygonMode = VK_POLYGON_MODE_LINE;
 		rasterizationStateCI.lineWidth = 1.0f;

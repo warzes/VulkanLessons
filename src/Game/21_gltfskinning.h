@@ -5,7 +5,7 @@
 class VulkanglTFModel2
 {
 public:
-	vks::VulkanDevice* vulkanDevice;
+	VulkanDevice* vulkanDevice;
 	VkQueue            copyQueue;
 
 	/*

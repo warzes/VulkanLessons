@@ -378,7 +378,7 @@ void TriangleApp::createVertexBuffer()
 	memAlloc.allocationSize = memReqs.size;
 	// Request a host visible memory type that can be used to copy our data do
 	// Also request it to be coherent, so that writes are visible to the GPU right after unmapping the buffer
-	memAlloc.memoryTypeIndex = m_physicalDevice.GetMemoryTypeIndex(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+	memAlloc.memoryTypeIndex = m_adapter.GetMemoryTypeIndex(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 	VK_CHECK_RESULT(vkAllocateMemory(GetDevice(), &memAlloc, nullptr, &stagingBuffers.vertices.memory));
 	// Map and copy
 	VK_CHECK_RESULT(vkMapMemory(GetDevice(), stagingBuffers.vertices.memory, 0, memAlloc.allocationSize, 0, &data));
@@ -391,7 +391,7 @@ void TriangleApp::createVertexBuffer()
 	VK_CHECK_RESULT(vkCreateBuffer(GetDevice(), &vertexBufferInfoCI, nullptr, &vertices.buffer));
 	vkGetBufferMemoryRequirements(GetDevice(), vertices.buffer, &memReqs);
 	memAlloc.allocationSize = memReqs.size;
-	memAlloc.memoryTypeIndex = m_physicalDevice.GetMemoryTypeIndex(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+	memAlloc.memoryTypeIndex = m_adapter.GetMemoryTypeIndex(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 	VK_CHECK_RESULT(vkAllocateMemory(GetDevice(), &memAlloc, nullptr, &vertices.memory));
 	VK_CHECK_RESULT(vkBindBufferMemory(GetDevice(), vertices.buffer, vertices.memory, 0));
 
@@ -404,7 +404,7 @@ void TriangleApp::createVertexBuffer()
 	VK_CHECK_RESULT(vkCreateBuffer(GetDevice(), &indexbufferCI, nullptr, &stagingBuffers.indices.buffer));
 	vkGetBufferMemoryRequirements(GetDevice(), stagingBuffers.indices.buffer, &memReqs);
 	memAlloc.allocationSize = memReqs.size;
-	memAlloc.memoryTypeIndex = m_physicalDevice.GetMemoryTypeIndex(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+	memAlloc.memoryTypeIndex = m_adapter.GetMemoryTypeIndex(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 	VK_CHECK_RESULT(vkAllocateMemory(GetDevice(), &memAlloc, nullptr, &stagingBuffers.indices.memory));
 	VK_CHECK_RESULT(vkMapMemory(GetDevice(), stagingBuffers.indices.memory, 0, indexBufferSize, 0, &data));
 	memcpy(data, indexBuffer.data(), indexBufferSize);
@@ -416,7 +416,7 @@ void TriangleApp::createVertexBuffer()
 	VK_CHECK_RESULT(vkCreateBuffer(GetDevice(), &indexbufferCI, nullptr, &indices.buffer));
 	vkGetBufferMemoryRequirements(GetDevice(), indices.buffer, &memReqs);
 	memAlloc.allocationSize = memReqs.size;
-	memAlloc.memoryTypeIndex = m_physicalDevice.GetMemoryTypeIndex(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+	memAlloc.memoryTypeIndex = m_adapter.GetMemoryTypeIndex(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 	VK_CHECK_RESULT(vkAllocateMemory(GetDevice(), &memAlloc, nullptr, &indices.memory));
 	VK_CHECK_RESULT(vkBindBufferMemory(GetDevice(), indices.buffer, indices.memory, 0));
 
@@ -502,7 +502,7 @@ void TriangleApp::createUniformBuffers()
 		// Most implementations offer multiple memory types and selecting the correct one to allocate memory from is crucial
 		// We also want the buffer to be host coherent so we don't have to flush (or sync after every update.
 		// Note: This may affect performance so you might not want to do this in a real world application that updates buffers on a regular base
-		allocInfo.memoryTypeIndex = m_physicalDevice.GetMemoryTypeIndex(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+		allocInfo.memoryTypeIndex = m_adapter.GetMemoryTypeIndex(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 		// Allocate memory for the uniform buffer
 		VK_CHECK_RESULT(vkAllocateMemory(GetDevice(), &allocInfo, nullptr, &(uniformBuffers[i].memory)));
 		// Bind memory to buffer

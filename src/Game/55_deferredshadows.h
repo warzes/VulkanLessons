@@ -120,24 +120,24 @@ private:
 	virtual void getEnabledFeatures()
 	{
 		// Geometry shader support is required for writing to multiple shadow map layers in one single pass
-		if (m_physicalDevice.deviceFeatures.geometryShader) {
+		if (m_adapter.deviceFeatures.geometryShader) {
 			enabledFeatures.geometryShader = VK_TRUE;
 		}
 		else {
 			vks::tools::exitFatal("Selected GPU does not support geometry shaders!", VK_ERROR_FEATURE_NOT_PRESENT);
 		}
 		// Enable anisotropic filtering if supported
-		if (m_physicalDevice.deviceFeatures.samplerAnisotropy) {
+		if (m_adapter.deviceFeatures.samplerAnisotropy) {
 			enabledFeatures.samplerAnisotropy = VK_TRUE;
 		}
 		// Enable texture compression
-		if (m_physicalDevice.deviceFeatures.textureCompressionBC) {
+		if (m_adapter.deviceFeatures.textureCompressionBC) {
 			enabledFeatures.textureCompressionBC = VK_TRUE;
 		}
-		else if (m_physicalDevice.deviceFeatures.textureCompressionASTC_LDR) {
+		else if (m_adapter.deviceFeatures.textureCompressionASTC_LDR) {
 			enabledFeatures.textureCompressionASTC_LDR = VK_TRUE;
 		}
-		else if (m_physicalDevice.deviceFeatures.textureCompressionETC2) {
+		else if (m_adapter.deviceFeatures.textureCompressionETC2) {
 			enabledFeatures.textureCompressionETC2 = VK_TRUE;
 		}
 	}
@@ -161,7 +161,7 @@ private:
 
 		// Find a suitable depth format
 		VkFormat shadowMapFormat;
-		VkBool32 validShadowMapFormat = vks::tools::getSupportedDepthFormat(m_physicalDevice.physicalDevice, &shadowMapFormat);
+		VkBool32 validShadowMapFormat = vks::tools::getSupportedDepthFormat(m_adapter.physicalDevice, &shadowMapFormat);
 		assert(validShadowMapFormat);
 
 		// Create a layered depth attachment for rendering the depth maps from the lights' point of view
@@ -221,7 +221,7 @@ private:
 		// Depth attachment
 		// Find a suitable depth format
 		VkFormat attDepthFormat;
-		VkBool32 validDepthFormat = vks::tools::getSupportedDepthFormat(m_physicalDevice.physicalDevice, &attDepthFormat);
+		VkBool32 validDepthFormat = vks::tools::getSupportedDepthFormat(m_adapter.physicalDevice, &attDepthFormat);
 		assert(validDepthFormat);
 
 		attachmentInfo.format = attDepthFormat;

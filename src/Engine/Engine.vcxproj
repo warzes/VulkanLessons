@@ -108,7 +108,7 @@
     <ClCompile Include="VulkanDevice.cpp" />
     <ClCompile Include="VulkanglTFModel.cpp" />
     <ClCompile Include="VulkanInstance.cpp" />
-    <ClCompile Include="VulkanPhysicalDevice.cpp" />
+    <ClCompile Include="VulkanAdapter.cpp" />
     <ClCompile Include="VulkanSwapChain.cpp" />
     <ClCompile Include="VulkanTexture.cpp" />
     <ClCompile Include="VulkanTools.cpp" />
@@ -137,7 +137,7 @@
     <ClInclude Include="VulkanglTFModel.h" />
     <ClInclude Include="VulkanInitializers.h" />
     <ClInclude Include="VulkanInstance.h" />
-    <ClInclude Include="VulkanPhysicalDevice.h" />
+    <ClInclude Include="VulkanAdapter.h" />
     <ClInclude Include="VulkanSwapChain.h" />
     <ClInclude Include="VulkanTexture.h" />
     <ClInclude Include="VulkanTools.h" />

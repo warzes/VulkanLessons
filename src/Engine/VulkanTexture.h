@@ -9,7 +9,7 @@ namespace vks
 	class Texture
 	{
 	public:
-		vks::VulkanDevice* device;
+		VulkanDevice* device;
 		VkImage               image;
 		VkImageLayout         imageLayout;
 		VkDeviceMemory        deviceMemory;
@@ -31,7 +31,7 @@ namespace vks
 		void loadFromFile(
 			std::string        filename,
 			VkFormat           format,
-			vks::VulkanDevice* device,
+			VulkanDevice* device,
 			VkQueue            copyQueue,
 			VkImageUsageFlags  imageUsageFlags = VK_IMAGE_USAGE_SAMPLED_BIT,
 			VkImageLayout      imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
@@ -42,7 +42,7 @@ namespace vks
 			VkFormat           format,
 			uint32_t           texWidth,
 			uint32_t           texHeight,
-			vks::VulkanDevice* device,
+			VulkanDevice* device,
 			VkQueue            copyQueue,
 			VkFilter           filter = VK_FILTER_LINEAR,
 			VkImageUsageFlags  imageUsageFlags = VK_IMAGE_USAGE_SAMPLED_BIT,
@@ -55,7 +55,7 @@ namespace vks
 		void loadFromFile(
 			std::string        filename,
 			VkFormat           format,
-			vks::VulkanDevice* device,
+			VulkanDevice* device,
 			VkQueue            copyQueue,
 			VkImageUsageFlags  imageUsageFlags = VK_IMAGE_USAGE_SAMPLED_BIT,
 			VkImageLayout      imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
@@ -67,7 +67,7 @@ namespace vks
 		void loadFromFile(
 			std::string        filename,
 			VkFormat           format,
-			vks::VulkanDevice* device,
+			VulkanDevice* device,
 			VkQueue            copyQueue,
 			VkImageUsageFlags  imageUsageFlags = VK_IMAGE_USAGE_SAMPLED_BIT,
 			VkImageLayout      imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);

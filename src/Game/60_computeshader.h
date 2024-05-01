@@ -74,7 +74,7 @@ private:
 
 		VkFormatProperties formatProperties;
 		// Get device properties for the requested texture format
-		vkGetPhysicalDeviceFormatProperties(m_physicalDevice.physicalDevice, format, &formatProperties);
+		vkGetPhysicalDeviceFormatProperties(m_adapter.physicalDevice, format, &formatProperties);
 		// Check if requested image format supports image storage operations required for storing pixel from the compute shader
 		assert(formatProperties.optimalTilingFeatures & VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT);
 

@@ -82,7 +82,7 @@ private:
 	void getEnabledFeatures() override
 	{
 		// The linked lists are built in a fragment shader using atomic stores, so the sample won't work without that feature available
-		if (m_physicalDevice.deviceFeatures.fragmentStoresAndAtomics) {
+		if (m_adapter.deviceFeatures.fragmentStoresAndAtomics) {
 			enabledFeatures.fragmentStoresAndAtomics = VK_TRUE;
 		}
 		else {

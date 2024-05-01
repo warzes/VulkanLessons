@@ -6,7 +6,7 @@ class VulkanglTFScene
 {
 public:
 	// The class requires some Vulkan objects so it can create it's own resources
-	vks::VulkanDevice* vulkanDevice;
+	VulkanDevice* vulkanDevice;
 	VkQueue copyQueue;
 
 	// The vertex layout for the samples' model

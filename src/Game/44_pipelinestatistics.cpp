@@ -59,10 +59,10 @@ void PipelineStatisticsApp::OnUpdateUIOverlay(vks::UIOverlay* overlay)
 		recreatePipeline |= overlay->checkBox("Blending", &blending);
 		recreatePipeline |= overlay->checkBox("Discard", &discard);
 		// These features may not be supported by all implementations
-		if (m_physicalDevice.deviceFeatures.fillModeNonSolid) {
+		if (m_adapter.deviceFeatures.fillModeNonSolid) {
 			recreatePipeline |= overlay->checkBox("Wireframe", &wireframe);
 		}
-		if (m_physicalDevice.deviceFeatures.tessellationShader) {
+		if (m_adapter.deviceFeatures.tessellationShader) {
 			recreatePipeline |= overlay->checkBox("Tessellation", &tessellation);
 		}
 		if (recreatePipeline) {

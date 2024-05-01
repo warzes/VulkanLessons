@@ -139,7 +139,7 @@ void TextureCubeMapApp::OnMouseMoved(int32_t x, int32_t y, int32_t dx, int32_t d
 //-----------------------------------------------------------------------------
 void TextureCubeMapApp::getEnabledFeatures()
 {
-	if (m_physicalDevice.deviceFeatures.samplerAnisotropy) {
+	if (m_adapter.deviceFeatures.samplerAnisotropy) {
 		enabledFeatures.samplerAnisotropy = VK_TRUE;
 	}
 }

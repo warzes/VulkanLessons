@@ -2,8 +2,6 @@
 #include "VulkanDevice.h"
 #include "Log.h"
 
-namespace vks
-{	
 	/**
 	* Default constructor
 	*
@@ -565,5 +563,3 @@ namespace vks
 		}
 		throw std::runtime_error("Could not find a matching depth format");
 	}
-
-};

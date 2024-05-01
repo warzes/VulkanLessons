@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "VulkanDebug.h"
 #include "Log.h"
+#include "BaseFunc.h"
 //-----------------------------------------------------------------------------
 namespace vks::debug
 {
@@ -23,9 +24,9 @@ namespace vks::debugutils
 //-----------------------------------------------------------------------------
 VKAPI_ATTR VkBool32 VKAPI_CALL debugUtilsMessageCallback(
 	VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
-	VkDebugUtilsMessageTypeFlagsEXT messageType,
+	VkDebugUtilsMessageTypeFlagsEXT /*messageType*/,
 	const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
-	void* pUserData)
+	void* /*pUserData*/)
 {
 	// Select prefix depending on flags passed to the callback
 	std::string prefix;
@@ -88,8 +89,8 @@ void vks::debug::SetupDebuggingMessengerCreateInfo(VkDebugUtilsMessengerCreateIn
 //-----------------------------------------------------------------------------
 void vks::debug::SetupDebugging(VkInstance instance)
 {
-	vkDestroyDebugUtilsMessengerEXT = reinterpret_cast<PFN_vkDestroyDebugUtilsMessengerEXT>(vkGetInstanceProcAddr(instance, "vkDestroyDebugUtilsMessengerEXT"));
-	vkCreateDebugUtilsMessengerEXT = reinterpret_cast<PFN_vkCreateDebugUtilsMessengerEXT>(vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT"));
+	vkCreateDebugUtilsMessengerEXT = FunctionCast<PFN_vkCreateDebugUtilsMessengerEXT>(vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT"));
+	vkDestroyDebugUtilsMessengerEXT = FunctionCast<PFN_vkDestroyDebugUtilsMessengerEXT>(vkGetInstanceProcAddr(instance, "vkDestroyDebugUtilsMessengerEXT"));
 
 	VkDebugUtilsMessengerCreateInfoEXT debugUtilsMessengerCI{};
 	SetupDebuggingMessengerCreateInfo(debugUtilsMessengerCI);
@@ -105,14 +106,14 @@ void vks::debug::FreeDebugCallback(VkInstance instance)
 //-----------------------------------------------------------------------------
 void vks::debugutils::Setup(VkInstance instance)
 {
-	vkCmdBeginDebugUtilsLabelEXT = reinterpret_cast<PFN_vkCmdBeginDebugUtilsLabelEXT>(vkGetInstanceProcAddr(instance, "vkCmdBeginDebugUtilsLabelEXT"));
-	vkCmdEndDebugUtilsLabelEXT = reinterpret_cast<PFN_vkCmdEndDebugUtilsLabelEXT>(vkGetInstanceProcAddr(instance, "vkCmdEndDebugUtilsLabelEXT"));
-	vkCmdInsertDebugUtilsLabelEXT = reinterpret_cast<PFN_vkCmdInsertDebugUtilsLabelEXT>(vkGetInstanceProcAddr(instance, "vkCmdInsertDebugUtilsLabelEXT"));
+	vkCmdBeginDebugUtilsLabelEXT = FunctionCast<PFN_vkCmdBeginDebugUtilsLabelEXT>(vkGetInstanceProcAddr(instance, "vkCmdBeginDebugUtilsLabelEXT"));
+	vkCmdEndDebugUtilsLabelEXT = FunctionCast<PFN_vkCmdEndDebugUtilsLabelEXT>(vkGetInstanceProcAddr(instance, "vkCmdEndDebugUtilsLabelEXT"));
+	vkCmdInsertDebugUtilsLabelEXT = FunctionCast<PFN_vkCmdInsertDebugUtilsLabelEXT>(vkGetInstanceProcAddr(instance, "vkCmdInsertDebugUtilsLabelEXT"));
 
-	vkQueueBeginDebugUtilsLabelEXT = reinterpret_cast<PFN_vkQueueBeginDebugUtilsLabelEXT>(vkGetInstanceProcAddr(instance, "vkQueueBeginDebugUtilsLabelEXT"));
-	vkQueueInsertDebugUtilsLabelEXT = reinterpret_cast<PFN_vkQueueInsertDebugUtilsLabelEXT>(vkGetInstanceProcAddr(instance, "vkQueueInsertDebugUtilsLabelEXT"));
-	vkQueueEndDebugUtilsLabelEXT = reinterpret_cast<PFN_vkQueueEndDebugUtilsLabelEXT>(vkGetInstanceProcAddr(instance, "vkQueueEndDebugUtilsLabelEXT"));
-	vkSetDebugUtilsObjectNameEXT = reinterpret_cast<PFN_vkSetDebugUtilsObjectNameEXT>(vkGetInstanceProcAddr(instance, "vkSetDebugUtilsObjectNameEXT"));
+	vkQueueBeginDebugUtilsLabelEXT = FunctionCast<PFN_vkQueueBeginDebugUtilsLabelEXT>(vkGetInstanceProcAddr(instance, "vkQueueBeginDebugUtilsLabelEXT"));
+	vkQueueInsertDebugUtilsLabelEXT = FunctionCast<PFN_vkQueueInsertDebugUtilsLabelEXT>(vkGetInstanceProcAddr(instance, "vkQueueInsertDebugUtilsLabelEXT"));
+	vkQueueEndDebugUtilsLabelEXT = FunctionCast<PFN_vkQueueEndDebugUtilsLabelEXT>(vkGetInstanceProcAddr(instance, "vkQueueEndDebugUtilsLabelEXT"));
+	vkSetDebugUtilsObjectNameEXT = FunctionCast<PFN_vkSetDebugUtilsObjectNameEXT>(vkGetInstanceProcAddr(instance, "vkSetDebugUtilsObjectNameEXT"));
 }
 //-----------------------------------------------------------------------------
 void vks::debugutils::CmdBeginLabel(VkCommandBuffer commandBuffer, const std::string& caption, const glm::vec4& color)
