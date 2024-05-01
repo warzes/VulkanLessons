@@ -28,7 +28,7 @@ private:
 		glm::mat4 view;
 		int32_t texIndex = 0;
 	} uniformData;
-	vks::VulkanBuffer uniformBuffer;
+	VulkanBuffer uniformBuffer;
 
 	VkPipelineLayout pipelineLayout{ VK_NULL_HANDLE };
 	VkPipeline pipeline{ VK_NULL_HANDLE };

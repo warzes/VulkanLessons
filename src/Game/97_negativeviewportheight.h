@@ -45,10 +45,10 @@ private:
 	} textures;
 
 	struct Quad {
-		vks::VulkanBuffer verticesYUp;
-		vks::VulkanBuffer verticesYDown;
-		vks::VulkanBuffer indicesCCW;
-		vks::VulkanBuffer indicesCW;
+		VulkanBuffer verticesYUp;
+		VulkanBuffer verticesYDown;
+		VulkanBuffer indicesCCW;
+		VulkanBuffer indicesCW;
 		void destroy()
 		{
 			verticesYUp.destroy();

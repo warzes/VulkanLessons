@@ -163,12 +163,19 @@
     <ClCompile Include="97_negativeviewportheight.cpp" />
     <ClCompile Include="98_descriptorindexing.cpp" />
     <ClCompile Include="GameApp.cpp" />
+    <ClCompile Include="IPTAssetManager.cpp" />
+    <ClCompile Include="IPTHeightMapSettings.cpp" />
+    <ClCompile Include="IPTInfiniteTerrain.cpp" />
+    <ClCompile Include="IPTNoise.cpp" />
+    <ClCompile Include="IPTTerrainChunk.cpp" />
+    <ClCompile Include="IPTVulkanContext.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="01_TriangleApp.cpp" />
+    <ClCompile Include="VulkanInfiniteProceduralTerrain.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="02_PipelinesApp.h" />
@@ -239,8 +246,23 @@
     <ClInclude Include="97_negativeviewportheight.h" />
     <ClInclude Include="98_descriptorindexing.h" />
     <ClInclude Include="GameApp.h" />
+    <ClInclude Include="IPTAssetManager.h" />
+    <ClInclude Include="IPTCommandBuffer.h" />
+    <ClInclude Include="IPTCommandPool.h" />
+    <ClInclude Include="IPTDescriptorPool.h" />
+    <ClInclude Include="IPTDescriptorSet.h" />
+    <ClInclude Include="IPTDescriptorSetLayout.h" />
+    <ClInclude Include="IPTHeightMapSettings.h" />
+    <ClInclude Include="IPTInfiniteTerrain.h" />
+    <ClInclude Include="IPTNoise.h" />
+    <ClInclude Include="IPTPipeline.h" />
+    <ClInclude Include="IPTPipelineLayout.h" />
+    <ClInclude Include="IPTTerrainChunk.h" />
+    <ClInclude Include="IPTVulkanContext.h" />
+    <ClInclude Include="IPTVulkanHeightmap.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="01_TriangleApp.h" />
+    <ClInclude Include="VulkanInfiniteProceduralTerrain.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

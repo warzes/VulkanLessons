@@ -30,7 +30,7 @@ private:
 		glm::mat4 modelview[2];
 		glm::vec4 lightPos = glm::vec4(-2.5f, -3.5f, 0.0f, 1.0f);
 	} uniformDataGS;
-	vks::VulkanBuffer uniformBufferGS;
+	VulkanBuffer uniformBufferGS;
 
 	VkPipeline pipeline{ VK_NULL_HANDLE };
 	VkPipelineLayout pipelineLayout{ VK_NULL_HANDLE };

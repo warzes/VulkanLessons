@@ -79,8 +79,8 @@ private:
 
 	Camera camera;
 	
-	vks::VulkanBuffer vertexBuffer;
-	vks::VulkanBuffer indexBuffer;
+	VulkanBuffer vertexBuffer;
+	VulkanBuffer indexBuffer;
 	uint32_t indexCount{ 0 };
 
 	struct UniformData {
@@ -90,7 +90,7 @@ private:
 		// This is used to change the bias for the level-of-detail (mips) in the fragment shader
 		float lodBias = 0.0f;
 	} uniformData;
-	vks::VulkanBuffer uniformBuffer;
+	VulkanBuffer uniformBuffer;
 
 	VkPipeline pipeline{ VK_NULL_HANDLE };
 	VkPipelineLayout pipelineLayout{ VK_NULL_HANDLE };

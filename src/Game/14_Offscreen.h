@@ -34,9 +34,9 @@ private:
 	} models;
 
 	struct {
-		vks::VulkanBuffer vsShared;
-		vks::VulkanBuffer vsMirror;
-		vks::VulkanBuffer vsOffScreen;
+		VulkanBuffer vsShared;
+		VulkanBuffer vsMirror;
+		VulkanBuffer vsOffScreen;
 	} uniformBuffers;
 
 	struct UniformData {

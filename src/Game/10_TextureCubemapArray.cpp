@@ -186,7 +186,7 @@ void TextureCubemapArrayApp::loadCubemapArray(std::string filename, VkFormat for
 	ktx_uint8_t* ktxTextureData = ktxTexture_GetData(ktxTexture);
 	ktx_size_t ktxTextureSize = ktxTexture_GetSize(ktxTexture);
 
-	vks::VulkanBuffer sourceData;
+	VulkanBuffer sourceData;
 
 	// Create a host-visible source buffer that contains the raw image data
 	VkBufferCreateInfo bufferCreateInfo = vks::initializers::bufferCreateInfo();

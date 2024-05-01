@@ -90,7 +90,7 @@ public:
 		Node* skeletonRoot = nullptr;
 		std::vector<glm::mat4> inverseBindMatrices;
 		std::vector<Node*>    joints;
-		vks::VulkanBuffer            ssbo;
+		VulkanBuffer            ssbo;
 		VkDescriptorSet        descriptorSet;
 	};
 
@@ -169,7 +169,7 @@ private:
 
 	struct ShaderData
 	{
-		vks::VulkanBuffer buffer;
+		VulkanBuffer buffer;
 		struct Values
 		{
 			glm::mat4 projection;

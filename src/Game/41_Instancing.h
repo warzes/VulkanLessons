@@ -55,7 +55,7 @@ private:
 		float locSpeed = 0.0f;
 		float globSpeed = 0.0f;
 	} uniformData;
-	vks::VulkanBuffer uniformBuffer;
+	VulkanBuffer uniformBuffer;
 
 	VkPipelineLayout pipelineLayout{ VK_NULL_HANDLE };
 	struct {

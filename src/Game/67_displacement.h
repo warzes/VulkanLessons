@@ -38,7 +38,7 @@ private:
 		float tessStrength = 0.1f;
 		float tessLevel = 64.0f;
 	} uniformData;
-	vks::VulkanBuffer uniformBuffer;
+	VulkanBuffer uniformBuffer;
 
 	struct Pipelines {
 		VkPipeline solid{ VK_NULL_HANDLE };

@@ -41,16 +41,16 @@ private:
 	struct GeometryPass {
 		VkRenderPass renderPass{ VK_NULL_HANDLE };
 		VkFramebuffer framebuffer{ VK_NULL_HANDLE };
-		vks::VulkanBuffer geometry;
+		VulkanBuffer geometry;
 		vks::Texture headIndex;
-		vks::VulkanBuffer linkedList;
+		VulkanBuffer linkedList;
 	} geometryPass;
 
 	struct RenderPassUniformData {
 		glm::mat4 projection;
 		glm::mat4 view;
 	} renderPassUniformData;
-	vks::VulkanBuffer renderPassUniformBuffer;
+	VulkanBuffer renderPassUniformBuffer;
 
 	struct ObjectData {
 		glm::mat4 model;
@@ -128,7 +128,7 @@ private:
 		VK_CHECK_RESULT(vkCreateFramebuffer(device, &fbufCreateInfo, nullptr, &geometryPass.framebuffer));
 
 		// Create a buffer for GeometrySBO
-		vks::VulkanBuffer stagingBuffer;
+		VulkanBuffer stagingBuffer;
 
 		VK_CHECK_RESULT(m_vulkanDevice->createBuffer(
 			VK_BUFFER_USAGE_TRANSFER_SRC_BIT,

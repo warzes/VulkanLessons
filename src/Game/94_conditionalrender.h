@@ -39,10 +39,10 @@ private:
 		glm::mat4 view;
 		glm::mat4 model;
 	} uniformData;
-	vks::VulkanBuffer uniformBuffer;
+	VulkanBuffer uniformBuffer;
 
 	std::vector<int32_t> conditionalVisibility{};
-	vks::VulkanBuffer conditionalBuffer;
+	VulkanBuffer conditionalBuffer;
 
 	VkPipelineLayout pipelineLayout{ VK_NULL_HANDLE };
 	VkPipeline pipeline{ VK_NULL_HANDLE };

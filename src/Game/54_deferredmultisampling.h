@@ -61,8 +61,8 @@ private:
 	} uniformDataComposition;
 
 	struct {
-		vks::VulkanBuffer offscreen{ VK_NULL_HANDLE };
-		vks::VulkanBuffer composition{ VK_NULL_HANDLE };
+		VulkanBuffer offscreen{ VK_NULL_HANDLE };
+		VulkanBuffer composition{ VK_NULL_HANDLE };
 	} uniformBuffers;
 
 	struct {

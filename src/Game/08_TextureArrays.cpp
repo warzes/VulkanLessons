@@ -400,8 +400,8 @@ void TextureArraysApp::generateCube()
 
 	// Create buffers and upload data to the GPU
 	struct StagingBuffers {
-		vks::VulkanBuffer vertices;
-		vks::VulkanBuffer indices;
+		VulkanBuffer vertices;
+		VulkanBuffer indices;
 	} stagingBuffers;
 
 	// Host visible source buffers (staging)

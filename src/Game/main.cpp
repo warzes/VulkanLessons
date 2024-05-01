@@ -68,6 +68,10 @@
 #include "99_dynamicrendering.h"
 #include "100_texturesparseresidency.h"
 #include "101_dynamicstate.h"
+
+// DEMO
+#include "VulkanInfiniteProceduralTerrain.h"
+
 //-----------------------------------------------------------------------------
 #if defined(_MSC_VER)
 #	pragma comment( lib, "3rdparty.lib" )
@@ -132,7 +136,7 @@ int main(
 	//GeometryShaderApp app;
 	//ViewportArrayApp app;
 	//DisplacementApp app;
-	TerrainTessellationApp app;
+	//TerrainTessellationApp app;
 	//TessellationApp app;
 	
 	//TextOverlayApp app;
@@ -155,6 +159,11 @@ int main(
 	//DynamicRenderingApp app;
 	//TextureSparseResidencyApp app;
 	//DynamicStateApp app;
+
+	//============================================
+	// DEMO
+	//============================================
+	VulkanInfiniteProceduralTerrainApp app;
 
 	app.Run();
 

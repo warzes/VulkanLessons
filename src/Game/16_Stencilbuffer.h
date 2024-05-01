@@ -29,7 +29,7 @@ private:
 		// Vertex shader extrudes model by this value along normals for outlining
 		float outlineWidth = 0.025f;
 	} uniformData;
-	vks::VulkanBuffer uniformBuffer;
+	VulkanBuffer uniformBuffer;
 
 	struct {
 		VkPipeline stencil{ VK_NULL_HANDLE };

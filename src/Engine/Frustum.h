@@ -7,6 +7,7 @@ namespace vks
 	public:
 		enum side { LEFT = 0, RIGHT = 1, TOP = 2, BOTTOM = 3, BACK = 4, FRONT = 5 };
 		std::array<glm::vec4, 6> planes;
+		glm::vec4 corners[8];
 
 		void update(glm::mat4 matrix)
 		{
@@ -45,6 +46,20 @@ namespace vks
 				float length = sqrtf(planes[i].x * planes[i].x + planes[i].y * planes[i].y + planes[i].z * planes[i].z);
 				planes[i] /= length;
 			}
+
+			constexpr glm::vec4 v[] =
+			{
+				glm::vec4(-1, -1, -1,  1),  glm::vec4(1, -1, -1,  1),
+				glm::vec4(1,  1, -1,  1),  glm::vec4(-1,  1, -1,  1),
+				glm::vec4(-1, -1,  1,  1),  glm::vec4(1, -1,  1,  1),
+				glm::vec4(1,  1,  1,  1),  glm::vec4(-1,  1,  1,  1)
+			};
+			const glm::mat4 inv = glm::inverse(matrix);
+			for (auto i = 0; i < 8; i++)
+			{
+				const glm::vec4 q = inv * v[i];
+				corners[i] = q / q.w;
+			}
 		}
 
 		bool checkSphere(glm::vec3 pos, float radius)
@@ -56,6 +71,37 @@ namespace vks
 					return false;
 				}
 			}
+			return true;
+		}
+
+		bool checkBox(glm::vec3 pos, glm::vec3 min, glm::vec3 max)
+		{
+			// https://iquilezles.org/articles/frustumcorrect/
+
+			// Check box outside/inside of frustum
+			for (int i = 0; i < 6; i++)
+			{
+				int out = 0;
+				out += ((glm::dot(planes[i], glm::vec4(min.x, min.y, min.z, 1.0f)) < 0.0) ? 1 : 0);
+				out += ((glm::dot(planes[i], glm::vec4(max.x, min.y, min.z, 1.0f)) < 0.0) ? 1 : 0);
+				out += ((glm::dot(planes[i], glm::vec4(min.x, max.y, min.z, 1.0f)) < 0.0) ? 1 : 0);
+				out += ((glm::dot(planes[i], glm::vec4(max.x, max.y, min.z, 1.0f)) < 0.0) ? 1 : 0);
+				out += ((glm::dot(planes[i], glm::vec4(min.x, min.y, max.z, 1.0f)) < 0.0) ? 1 : 0);
+				out += ((glm::dot(planes[i], glm::vec4(max.x, min.y, max.z, 1.0f)) < 0.0) ? 1 : 0);
+				out += ((glm::dot(planes[i], glm::vec4(min.x, max.y, max.z, 1.0f)) < 0.0) ? 1 : 0);
+				out += ((glm::dot(planes[i], glm::vec4(max.x, max.y, max.z, 1.0f)) < 0.0) ? 1 : 0);
+				if (out == 8) return false;
+			}
+
+			// Check frustum outside/inside box
+			int out;
+			out = 0; for (int i = 0; i < 8; i++) out += ((corners[i].x > max.x) ? 1 : 0); if (out == 8) return false;
+			out = 0; for (int i = 0; i < 8; i++) out += ((corners[i].x < min.x) ? 1 : 0); if (out == 8) return false;
+			out = 0; for (int i = 0; i < 8; i++) out += ((corners[i].y > max.y) ? 1 : 0); if (out == 8) return false;
+			out = 0; for (int i = 0; i < 8; i++) out += ((corners[i].y < min.y) ? 1 : 0); if (out == 8) return false;
+			out = 0; for (int i = 0; i < 8; i++) out += ((corners[i].z > max.z) ? 1 : 0); if (out == 8) return false;
+			out = 0; for (int i = 0; i < 8; i++) out += ((corners[i].z < min.z) ? 1 : 0); if (out == 8) return false;
+
 			return true;
 		}
 	};

@@ -35,9 +35,9 @@ private:
 	} models;
 
 	struct {
-		vks::VulkanBuffer scene;
-		vks::VulkanBuffer skyBox;
-		vks::VulkanBuffer blurParams;
+		VulkanBuffer scene;
+		VulkanBuffer skyBox;
+		VulkanBuffer blurParams;
 	} uniformBuffers;
 
 	struct UBO {

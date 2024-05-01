@@ -59,8 +59,8 @@ private:
 	} uniformDataOffscreen;
 
 	struct {
-		vks::VulkanBuffer scene;
-		vks::VulkanBuffer offscreen;
+		VulkanBuffer scene;
+		VulkanBuffer offscreen;
 	} uniformBuffers;
 
 	struct {

@@ -54,7 +54,7 @@ private:
 		// Used by the fragment shader to select the cubemap from the array cubemap
 		int cubeMapIndex = 1;
 	} uniformData;
-	vks::VulkanBuffer uniformBuffer;
+	VulkanBuffer uniformBuffer;
 
 	struct {
 		VkPipeline skybox{ VK_NULL_HANDLE };

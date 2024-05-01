@@ -40,7 +40,7 @@ private:
 
 	// We use a shader storage buffer object to store the particlces
 	// This is updated by the compute pipeline and displayed as a vertex buffer by the graphics pipeline
-	vks::VulkanBuffer storageBuffer;
+	VulkanBuffer storageBuffer;
 
 	// Resources for the graphics part of the example
 	struct Graphics {
@@ -63,7 +63,7 @@ private:
 		VkDescriptorSet descriptorSet;				// Compute shader bindings
 		VkPipelineLayout pipelineLayout;			// Layout of the compute pipeline
 		VkPipeline pipeline;						// Compute pipeline for updating particle positions
-		vks::VulkanBuffer uniformBuffer;					// Uniform buffer object containing particle system parameters
+		VulkanBuffer uniformBuffer;					// Uniform buffer object containing particle system parameters
 		struct UniformData {						// Compute shader uniform block object
 			float deltaT;							//		Frame delta time
 			float destX;							//		x position of the attractor
@@ -267,7 +267,7 @@ private:
 		// Staging
 		// SSBO won't be changed on the host after upload so copy to device local memory
 
-		vks::VulkanBuffer stagingBuffer;
+		VulkanBuffer stagingBuffer;
 
 		m_vulkanDevice->createBuffer(
 			VK_BUFFER_USAGE_TRANSFER_SRC_BIT,

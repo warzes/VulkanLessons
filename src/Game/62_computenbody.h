@@ -45,7 +45,7 @@ private:
 
 	// We use a shader storage buffer object to store the particlces
 	// This is updated by the compute pipeline and displayed as a vertex buffer by the graphics pipeline
-	vks::VulkanBuffer storageBuffer;
+	VulkanBuffer storageBuffer;
 
 	// Resources for the graphics part of the example
 	struct Graphics {
@@ -60,7 +60,7 @@ private:
 			glm::mat4 view;
 			glm::vec2 screenDim;
 		} uniformData;
-		vks::VulkanBuffer uniformBuffer;					// Contains scene matrices
+		VulkanBuffer uniformBuffer;					// Contains scene matrices
 	} graphics;
 
 	// Resources for the compute part of the example
@@ -83,7 +83,7 @@ private:
 			float power{ 0.75f };
 			float soften{ 0.05f };
 		} uniformData;
-		vks::VulkanBuffer uniformBuffer;					// Uniform buffer object containing particle system parameters
+		VulkanBuffer uniformBuffer;					// Uniform buffer object containing particle system parameters
 	} compute;
 
 	void loadAssets()
@@ -345,7 +345,7 @@ private:
 		// Staging
 		// SSBO won't be changed on the host after upload so copy to device local memory
 
-		vks::VulkanBuffer stagingBuffer;
+		VulkanBuffer stagingBuffer;
 
 		m_vulkanDevice->createBuffer(VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &stagingBuffer, storageBufferSize, particleBuffer.data());
 		// The SSBO will be used as a storage buffer for the compute pipeline and as a vertex buffer in the graphics pipeline

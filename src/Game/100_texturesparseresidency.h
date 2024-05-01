@@ -87,7 +87,7 @@ private:
 		glm::vec4 viewPos;
 		float lodBias = 0.0f;
 	} uniformData;
-	vks::VulkanBuffer uniformBuffer;
+	VulkanBuffer uniformBuffer;
 
 	VkPipeline pipeline{ VK_NULL_HANDLE };
 	VkPipelineLayout pipelineLayout{ VK_NULL_HANDLE };
@@ -588,7 +588,7 @@ private:
 		// Generate some random image data and upload as a buffer
 		const size_t bufferSize = 4 * page.extent.width * page.extent.height;
 
-		vks::VulkanBuffer imageBuffer;
+		VulkanBuffer imageBuffer;
 		VK_CHECK_RESULT(m_vulkanDevice->createBuffer(
 			VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
 			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
@@ -679,7 +679,7 @@ private:
 			// Generate some random image data and upload as a buffer
 			const size_t bufferSize = 4 * width * height;
 
-			vks::VulkanBuffer imageBuffer;
+			VulkanBuffer imageBuffer;
 			VK_CHECK_RESULT(m_vulkanDevice->createBuffer(
 				VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
 				VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,

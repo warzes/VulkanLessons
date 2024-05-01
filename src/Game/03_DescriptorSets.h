@@ -39,7 +39,7 @@ private:
 		} matrices;
 		VkDescriptorSet descriptorSet;
 		vks::Texture2D texture;
-		vks::VulkanBuffer uniformBuffer;
+		VulkanBuffer uniformBuffer;
 		glm::vec3 rotation;
 	};
 	std::array<Cube, 2> cubes;

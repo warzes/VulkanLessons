@@ -48,8 +48,8 @@ private:
 	} models;
 
 	struct {
-		vks::VulkanBuffer object;
-		vks::VulkanBuffer params;
+		VulkanBuffer object;
+		VulkanBuffer params;
 	} uniformBuffers;
 
 	struct UBOMatrices {

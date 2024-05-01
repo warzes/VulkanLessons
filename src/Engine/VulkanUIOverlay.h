@@ -17,8 +17,8 @@ namespace vks
 		VkSampleCountFlagBits rasterizationSamples{ VK_SAMPLE_COUNT_1_BIT };
 		uint32_t subpass{ 0 };
 
-		vks::VulkanBuffer vertexBuffer;
-		vks::VulkanBuffer indexBuffer;
+		VulkanBuffer vertexBuffer;
+		VulkanBuffer indexBuffer;
 		int32_t vertexCount{ 0 };
 		int32_t indexCount{ 0 };
 

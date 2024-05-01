@@ -46,8 +46,8 @@ private:
 	std::array<Light, 64> lights;
 
 	struct {
-		vks::VulkanBuffer GBuffer;
-		vks::VulkanBuffer lights;
+		VulkanBuffer GBuffer;
+		VulkanBuffer lights;
 	} buffers;
 
 	struct {

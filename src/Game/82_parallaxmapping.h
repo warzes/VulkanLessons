@@ -47,8 +47,8 @@ private:
 	} uniformDataFragmentShader;
 
 	struct {
-		vks::VulkanBuffer vertexShader;
-		vks::VulkanBuffer fragmentShader;
+		VulkanBuffer vertexShader;
+		VulkanBuffer fragmentShader;
 	} uniformBuffers;
 
 	VkPipelineLayout pipelineLayout{ VK_NULL_HANDLE };

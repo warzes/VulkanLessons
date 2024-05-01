@@ -53,8 +53,8 @@ private:
 	} models;
 
 	struct uniformBuffers {
-		vks::VulkanBuffer VS;
-		vks::VulkanBuffer FS;
+		VulkanBuffer VS;
+		VulkanBuffer FS;
 	} uniformBuffers;
 
 	struct UBOVS {
@@ -96,7 +96,7 @@ private:
 		VkRenderPass renderPass;
 		VkPipelineLayout pipelineLayout;
 		VkPipeline pipeline;
-		vks::VulkanBuffer uniformBuffer;
+		VulkanBuffer uniformBuffer;
 
 		struct UniformBlock {
 			std::array<glm::mat4, SHADOW_MAP_CASCADE_COUNT> cascadeViewProjMat;

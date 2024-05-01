@@ -210,6 +210,27 @@
     <ClCompile Include="64_computeraytracing.cpp">
       <Filter>App\Examples\6_Compute&amp;Geometry&amp;Tessellation</Filter>
     </ClCompile>
+    <ClCompile Include="VulkanInfiniteProceduralTerrain.cpp">
+      <Filter>App\Demo\VulkanInfiniteProceduralTerrain</Filter>
+    </ClCompile>
+    <ClCompile Include="IPTAssetManager.cpp">
+      <Filter>App\Demo\VulkanInfiniteProceduralTerrain</Filter>
+    </ClCompile>
+    <ClCompile Include="IPTVulkanContext.cpp">
+      <Filter>App\Demo\VulkanInfiniteProceduralTerrain</Filter>
+    </ClCompile>
+    <ClCompile Include="IPTHeightMapSettings.cpp">
+      <Filter>App\Demo\VulkanInfiniteProceduralTerrain</Filter>
+    </ClCompile>
+    <ClCompile Include="IPTTerrainChunk.cpp">
+      <Filter>App\Demo\VulkanInfiniteProceduralTerrain</Filter>
+    </ClCompile>
+    <ClCompile Include="IPTInfiniteTerrain.cpp">
+      <Filter>App\Demo\VulkanInfiniteProceduralTerrain</Filter>
+    </ClCompile>
+    <ClCompile Include="IPTNoise.cpp">
+      <Filter>App\Demo\VulkanInfiniteProceduralTerrain</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -420,6 +441,51 @@
     <ClInclude Include="64_computeraytracing.h">
       <Filter>App\Examples\6_Compute&amp;Geometry&amp;Tessellation</Filter>
     </ClInclude>
+    <ClInclude Include="VulkanInfiniteProceduralTerrain.h">
+      <Filter>App\Demo\VulkanInfiniteProceduralTerrain</Filter>
+    </ClInclude>
+    <ClInclude Include="IPTAssetManager.h">
+      <Filter>App\Demo\VulkanInfiniteProceduralTerrain</Filter>
+    </ClInclude>
+    <ClInclude Include="IPTVulkanContext.h">
+      <Filter>App\Demo\VulkanInfiniteProceduralTerrain</Filter>
+    </ClInclude>
+    <ClInclude Include="IPTHeightMapSettings.h">
+      <Filter>App\Demo\VulkanInfiniteProceduralTerrain</Filter>
+    </ClInclude>
+    <ClInclude Include="IPTTerrainChunk.h">
+      <Filter>App\Demo\VulkanInfiniteProceduralTerrain</Filter>
+    </ClInclude>
+    <ClInclude Include="IPTVulkanHeightmap.h">
+      <Filter>App\Demo\VulkanInfiniteProceduralTerrain</Filter>
+    </ClInclude>
+    <ClInclude Include="IPTCommandBuffer.h">
+      <Filter>App\Demo\VulkanInfiniteProceduralTerrain</Filter>
+    </ClInclude>
+    <ClInclude Include="IPTCommandPool.h">
+      <Filter>App\Demo\VulkanInfiniteProceduralTerrain</Filter>
+    </ClInclude>
+    <ClInclude Include="IPTPipelineLayout.h">
+      <Filter>App\Demo\VulkanInfiniteProceduralTerrain</Filter>
+    </ClInclude>
+    <ClInclude Include="IPTDescriptorSetLayout.h">
+      <Filter>App\Demo\VulkanInfiniteProceduralTerrain</Filter>
+    </ClInclude>
+    <ClInclude Include="IPTDescriptorSet.h">
+      <Filter>App\Demo\VulkanInfiniteProceduralTerrain</Filter>
+    </ClInclude>
+    <ClInclude Include="IPTDescriptorPool.h">
+      <Filter>App\Demo\VulkanInfiniteProceduralTerrain</Filter>
+    </ClInclude>
+    <ClInclude Include="IPTPipeline.h">
+      <Filter>App\Demo\VulkanInfiniteProceduralTerrain</Filter>
+    </ClInclude>
+    <ClInclude Include="IPTInfiniteTerrain.h">
+      <Filter>App\Demo\VulkanInfiniteProceduralTerrain</Filter>
+    </ClInclude>
+    <ClInclude Include="IPTNoise.h">
+      <Filter>App\Demo\VulkanInfiniteProceduralTerrain</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="App">
@@ -454,6 +520,12 @@
     </Filter>
     <Filter Include="App\Examples\9_Extensions">
       <UniqueIdentifier>{870746ab-dc89-42be-b47c-b2a5b65436ae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="App\Demo">
+      <UniqueIdentifier>{89ae6e5a-339d-4bed-8601-73dabe26e439}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="App\Demo\VulkanInfiniteProceduralTerrain">
+      <UniqueIdentifier>{6e5854b4-2163-4380-9575-596f741fd5aa}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

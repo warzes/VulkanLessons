@@ -26,7 +26,7 @@ public:
 private:
 	Camera camera;
 
-	vks::VulkanBuffer uniformBuffer;
+	VulkanBuffer uniformBuffer;
 	vkglTF::Model scene;
 
 	struct UBOVS {

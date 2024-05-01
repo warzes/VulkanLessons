@@ -31,7 +31,7 @@ private:
 		glm::mat4 projection;
 		glm::mat4 modelView;
 	} uniformData;
-	vks::VulkanBuffer uniformBuffer;
+	VulkanBuffer uniformBuffer;
 
 	struct {
 		VkPipeline solid{ VK_NULL_HANDLE };

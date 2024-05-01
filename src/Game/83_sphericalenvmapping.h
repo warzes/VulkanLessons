@@ -40,7 +40,7 @@ private:
 		// Selects the texture index of the material to display (see sem.vert)
 		int32_t texIndex = 0;
 	} uniformData;
-	vks::VulkanBuffer uniformBuffer;
+	VulkanBuffer uniformBuffer;
 
 	VkPipeline pipeline{ VK_NULL_HANDLE };
 	VkPipelineLayout pipelineLayout{ VK_NULL_HANDLE };

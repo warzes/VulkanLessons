@@ -343,7 +343,7 @@ VkResult VulkanDevice::createBuffer(VkBufferUsageFlags usageFlags, VkMemoryPrope
 *
 * @return VK_SUCCESS if buffer handle and memory have been created and (optionally passed) data has been copied
 */
-VkResult VulkanDevice::createBuffer(VkBufferUsageFlags usageFlags, VkMemoryPropertyFlags memoryPropertyFlags, vks::VulkanBuffer* buffer, VkDeviceSize size, void* data)
+VkResult VulkanDevice::createBuffer(VkBufferUsageFlags usageFlags, VkMemoryPropertyFlags memoryPropertyFlags, VulkanBuffer* buffer, VkDeviceSize size, void* data)
 {
 	buffer->device = logicalDevice;
 
@@ -400,7 +400,7 @@ VkResult VulkanDevice::createBuffer(VkBufferUsageFlags usageFlags, VkMemoryPrope
 *
 * @note Source and destination pointers must have the appropriate transfer usage flags set (TRANSFER_SRC / TRANSFER_DST)
 */
-void VulkanDevice::copyBuffer(vks::VulkanBuffer* src, vks::VulkanBuffer* dst, VkQueue queue, VkBufferCopy* copyRegion)
+void VulkanDevice::copyBuffer(VulkanBuffer* src, VulkanBuffer* dst, VkQueue queue, VkBufferCopy* copyRegion)
 {
 	assert(dst->size <= src->size);
 	assert(src->buffer);

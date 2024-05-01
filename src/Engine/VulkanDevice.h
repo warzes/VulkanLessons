@@ -54,8 +54,8 @@ public:
 	uint32_t        getQueueFamilyIndex(VkQueueFlags queueFlags) const;
 
 	VkResult        createBuffer(VkBufferUsageFlags usageFlags, VkMemoryPropertyFlags memoryPropertyFlags, VkDeviceSize size, VkBuffer* buffer, VkDeviceMemory* memory, void* data = nullptr);
-	VkResult        createBuffer(VkBufferUsageFlags usageFlags, VkMemoryPropertyFlags memoryPropertyFlags, vks::VulkanBuffer* buffer, VkDeviceSize size, void* data = nullptr);
-	void            copyBuffer(vks::VulkanBuffer* src, vks::VulkanBuffer* dst, VkQueue queue, VkBufferCopy* copyRegion = nullptr);
+	VkResult        createBuffer(VkBufferUsageFlags usageFlags, VkMemoryPropertyFlags memoryPropertyFlags, VulkanBuffer* buffer, VkDeviceSize size, void* data = nullptr);
+	void            copyBuffer(VulkanBuffer* src, VulkanBuffer* dst, VkQueue queue, VkBufferCopy* copyRegion = nullptr);
 
 	VkCommandBuffer createCommandBuffer(VkCommandBufferLevel level, VkCommandPool pool, bool begin = false);
 	VkCommandBuffer createCommandBuffer(VkCommandBufferLevel level, bool begin = false);

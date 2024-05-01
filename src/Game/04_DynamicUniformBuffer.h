@@ -73,13 +73,13 @@ private:
 
 	Camera camera;
 
-	vks::VulkanBuffer vertexBuffer;
-	vks::VulkanBuffer indexBuffer;
+	VulkanBuffer vertexBuffer;
+	VulkanBuffer indexBuffer;
 	uint32_t indexCount{ 0 };
 
 	struct {
-		vks::VulkanBuffer view;
-		vks::VulkanBuffer dynamic;
+		VulkanBuffer view;
+		VulkanBuffer dynamic;
 	} uniformBuffers;
 
 	struct {

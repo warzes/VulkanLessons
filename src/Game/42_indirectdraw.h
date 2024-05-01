@@ -58,16 +58,16 @@ private:
 	};
 
 	// Contains the instanced data
-	vks::VulkanBuffer instanceBuffer;
+	VulkanBuffer instanceBuffer;
 	// Contains the indirect drawing commands
-	vks::VulkanBuffer indirectCommandsBuffer;
+	VulkanBuffer indirectCommandsBuffer;
 	uint32_t indirectDrawCount{ 0 };
 
 	struct UniformData {
 		glm::mat4 projection;
 		glm::mat4 view;
 	} uniformData;
-	vks::VulkanBuffer uniformBuffer;
+	VulkanBuffer uniformBuffer;
 
 	struct {
 		VkPipeline plants{ VK_NULL_HANDLE };
@@ -343,7 +343,7 @@ private:
 			objectCount += indirectCmd.instanceCount;
 		}
 
-		vks::VulkanBuffer stagingBuffer;
+		VulkanBuffer stagingBuffer;
 		VK_CHECK_RESULT(m_vulkanDevice->createBuffer(
 			VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
 			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
@@ -380,7 +380,7 @@ private:
 			instanceData[i].texIndex = i / OBJECT_INSTANCE_COUNT;
 		}
 
-		vks::VulkanBuffer stagingBuffer;
+		VulkanBuffer stagingBuffer;
 		VK_CHECK_RESULT(m_vulkanDevice->createBuffer(
 			VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
 			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,

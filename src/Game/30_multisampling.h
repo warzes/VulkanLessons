@@ -36,7 +36,7 @@ private:
 		glm::mat4 model;
 		glm::vec4 lightPos = glm::vec4(5.0f, -5.0f, 5.0f, 1.0f);
 	} uniformData;
-	vks::VulkanBuffer uniformBuffer;
+	VulkanBuffer uniformBuffer;
 
 	struct {
 		VkPipeline MSAA{ VK_NULL_HANDLE };

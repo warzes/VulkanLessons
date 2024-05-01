@@ -43,8 +43,8 @@ private:
 	struct Compute {
 		// Object properties for planes and spheres are passed via a shade storage buffer
 		// There is no vertex data, the compute shader calculates the primitives on the fly
-		vks::VulkanBuffer objectStorageBuffer;
-		vks::VulkanBuffer uniformBuffer;										// Uniform buffer object containing scene parameters
+		VulkanBuffer objectStorageBuffer;
+		VulkanBuffer uniformBuffer;										// Uniform buffer object containing scene parameters
 		VkQueue queue{ VK_NULL_HANDLE };								// Separate queue for compute commands (queue family may differ from the one used for graphics)
 		VkCommandPool commandPool{ VK_NULL_HANDLE };					// Use a separate command pool (queue family may differ from the one used for graphics)
 		VkCommandBuffer commandBuffer{ VK_NULL_HANDLE };				// Command buffer storing the dispatch commands and barriers
@@ -394,7 +394,7 @@ private:
 		VkDeviceSize storageBufferSize = sceneObjects.size() * sizeof(SceneObject);
 
 		// Copy the data to the device
-		vks::VulkanBuffer stagingBuffer;
+		VulkanBuffer stagingBuffer;
 		m_vulkanDevice->createBuffer(VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &stagingBuffer, storageBufferSize, sceneObjects.data());
 		m_vulkanDevice->createBuffer(VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, &compute.objectStorageBuffer, storageBufferSize);
 		VkCommandBuffer copyCmd = m_vulkanDevice->createCommandBuffer(VK_COMMAND_BUFFER_LEVEL_PRIMARY, true);

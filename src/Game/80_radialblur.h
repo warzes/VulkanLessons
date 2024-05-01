@@ -42,8 +42,8 @@ private:
 	} uniformDataBlurParams;
 
 	struct {
-		vks::VulkanBuffer scene;
-		vks::VulkanBuffer blurParams;
+		VulkanBuffer scene;
+		VulkanBuffer blurParams;
 	} uniformBuffers;
 
 	struct {

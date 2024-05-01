@@ -34,7 +34,7 @@ private:
 		glm::mat4 modelview;
 		glm::vec4 lightPos{ -10.0f, -10.0f, 10.0f, 1.0f };
 	} uniformData;
-	vks::VulkanBuffer uniformBuffer;
+	VulkanBuffer uniformBuffer;
 
 	int32_t cullMode{ VK_CULL_MODE_BACK_BIT };
 	bool blending{ false };

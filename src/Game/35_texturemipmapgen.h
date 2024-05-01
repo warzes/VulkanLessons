@@ -43,7 +43,7 @@ private:
 		float lodBias = 0.0f;
 		int32_t samplerIndex = 2;
 	} uniformData;
-	vks::VulkanBuffer uniformBuffer;
+	VulkanBuffer uniformBuffer;
 
 	VkPipeline pipeline{ VK_NULL_HANDLE };
 	VkPipelineLayout pipelineLayout{ VK_NULL_HANDLE };

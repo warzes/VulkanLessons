@@ -35,8 +35,8 @@ private:
 	};
 
 	struct Triangle {
-		vks::VulkanBuffer vertices;
-		vks::VulkanBuffer indices;
+		VulkanBuffer vertices;
+		VulkanBuffer indices;
 		uint32_t indexCount{ 0 };
 	} triangle;
 
@@ -44,7 +44,7 @@ private:
 		glm::mat4 projection;
 		glm::mat4 model;
 	} uniformData;
-	vks::VulkanBuffer uniformBuffer;
+	VulkanBuffer uniformBuffer;
 
 	struct PipelineLayouts {
 		VkPipelineLayout scene{ VK_NULL_HANDLE };
@@ -382,8 +382,8 @@ private:
 		uint32_t indexBufferSize = triangle.indexCount * sizeof(uint32_t);
 
 		struct StagingBuffers {
-			vks::VulkanBuffer vertices;
-			vks::VulkanBuffer indices;
+			VulkanBuffer vertices;
+			VulkanBuffer indices;
 		} stagingBuffers;
 
 		// Host visible source buffers (staging)

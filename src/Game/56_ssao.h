@@ -78,9 +78,9 @@ private:
 	} descriptorSetLayouts;
 
 	struct {
-		vks::VulkanBuffer sceneParams;
-		vks::VulkanBuffer ssaoKernel;
-		vks::VulkanBuffer ssaoParams;
+		VulkanBuffer sceneParams;
+		VulkanBuffer ssaoKernel;
+		VulkanBuffer ssaoParams;
 	} uniformBuffers;
 
 	// Framebuffer for offscreen rendering

@@ -83,9 +83,9 @@ private:
 	} uniformDataComposition;
 
 	struct {
-		vks::VulkanBuffer offscreen;
-		vks::VulkanBuffer composition;
-		vks::VulkanBuffer shadowGeometryShader;
+		VulkanBuffer offscreen;
+		VulkanBuffer composition;
+		VulkanBuffer shadowGeometryShader;
 	} uniformBuffers;
 
 	struct {

@@ -83,17 +83,17 @@ private:
 
 	// Buffers for the separate vertex attributes
 	struct SeparateVertexBuffers {
-		vks::VulkanBuffer pos, normal, uv, tangent;
+		VulkanBuffer pos, normal, uv, tangent;
 	} separateVertexBuffers;
 
 	// Single vertex buffer for all primitives
-	vks::VulkanBuffer interleavedVertexBuffer;
+	VulkanBuffer interleavedVertexBuffer;
 
 	// Index buffer for all primitives of the scene
-	vks::VulkanBuffer indices;
+	VulkanBuffer indices;
 
 	struct ShaderData {
-		vks::VulkanBuffer buffer;
+		VulkanBuffer buffer;
 		struct Values {
 			glm::mat4 projection;
 			glm::mat4 view;

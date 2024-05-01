@@ -73,8 +73,8 @@ private:
 	} particles;
 
 	struct {
-		vks::VulkanBuffer particles;
-		vks::VulkanBuffer environment;
+		VulkanBuffer particles;
+		VulkanBuffer environment;
 	} uniformBuffers;
 
 	struct UniformDataParticles {

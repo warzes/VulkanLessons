@@ -37,7 +37,7 @@ private:
 
 	struct Cube {
 		vks::Texture2D texture;
-		vks::VulkanBuffer uniformBuffer;
+		VulkanBuffer uniformBuffer;
 		glm::vec3 rotation;
 		glm::mat4 modelMat;
 	};
@@ -49,7 +49,7 @@ private:
 		glm::mat4 projection;
 		glm::mat4 view;
 	} uniformData;
-	vks::VulkanBuffer uniformBuffer;
+	VulkanBuffer uniformBuffer;
 
 	VkPipeline pipeline{ VK_NULL_HANDLE };
 	VkPipelineLayout pipelineLayout{ VK_NULL_HANDLE };

@@ -49,7 +49,7 @@ private:
 		glm::mat4 inverseModelview;
 		float exposure{ 1.0f };
 	} uniformData;
-	vks::VulkanBuffer uniformBuffer;
+	VulkanBuffer uniformBuffer;
 
 	struct {
 		VkPipeline skybox{ VK_NULL_HANDLE };

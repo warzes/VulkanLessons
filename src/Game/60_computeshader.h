@@ -44,7 +44,7 @@ private:
 			glm::mat4 projection;
 			glm::mat4 modelView;
 		} uniformData;
-		vks::VulkanBuffer uniformBuffer;
+		VulkanBuffer uniformBuffer;
 	} graphics;
 
 	// Resources for the compute part of the example
@@ -60,8 +60,8 @@ private:
 		int32_t pipelineIndex{ 0 };										// Current image filtering compute pipeline index
 	} compute;
 
-	vks::VulkanBuffer vertexBuffer;
-	vks::VulkanBuffer indexBuffer;
+	VulkanBuffer vertexBuffer;
+	VulkanBuffer indexBuffer;
 	uint32_t indexCount{ 0 };
 	uint32_t vertexBufferSize{ 0 };
 
@@ -272,8 +272,8 @@ private:
 		// Create buffers and upload data to the GPU
 
 		struct StagingBuffers {
-			vks::VulkanBuffer vertices;
-			vks::VulkanBuffer indices;
+			VulkanBuffer vertices;
+			VulkanBuffer indices;
 		} stagingBuffers;
 
 		// Host visible source buffers (staging)

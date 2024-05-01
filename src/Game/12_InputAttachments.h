@@ -38,8 +38,8 @@ private:
 	} uboParams;
 
 	struct {
-		vks::VulkanBuffer matrices;
-		vks::VulkanBuffer params;
+		VulkanBuffer matrices;
+		VulkanBuffer params;
 	} uniformBuffers;
 
 	struct {

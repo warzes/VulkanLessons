@@ -53,8 +53,8 @@ private:
 	} models;
 
 	struct {
-		vks::VulkanBuffer terrainTessellation;
-		vks::VulkanBuffer skysphereVertex;
+		VulkanBuffer terrainTessellation;
+		VulkanBuffer skysphereVertex;
 	} uniformBuffers;
 
 	// Shared values for tessellation control and evaluation stages

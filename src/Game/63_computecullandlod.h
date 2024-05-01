@@ -33,10 +33,10 @@ private:
 	};
 
 	// Contains the instanced data
-	vks::VulkanBuffer instanceBuffer;
+	VulkanBuffer instanceBuffer;
 	// Contains the indirect drawing commands
-	vks::VulkanBuffer indirectCommandsBuffer;
-	vks::VulkanBuffer indirectDrawCountBuffer;
+	VulkanBuffer indirectCommandsBuffer;
+	VulkanBuffer indirectDrawCountBuffer;
 
 	// Indirect draw statistics (updated via compute)
 	struct {
@@ -55,7 +55,7 @@ private:
 	} uboScene;
 
 	struct {
-		vks::VulkanBuffer scene;
+		VulkanBuffer scene;
 	} uniformData;
 
 	struct {
@@ -68,7 +68,7 @@ private:
 
 	// Resources for the compute part of the example
 	struct {
-		vks::VulkanBuffer lodLevelsBuffers;				// Contains index start and counts for the different lod levels
+		VulkanBuffer lodLevelsBuffers;				// Contains index start and counts for the different lod levels
 		VkQueue queue;								// Separate queue for compute commands (queue family may differ from the one used for graphics)
 		VkCommandPool commandPool;					// Use a separate command pool (queue family may differ from the one used for graphics)
 		VkCommandBuffer commandBuffer;				// Command buffer storing the dispatch commands and barriers
@@ -400,7 +400,7 @@ private:
 	{
 		objectCount = OBJECT_COUNT * OBJECT_COUNT * OBJECT_COUNT;
 
-		vks::VulkanBuffer stagingBuffer;
+		VulkanBuffer stagingBuffer;
 
 		std::vector<InstanceData> instanceData(objectCount);
 		indirectCommands.resize(objectCount);

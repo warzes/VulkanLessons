@@ -32,8 +32,8 @@ private:
 	// We will be dynamically indexing into an array of images
 	std::vector<vks::Texture2D> textures;
 
-	vks::VulkanBuffer vertexBuffer;
-	vks::VulkanBuffer indexBuffer;
+	VulkanBuffer vertexBuffer;
+	VulkanBuffer indexBuffer;
 	uint32_t indexCount{ 0 };
 
 	struct UniformData {
@@ -41,7 +41,7 @@ private:
 		glm::mat4 view;
 		glm::mat4 model;
 	} uniformData;
-	vks::VulkanBuffer uniformBuffer;
+	VulkanBuffer uniformBuffer;
 
 	VkPipeline pipeline{ VK_NULL_HANDLE };
 	VkPipelineLayout pipelineLayout{ VK_NULL_HANDLE };
@@ -165,8 +165,8 @@ private:
 
 		// Create buffers and upload data to the GPU
 		struct StagingBuffers {
-			vks::VulkanBuffer vertices;
-			vks::VulkanBuffer indices;
+			VulkanBuffer vertices;
+			VulkanBuffer indices;
 		} stagingBuffers;
 
 		// Host visible source buffers (staging)

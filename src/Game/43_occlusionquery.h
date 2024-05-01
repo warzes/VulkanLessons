@@ -27,9 +27,9 @@ private:
 	} models;
 
 	struct {
-		vks::VulkanBuffer occluder;
-		vks::VulkanBuffer teapot;
-		vks::VulkanBuffer sphere;
+		VulkanBuffer occluder;
+		VulkanBuffer teapot;
+		VulkanBuffer sphere;
 	} uniformBuffers;
 
 	struct UBOVS {

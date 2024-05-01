@@ -65,8 +65,8 @@ private:
 		vks::Texture2D fontBitmap;
 	} textures;
 
-	vks::VulkanBuffer vertexBuffer;
-	vks::VulkanBuffer indexBuffer;
+	VulkanBuffer vertexBuffer;
+	VulkanBuffer indexBuffer;
 	uint32_t indexCount{ 0 };
 
 	struct UniformData {
@@ -78,7 +78,7 @@ private:
 		float outlineWidth{ 0.6f };
 		float outline{ true };
 	} uniformData;
-	vks::VulkanBuffer uniformBuffer;
+	VulkanBuffer uniformBuffer;
 
 	struct Pipelines {
 		VkPipeline sdf{ VK_NULL_HANDLE };
