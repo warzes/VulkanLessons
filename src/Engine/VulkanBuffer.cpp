@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "VulkanBuffer.h"
-
+#include "VulkanTools.h"
 
 namespace vks
 {
@@ -12,7 +12,7 @@ namespace vks
 	*
 	* @return VkResult of the buffer mapping call
 	*/
-	VkResult Buffer::map(VkDeviceSize size, VkDeviceSize offset)
+	VkResult VulkanBuffer::map(VkDeviceSize size, VkDeviceSize offset)
 	{
 		return vkMapMemory(device, memory, offset, size, 0, &mapped);
 	}
@@ -22,7 +22,7 @@ namespace vks
 	*
 	* @note Does not return a result as vkUnmapMemory can't fail
 	*/
-	void Buffer::unmap()
+	void VulkanBuffer::unmap()
 	{
 		if (mapped)
 		{
@@ -38,7 +38,7 @@ namespace vks
 	*
 	* @return VkResult of the bindBufferMemory call
 	*/
-	VkResult Buffer::bind(VkDeviceSize offset)
+	VkResult VulkanBuffer::bind(VkDeviceSize offset)
 	{
 		return vkBindBufferMemory(device, buffer, memory, offset);
 	}
@@ -50,7 +50,7 @@ namespace vks
 	* @param offset (Optional) Byte offset from beginning
 	*
 	*/
-	void Buffer::setupDescriptor(VkDeviceSize size, VkDeviceSize offset)
+	void VulkanBuffer::setupDescriptor(VkDeviceSize size, VkDeviceSize offset)
 	{
 		descriptor.offset = offset;
 		descriptor.buffer = buffer;
@@ -64,7 +64,7 @@ namespace vks
 	* @param size Size of the data to copy in machine units
 	*
 	*/
-	void Buffer::copyTo(void* data, VkDeviceSize size)
+	void VulkanBuffer::copyTo(void* data, VkDeviceSize size)
 	{
 		assert(mapped);
 		memcpy(mapped, data, size);
@@ -80,7 +80,7 @@ namespace vks
 	*
 	* @return VkResult of the flush call
 	*/
-	VkResult Buffer::flush(VkDeviceSize size, VkDeviceSize offset)
+	VkResult VulkanBuffer::flush(VkDeviceSize size, VkDeviceSize offset)
 	{
 		VkMappedMemoryRange mappedRange = {};
 		mappedRange.sType = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
@@ -100,7 +100,7 @@ namespace vks
 	*
 	* @return VkResult of the invalidate call
 	*/
-	VkResult Buffer::invalidate(VkDeviceSize size, VkDeviceSize offset)
+	VkResult VulkanBuffer::invalidate(VkDeviceSize size, VkDeviceSize offset)
 	{
 		VkMappedMemoryRange mappedRange = {};
 		mappedRange.sType = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
@@ -113,7 +113,7 @@ namespace vks
 	/**
 	* Release all Vulkan resources held by this buffer
 	*/
-	void Buffer::destroy()
+	void VulkanBuffer::destroy()
 	{
 		if (buffer)
 		{

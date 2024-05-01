@@ -35,8 +35,8 @@ private:
 	};
 
 	struct Triangle {
-		vks::Buffer vertices;
-		vks::Buffer indices;
+		vks::VulkanBuffer vertices;
+		vks::VulkanBuffer indices;
 		uint32_t indexCount{ 0 };
 	} triangle;
 
@@ -44,7 +44,7 @@ private:
 		glm::mat4 projection;
 		glm::mat4 model;
 	} uniformData;
-	vks::Buffer uniformBuffer;
+	vks::VulkanBuffer uniformBuffer;
 
 	struct PipelineLayouts {
 		VkPipelineLayout scene{ VK_NULL_HANDLE };
@@ -274,8 +274,8 @@ private:
 	{
 		VkCommandBufferBeginInfo cmdBufInfo = vks::initializers::commandBufferBeginInfo();
 
-		for (int32_t i = 0; i < drawCmdBuffers.size(); ++i) {
-			VK_CHECK_RESULT(vkBeginCommandBuffer(drawCmdBuffers[i], &cmdBufInfo));
+		for (int32_t i = 0; i < drawCommandBuffers.size(); ++i) {
+			VK_CHECK_RESULT(vkBeginCommandBuffer(drawCommandBuffers[i], &cmdBufInfo));
 
 			/*
 				First render pass: Render a low res triangle to an offscreen framebuffer to use for visualization in second pass
@@ -294,23 +294,23 @@ private:
 				renderPassBeginInfo.pClearValues = clearValues;
 
 				VkViewport viewport = vks::initializers::viewport((float)offscreenPass.width, (float)offscreenPass.height, 0.0f, 1.0f);
-				vkCmdSetViewport(drawCmdBuffers[i], 0, 1, &viewport);
+				vkCmdSetViewport(drawCommandBuffers[i], 0, 1, &viewport);
 
 				VkRect2D scissor = vks::initializers::rect2D(offscreenPass.width, offscreenPass.height, 0, 0);
-				vkCmdSetScissor(drawCmdBuffers[i], 0, 1, &scissor);
+				vkCmdSetScissor(drawCommandBuffers[i], 0, 1, &scissor);
 
-				vkCmdBeginRenderPass(drawCmdBuffers[i], &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
+				vkCmdBeginRenderPass(drawCommandBuffers[i], &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 
-				vkCmdBindDescriptorSets(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayouts.scene, 0, 1, &descriptorSets.scene, 0, nullptr);
-				vkCmdBindPipeline(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, conservativeRasterEnabled ? pipelines.triangleConservativeRaster : pipelines.triangle);
+				vkCmdBindDescriptorSets(drawCommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayouts.scene, 0, 1, &descriptorSets.scene, 0, nullptr);
+				vkCmdBindPipeline(drawCommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, conservativeRasterEnabled ? pipelines.triangleConservativeRaster : pipelines.triangle);
 
 				VkDeviceSize offsets[1] = { 0 };
-				vkCmdBindVertexBuffers(drawCmdBuffers[i], 0, 1, &triangle.vertices.buffer, offsets);
-				vkCmdBindIndexBuffer(drawCmdBuffers[i], triangle.indices.buffer, 0, VK_INDEX_TYPE_UINT32);
-				vkCmdSetViewport(drawCmdBuffers[i], 0, 1, &viewport);
-				vkCmdDrawIndexed(drawCmdBuffers[i], triangle.indexCount, 1, 0, 0, 0);
+				vkCmdBindVertexBuffers(drawCommandBuffers[i], 0, 1, &triangle.vertices.buffer, offsets);
+				vkCmdBindIndexBuffer(drawCommandBuffers[i], triangle.indices.buffer, 0, VK_INDEX_TYPE_UINT32);
+				vkCmdSetViewport(drawCommandBuffers[i], 0, 1, &viewport);
+				vkCmdDrawIndexed(drawCommandBuffers[i], triangle.indexCount, 1, 0, 0, 0);
 
-				vkCmdEndRenderPass(drawCmdBuffers[i]);
+				vkCmdEndRenderPass(drawCommandBuffers[i]);
 			}
 
 			/*
@@ -335,31 +335,31 @@ private:
 				renderPassBeginInfo.clearValueCount = 2;
 				renderPassBeginInfo.pClearValues = clearValues;
 
-				vkCmdBeginRenderPass(drawCmdBuffers[i], &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
+				vkCmdBeginRenderPass(drawCommandBuffers[i], &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 				VkViewport viewport = vks::initializers::viewport((float)destWidth, (float)destHeight, 0.0f, 1.0f);
-				vkCmdSetViewport(drawCmdBuffers[i], 0, 1, &viewport);
+				vkCmdSetViewport(drawCommandBuffers[i], 0, 1, &viewport);
 				VkRect2D scissor = vks::initializers::rect2D(destWidth, destHeight, 0, 0);
-				vkCmdSetScissor(drawCmdBuffers[i], 0, 1, &scissor);
+				vkCmdSetScissor(drawCommandBuffers[i], 0, 1, &scissor);
 
 				// Low-res triangle from offscreen framebuffer
-				vkCmdBindPipeline(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines.fullscreen);
-				vkCmdBindDescriptorSets(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayouts.fullscreen, 0, 1, &descriptorSets.fullscreen, 0, nullptr);
-				vkCmdDraw(drawCmdBuffers[i], 3, 1, 0, 0);
+				vkCmdBindPipeline(drawCommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines.fullscreen);
+				vkCmdBindDescriptorSets(drawCommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayouts.fullscreen, 0, 1, &descriptorSets.fullscreen, 0, nullptr);
+				vkCmdDraw(drawCommandBuffers[i], 3, 1, 0, 0);
 
 				// Overlay actual triangle
 				VkDeviceSize offsets[1] = { 0 };
-				vkCmdBindVertexBuffers(drawCmdBuffers[i], 0, 1, &triangle.vertices.buffer, offsets);
-				vkCmdBindIndexBuffer(drawCmdBuffers[i], triangle.indices.buffer, 0, VK_INDEX_TYPE_UINT32);
-				vkCmdBindPipeline(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines.triangleOverlay);
-				vkCmdBindDescriptorSets(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayouts.scene, 0, 1, &descriptorSets.scene, 0, nullptr);
-				vkCmdDraw(drawCmdBuffers[i], 3, 1, 0, 0);
+				vkCmdBindVertexBuffers(drawCommandBuffers[i], 0, 1, &triangle.vertices.buffer, offsets);
+				vkCmdBindIndexBuffer(drawCommandBuffers[i], triangle.indices.buffer, 0, VK_INDEX_TYPE_UINT32);
+				vkCmdBindPipeline(drawCommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines.triangleOverlay);
+				vkCmdBindDescriptorSets(drawCommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayouts.scene, 0, 1, &descriptorSets.scene, 0, nullptr);
+				vkCmdDraw(drawCommandBuffers[i], 3, 1, 0, 0);
 
-				DrawUI(drawCmdBuffers[i]);
+				DrawUI(drawCommandBuffers[i]);
 
-				vkCmdEndRenderPass(drawCmdBuffers[i]);
+				vkCmdEndRenderPass(drawCommandBuffers[i]);
 			}
 
-			VK_CHECK_RESULT(vkEndCommandBuffer(drawCmdBuffers[i]));
+			VK_CHECK_RESULT(vkEndCommandBuffer(drawCommandBuffers[i]));
 		}
 	}
 
@@ -382,8 +382,8 @@ private:
 		uint32_t indexBufferSize = triangle.indexCount * sizeof(uint32_t);
 
 		struct StagingBuffers {
-			vks::Buffer vertices;
-			vks::Buffer indices;
+			vks::VulkanBuffer vertices;
+			vks::VulkanBuffer indices;
 		} stagingBuffers;
 
 		// Host visible source buffers (staging)
@@ -605,7 +605,7 @@ private:
 	{
 		prepareFrame();
 		submitInfo.commandBufferCount = 1;
-		submitInfo.pCommandBuffers = &drawCmdBuffers[currentBuffer];
+		submitInfo.pCommandBuffers = &drawCommandBuffers[currentBuffer];
 		VK_CHECK_RESULT(vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE));
 		submitFrame();
 	}

@@ -152,8 +152,8 @@ private:
 		uint32_t mipLevels{ 0 };
 	} texture;
 
-	vks::Buffer vertexBuffer;
-	vks::Buffer indexBuffer;
+	vks::VulkanBuffer vertexBuffer;
+	vks::VulkanBuffer indexBuffer;
 	uint32_t indexCount{ 0 };
 
 	struct UniformData {
@@ -164,7 +164,7 @@ private:
 		// This is animated
 		float depth = 0.0f;
 	} uniformData;
-	vks::Buffer uniformBuffer;
+	vks::VulkanBuffer uniformBuffer;
 
 	VkPipeline pipeline{ VK_NULL_HANDLE };
 	VkPipelineLayout pipelineLayout{ VK_NULL_HANDLE };

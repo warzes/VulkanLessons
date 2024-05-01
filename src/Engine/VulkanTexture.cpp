@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "VulkanTexture.h"
+#include "VulkanTools.h"
 #include "Log.h"
 
 namespace vks

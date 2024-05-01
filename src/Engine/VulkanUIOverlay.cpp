@@ -114,7 +114,7 @@ namespace vks
 		VK_CHECK_RESULT(vkCreateImageView(device->logicalDevice, &viewInfo, nullptr, &fontView));
 
 		// Staging buffers for font data upload
-		vks::Buffer stagingBuffer;
+		vks::VulkanBuffer stagingBuffer;
 
 		VK_CHECK_RESULT(device->createBuffer(
 			VK_BUFFER_USAGE_TRANSFER_SRC_BIT,

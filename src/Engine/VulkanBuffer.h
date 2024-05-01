@@ -1,14 +1,12 @@
 #pragma once
 
-#include "VulkanTools.h"
-
 namespace vks
 {
 	/**
 	* @brief Encapsulates access to a Vulkan buffer backed up by device memory
 	* @note To be filled by an external source like the VulkanDevice
 	*/
-	struct Buffer
+	struct VulkanBuffer
 	{
 		VkDevice device;
 		VkBuffer buffer = VK_NULL_HANDLE;

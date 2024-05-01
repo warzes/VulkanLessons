@@ -51,8 +51,8 @@ private:
 	uint32_t layerCount{ 0 };
 	vks::Texture textureArray;
 
-	vks::Buffer vertexBuffer;
-	vks::Buffer indexBuffer;
+	vks::VulkanBuffer vertexBuffer;
+	vks::VulkanBuffer indexBuffer;
 	uint32_t indexCount{ 0 };
 
 	// Values passed to the shader per drawn instance
@@ -72,7 +72,7 @@ private:
 		// Separate data for each instance
 		PerInstanceData* instance{ nullptr };
 	} uniformData;
-	vks::Buffer uniformBuffer;
+	vks::VulkanBuffer uniformBuffer;
 
 	VkPipeline pipeline{ VK_NULL_HANDLE };
 	VkPipelineLayout pipelineLayout{ VK_NULL_HANDLE };

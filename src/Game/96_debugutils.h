@@ -38,7 +38,7 @@ private:
 		glm::mat4 model;
 		glm::vec4 lightPos = glm::vec4(0.0f, 5.0f, 15.0f, 1.0f);
 	} uniformData;
-	vks::Buffer uniformBuffer;
+	vks::VulkanBuffer uniformBuffer;
 
 	struct Pipelines {
 		VkPipeline toonshading;
@@ -271,9 +271,9 @@ private:
 		VkCommandBufferBeginInfo cmdBufInfo = vks::initializers::commandBufferBeginInfo();
 		VkClearValue clearValues[2];
 
-		for (int32_t i = 0; i < drawCmdBuffers.size(); ++i)
+		for (int32_t i = 0; i < drawCommandBuffers.size(); ++i)
 		{
-			VK_CHECK_RESULT(vkBeginCommandBuffer(drawCmdBuffers[i], &cmdBufInfo));
+			VK_CHECK_RESULT(vkBeginCommandBuffer(drawCommandBuffers[i], &cmdBufInfo));
 
 			/*
 				First render pass: Offscreen rendering
@@ -292,24 +292,24 @@ private:
 				renderPassBeginInfo.clearValueCount = 2;
 				renderPassBeginInfo.pClearValues = clearValues;
 
-				vks::debugutils::CmdBeginLabel(drawCmdBuffers[i], "Off-screen scene rendering", { 1.0f, 0.78f, 0.05f, 1.0f });
+				vks::debugutils::CmdBeginLabel(drawCommandBuffers[i], "Off-screen scene rendering", { 1.0f, 0.78f, 0.05f, 1.0f });
 
-				vkCmdBeginRenderPass(drawCmdBuffers[i], &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
+				vkCmdBeginRenderPass(drawCommandBuffers[i], &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 
 				VkViewport viewport = vks::initializers::viewport((float)offscreenPass.width, (float)offscreenPass.height, 0.0f, 1.0f);
-				vkCmdSetViewport(drawCmdBuffers[i], 0, 1, &viewport);
+				vkCmdSetViewport(drawCommandBuffers[i], 0, 1, &viewport);
 
 				VkRect2D scissor = vks::initializers::rect2D(offscreenPass.width, offscreenPass.height, 0, 0);
-				vkCmdSetScissor(drawCmdBuffers[i], 0, 1, &scissor);
+				vkCmdSetScissor(drawCommandBuffers[i], 0, 1, &scissor);
 
-				vkCmdBindDescriptorSets(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSet, 0, nullptr);
-				vkCmdBindPipeline(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines.color);
+				vkCmdBindDescriptorSets(drawCommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSet, 0, nullptr);
+				vkCmdBindPipeline(drawCommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines.color);
 
-				drawModel(models.sceneGlow, drawCmdBuffers[i]);
+				drawModel(models.sceneGlow, drawCommandBuffers[i]);
 
-				vkCmdEndRenderPass(drawCmdBuffers[i]);
+				vkCmdEndRenderPass(drawCommandBuffers[i]);
 
-				vks::debugutils::CmdEndLabel(drawCmdBuffers[i]);
+				vks::debugutils::CmdEndLabel(drawCommandBuffers[i]);
 			}
 
 			/*
@@ -331,67 +331,67 @@ private:
 				renderPassBeginInfo.clearValueCount = 2;
 				renderPassBeginInfo.pClearValues = clearValues;
 
-				vks::debugutils::CmdBeginLabel(drawCmdBuffers[i], "Render scene", { 0.5f, 0.76f, 0.34f, 1.0f });
+				vks::debugutils::CmdBeginLabel(drawCommandBuffers[i], "Render scene", { 0.5f, 0.76f, 0.34f, 1.0f });
 
-				vkCmdBeginRenderPass(drawCmdBuffers[i], &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
+				vkCmdBeginRenderPass(drawCommandBuffers[i], &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 
 				VkViewport viewport = vks::initializers::viewport((float)destWidth, (float)destHeight, 0.0f, 1.0f);
-				vkCmdSetViewport(drawCmdBuffers[i], 0, 1, &viewport);
+				vkCmdSetViewport(drawCommandBuffers[i], 0, 1, &viewport);
 
 				VkRect2D scissor = vks::initializers::rect2D(wireframe ? destWidth / 2 : destWidth, destHeight, 0, 0);
-				vkCmdSetScissor(drawCmdBuffers[i], 0, 1, &scissor);
+				vkCmdSetScissor(drawCommandBuffers[i], 0, 1, &scissor);
 
-				vkCmdBindDescriptorSets(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSet, 0, nullptr);
+				vkCmdBindDescriptorSets(drawCommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSet, 0, nullptr);
 
 				// Solid rendering
 
-				vks::debugutils::CmdBeginLabel(drawCmdBuffers[i], "Toon shading draw", { 0.78f, 0.74f, 0.9f, 1.0f });
+				vks::debugutils::CmdBeginLabel(drawCommandBuffers[i], "Toon shading draw", { 0.78f, 0.74f, 0.9f, 1.0f });
 
-				vkCmdBindPipeline(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines.toonshading);
-				drawModel(models.scene, drawCmdBuffers[i]);
+				vkCmdBindPipeline(drawCommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines.toonshading);
+				drawModel(models.scene, drawCommandBuffers[i]);
 
-				vks::debugutils::CmdEndLabel(drawCmdBuffers[i]);
+				vks::debugutils::CmdEndLabel(drawCommandBuffers[i]);
 
 				// Wireframe rendering
 				if (wireframe)
 				{
-					vks::debugutils::CmdBeginLabel(drawCmdBuffers[i], "Wireframe draw", { 0.53f, 0.78f, 0.91f, 1.0f });
+					vks::debugutils::CmdBeginLabel(drawCommandBuffers[i], "Wireframe draw", { 0.53f, 0.78f, 0.91f, 1.0f });
 
 					scissor.offset.x = destWidth / 2;
-					vkCmdSetScissor(drawCmdBuffers[i], 0, 1, &scissor);
+					vkCmdSetScissor(drawCommandBuffers[i], 0, 1, &scissor);
 
-					vkCmdBindPipeline(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines.wireframe);
-					drawModel(models.scene, drawCmdBuffers[i]);
+					vkCmdBindPipeline(drawCommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines.wireframe);
+					drawModel(models.scene, drawCommandBuffers[i]);
 
-					vks::debugutils::CmdEndLabel(drawCmdBuffers[i]);
+					vks::debugutils::CmdEndLabel(drawCommandBuffers[i]);
 
 					scissor.offset.x = 0;
 					scissor.extent.width = destWidth;
-					vkCmdSetScissor(drawCmdBuffers[i], 0, 1, &scissor);
+					vkCmdSetScissor(drawCommandBuffers[i], 0, 1, &scissor);
 				}
 
 				// Post processing
 				if (glow)
 				{
-					vks::debugutils::CmdBeginLabel(drawCmdBuffers[i], "Apply post processing", { 0.93f, 0.89f, 0.69f, 1.0f });
+					vks::debugutils::CmdBeginLabel(drawCommandBuffers[i], "Apply post processing", { 0.93f, 0.89f, 0.69f, 1.0f });
 
-					vkCmdBindPipeline(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines.postprocess);
+					vkCmdBindPipeline(drawCommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines.postprocess);
 					// Full screen quad is generated by the vertex shaders, so we reuse four vertices (for four invocations) from current vertex buffer
-					vkCmdDraw(drawCmdBuffers[i], 4, 1, 0, 0);
+					vkCmdDraw(drawCommandBuffers[i], 4, 1, 0, 0);
 
-					vks::debugutils::CmdEndLabel(drawCmdBuffers[i]);
+					vks::debugutils::CmdEndLabel(drawCommandBuffers[i]);
 				}
 
-				vks::debugutils::CmdBeginLabel(drawCmdBuffers[i], "UI overlay", { 0.23f, 0.65f, 0.28f, 1.0f });
-				DrawUI(drawCmdBuffers[i]);
-				vks::debugutils::CmdEndLabel(drawCmdBuffers[i]);
+				vks::debugutils::CmdBeginLabel(drawCommandBuffers[i], "UI overlay", { 0.23f, 0.65f, 0.28f, 1.0f });
+				DrawUI(drawCommandBuffers[i]);
+				vks::debugutils::CmdEndLabel(drawCommandBuffers[i]);
 
-				vkCmdEndRenderPass(drawCmdBuffers[i]);
+				vkCmdEndRenderPass(drawCommandBuffers[i]);
 
-				vks::debugutils::CmdEndLabel(drawCmdBuffers[i]);
+				vks::debugutils::CmdEndLabel(drawCommandBuffers[i]);
 			}
 
-			VK_CHECK_RESULT(vkEndCommandBuffer(drawCmdBuffers[i]));
+			VK_CHECK_RESULT(vkEndCommandBuffer(drawCommandBuffers[i]));
 		}
 	}
 
@@ -557,7 +557,7 @@ private:
 		vks::debugutils::QueueBeginLabel(queue, "Graphics queue command buffer submission", { 1.0f, 1.0f, 1.0f, 1.0f });
 		prepareFrame();
 		submitInfo.commandBufferCount = 1;
-		submitInfo.pCommandBuffers = &drawCmdBuffers[currentBuffer];
+		submitInfo.pCommandBuffers = &drawCommandBuffers[currentBuffer];
 		VK_CHECK_RESULT(vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE));
 		submitFrame();
 		vks::debugutils::QueueEndLabel(queue);

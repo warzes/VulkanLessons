@@ -332,42 +332,42 @@ void VertexAttributesApp::buildCommandBuffers()
 	const VkViewport viewport = vks::initializers::viewport((float)destWidth, (float)destHeight, 0.0f, 1.0f);
 	const VkRect2D scissor = vks::initializers::rect2D(destWidth, destHeight, 0, 0);
 
-	for (int32_t i = 0; i < drawCmdBuffers.size(); ++i)
+	for (int32_t i = 0; i < drawCommandBuffers.size(); ++i)
 	{
 		renderPassBeginInfo.framebuffer = frameBuffers[i];
-		VK_CHECK_RESULT(vkBeginCommandBuffer(drawCmdBuffers[i], &cmdBufInfo));
-		vkCmdBeginRenderPass(drawCmdBuffers[i], &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
-		vkCmdSetViewport(drawCmdBuffers[i], 0, 1, &viewport);
-		vkCmdSetScissor(drawCmdBuffers[i], 0, 1, &scissor);
+		VK_CHECK_RESULT(vkBeginCommandBuffer(drawCommandBuffers[i], &cmdBufInfo));
+		vkCmdBeginRenderPass(drawCommandBuffers[i], &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
+		vkCmdSetViewport(drawCommandBuffers[i], 0, 1, &viewport);
+		vkCmdSetScissor(drawCommandBuffers[i], 0, 1, &scissor);
 
 		// Select the separate or interleaved vertex binding pipeline
-		vkCmdBindPipeline(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, vertexAttributeSettings == VertexAttributeSettings::separate ? pipelines.vertexAttributesSeparate : pipelines.vertexAttributesInterleaved);
+		vkCmdBindPipeline(drawCommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, vertexAttributeSettings == VertexAttributeSettings::separate ? pipelines.vertexAttributesSeparate : pipelines.vertexAttributesInterleaved);
 
 		// Bind scene matrices descriptor to set 0
-		vkCmdBindDescriptorSets(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSet, 0, nullptr);
+		vkCmdBindDescriptorSets(drawCommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSet, 0, nullptr);
 
 		// Use the same index buffer, no matter how vertex attributes are passed
-		vkCmdBindIndexBuffer(drawCmdBuffers[i], indices.buffer, 0, VK_INDEX_TYPE_UINT32);
+		vkCmdBindIndexBuffer(drawCommandBuffers[i], indices.buffer, 0, VK_INDEX_TYPE_UINT32);
 
 		if (vertexAttributeSettings == VertexAttributeSettings::separate) {
 			// Using separate vertex attribute bindings requires binding multiple attribute buffers
 			VkDeviceSize offsets[4] = { 0, 0, 0, 0 };
 			std::array<VkBuffer, 4> buffers = { separateVertexBuffers.pos.buffer, separateVertexBuffers.normal.buffer, separateVertexBuffers.uv.buffer, separateVertexBuffers.tangent.buffer };
-			vkCmdBindVertexBuffers(drawCmdBuffers[i], 0, static_cast<uint32_t>(buffers.size()), buffers.data(), offsets);
+			vkCmdBindVertexBuffers(drawCommandBuffers[i], 0, static_cast<uint32_t>(buffers.size()), buffers.data(), offsets);
 		}
 		else {
 			// Using interleaved attribute bindings only requires one buffer to be bound
 			VkDeviceSize offsets[1] = { 0 };
-			vkCmdBindVertexBuffers(drawCmdBuffers[i], 0, 1, &interleavedVertexBuffer.buffer, offsets);
+			vkCmdBindVertexBuffers(drawCommandBuffers[i], 0, 1, &interleavedVertexBuffer.buffer, offsets);
 		}
 		// Render all nodes starting at top-level
 		for (auto& node : nodes) {
-			drawSceneNode(drawCmdBuffers[i], node);
+			drawSceneNode(drawCommandBuffers[i], node);
 		}
 
-		DrawUI(drawCmdBuffers[i]);
-		vkCmdEndRenderPass(drawCmdBuffers[i]);
-		VK_CHECK_RESULT(vkEndCommandBuffer(drawCmdBuffers[i]));
+		DrawUI(drawCommandBuffers[i]);
+		vkCmdEndRenderPass(drawCommandBuffers[i]);
+		VK_CHECK_RESULT(vkEndCommandBuffer(drawCommandBuffers[i]));
 	}
 }
 
@@ -442,11 +442,11 @@ void VertexAttributesApp::uploadVertexData()
 
 	// Anonymous functions to simplify buffer creation
 	// Create a staging buffer used as a source for copies
-	auto createStagingBuffer = [this](vks::Buffer& buffer, void* data, VkDeviceSize size) {
+	auto createStagingBuffer = [this](vks::VulkanBuffer& buffer, void* data, VkDeviceSize size) {
 		VK_CHECK_RESULT(m_vulkanDevice->createBuffer(VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &buffer, size, data));
 		};
 	// Create a device local buffer used as a target for copies
-	auto createDeviceBuffer = [this](vks::Buffer& buffer, VkDeviceSize size, VkBufferUsageFlags usageFlags = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT) {
+	auto createDeviceBuffer = [this](vks::VulkanBuffer& buffer, VkDeviceSize size, VkBufferUsageFlags usageFlags = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT) {
 		VK_CHECK_RESULT(m_vulkanDevice->createBuffer(usageFlags | VK_BUFFER_USAGE_TRANSFER_DST_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, &buffer, size));
 		};
 
@@ -458,7 +458,7 @@ void VertexAttributesApp::uploadVertexData()
 		We create one single buffer containing the interleaved vertex attributes
 	*/
 	size_t vertexBufferSize = vertexBuffer.size() * sizeof(Vertex);
-	vks::Buffer vertexStaging;
+	vks::VulkanBuffer vertexStaging;
 	createStagingBuffer(vertexStaging, vertexBuffer.data(), vertexBufferSize);
 	createDeviceBuffer(interleavedVertexBuffer, vertexStaging.size);
 
@@ -473,7 +473,7 @@ void VertexAttributesApp::uploadVertexData()
 		Separate vertex attributes
 		We create multiple separate buffers for each of the vertex attributes (position, normals, etc.)
 	*/
-	std::array<vks::Buffer, 4> stagingBuffers;
+	std::array<vks::VulkanBuffer, 4> stagingBuffers;
 	createStagingBuffer(stagingBuffers[0], vertexAttributeBuffers.pos.data(), vertexAttributeBuffers.pos.size() * sizeof(vertexAttributeBuffers.pos[0]));
 	createStagingBuffer(stagingBuffers[1], vertexAttributeBuffers.normal.data(), vertexAttributeBuffers.normal.size() * sizeof(vertexAttributeBuffers.normal[0]));
 	createStagingBuffer(stagingBuffers[2], vertexAttributeBuffers.uv.data(), vertexAttributeBuffers.uv.size() * sizeof(vertexAttributeBuffers.uv[0]));
@@ -485,7 +485,7 @@ void VertexAttributesApp::uploadVertexData()
 	createDeviceBuffer(separateVertexBuffers.tangent, stagingBuffers[3].size);
 
 	// Stage
-	std::vector<vks::Buffer> attributeBuffers = {
+	std::vector<vks::VulkanBuffer> attributeBuffers = {
 		separateVertexBuffers.pos,
 		separateVertexBuffers.normal,
 		separateVertexBuffers.uv,
@@ -509,7 +509,7 @@ void VertexAttributesApp::uploadVertexData()
 		The index buffer is always the same, no matter how we pass the vertex attributes
 	*/
 	size_t indexBufferSize = indexBuffer.size() * sizeof(uint32_t);
-	vks::Buffer indexStaging;
+	vks::VulkanBuffer indexStaging;
 	createStagingBuffer(indexStaging, indexBuffer.data(), indexBufferSize);
 	createDeviceBuffer(indices, indexStaging.size, VK_BUFFER_USAGE_INDEX_BUFFER_BIT);
 	// Copy data from staging buffer (host) do device local buffer (gpu)

@@ -137,7 +137,7 @@ private:
 	VulkanglTFScene glTFScene;
 
 	struct ShaderData {
-		vks::Buffer buffer;
+		vks::VulkanBuffer buffer;
 		struct Values {
 			glm::mat4 projection;
 			glm::mat4 view;

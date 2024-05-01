@@ -14,8 +14,8 @@ bool MultiviewApp::OnCreate()
 	prepareDescriptors();
 	preparePipelines();
 
-	VkCommandBufferAllocateInfo cmdBufAllocateInfo = vks::initializers::commandBufferAllocateInfo(cmdPool, VK_COMMAND_BUFFER_LEVEL_PRIMARY, static_cast<uint32_t>(drawCmdBuffers.size()));
-	multiviewPass.commandBuffers.resize(drawCmdBuffers.size());
+	VkCommandBufferAllocateInfo cmdBufAllocateInfo = vks::initializers::commandBufferAllocateInfo(commandPool, VK_COMMAND_BUFFER_LEVEL_PRIMARY, static_cast<uint32_t>(drawCommandBuffers.size()));
+	multiviewPass.commandBuffers.resize(drawCommandBuffers.size());
 	VK_CHECK_RESULT(vkAllocateCommandBuffers(device, &cmdBufAllocateInfo, multiviewPass.commandBuffers.data()));
 
 	buildCommandBuffers();
@@ -44,7 +44,7 @@ void MultiviewApp::OnDestroy()
 		vkDestroyRenderPass(device, multiviewPass.renderPass, nullptr);
 		vkDestroySampler(device, multiviewPass.sampler, nullptr);
 		vkDestroyFramebuffer(device, multiviewPass.frameBuffer, nullptr);
-		vkFreeCommandBuffers(device, cmdPool, static_cast<uint32_t>(multiviewPass.commandBuffers.size()), multiviewPass.commandBuffers.data());
+		vkFreeCommandBuffers(device, commandPool, static_cast<uint32_t>(multiviewPass.commandBuffers.size()), multiviewPass.commandBuffers.data());
 		vkDestroySemaphore(device, multiviewPass.semaphore, nullptr);
 		for (auto& fence : multiviewPass.waitFences) {
 			vkDestroyFence(device, fence, nullptr);

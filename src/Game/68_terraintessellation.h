@@ -53,8 +53,8 @@ private:
 	} models;
 
 	struct {
-		vks::Buffer terrainTessellation;
-		vks::Buffer skysphereVertex;
+		vks::VulkanBuffer terrainTessellation;
+		vks::VulkanBuffer skysphereVertex;
 	} uniformBuffers;
 
 	// Shared values for tessellation control and evaluation stages
@@ -246,54 +246,54 @@ private:
 		renderPassBeginInfo.clearValueCount = 2;
 		renderPassBeginInfo.pClearValues = clearValues;
 
-		for (int32_t i = 0; i < drawCmdBuffers.size(); ++i)
+		for (int32_t i = 0; i < drawCommandBuffers.size(); ++i)
 		{
 			renderPassBeginInfo.framebuffer = frameBuffers[i];
 
-			VK_CHECK_RESULT(vkBeginCommandBuffer(drawCmdBuffers[i], &cmdBufInfo));
+			VK_CHECK_RESULT(vkBeginCommandBuffer(drawCommandBuffers[i], &cmdBufInfo));
 
 			if (m_adapter.deviceFeatures.pipelineStatisticsQuery) {
-				vkCmdResetQueryPool(drawCmdBuffers[i], queryPool, 0, 2);
+				vkCmdResetQueryPool(drawCommandBuffers[i], queryPool, 0, 2);
 			}
 
-			vkCmdBeginRenderPass(drawCmdBuffers[i], &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
+			vkCmdBeginRenderPass(drawCommandBuffers[i], &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 
 			VkViewport viewport = vks::initializers::viewport((float)destWidth, (float)destHeight, 0.0f, 1.0f);
-			vkCmdSetViewport(drawCmdBuffers[i], 0, 1, &viewport);
+			vkCmdSetViewport(drawCommandBuffers[i], 0, 1, &viewport);
 
 			VkRect2D scissor = vks::initializers::rect2D(destWidth, destHeight, 0, 0);
-			vkCmdSetScissor(drawCmdBuffers[i], 0, 1, &scissor);
+			vkCmdSetScissor(drawCommandBuffers[i], 0, 1, &scissor);
 
-			vkCmdSetLineWidth(drawCmdBuffers[i], 1.0f);
+			vkCmdSetLineWidth(drawCommandBuffers[i], 1.0f);
 
 			VkDeviceSize offsets[1] = { 0 };
 
 			// Skysphere
-			vkCmdBindPipeline(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines.skysphere);
-			vkCmdBindDescriptorSets(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayouts.skysphere, 0, 1, &descriptorSets.skysphere, 0, nullptr);
-			models.skysphere.draw(drawCmdBuffers[i]);
+			vkCmdBindPipeline(drawCommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines.skysphere);
+			vkCmdBindDescriptorSets(drawCommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayouts.skysphere, 0, 1, &descriptorSets.skysphere, 0, nullptr);
+			models.skysphere.draw(drawCommandBuffers[i]);
 
 			// Tessellated terrain
 			if (m_adapter.deviceFeatures.pipelineStatisticsQuery) {
 				// Begin pipeline statistics query
-				vkCmdBeginQuery(drawCmdBuffers[i], queryPool, 0, 0);
+				vkCmdBeginQuery(drawCommandBuffers[i], queryPool, 0, 0);
 			}
 			// Render
-			vkCmdBindPipeline(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, wireframe ? pipelines.wireframe : pipelines.terrain);
-			vkCmdBindDescriptorSets(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayouts.terrain, 0, 1, &descriptorSets.terrain, 0, nullptr);
-			vkCmdBindVertexBuffers(drawCmdBuffers[i], 0, 1, &terrain.vertices.buffer, offsets);
-			vkCmdBindIndexBuffer(drawCmdBuffers[i], terrain.indices.buffer, 0, VK_INDEX_TYPE_UINT32);
-			vkCmdDrawIndexed(drawCmdBuffers[i], terrain.indices.count, 1, 0, 0, 0);
+			vkCmdBindPipeline(drawCommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, wireframe ? pipelines.wireframe : pipelines.terrain);
+			vkCmdBindDescriptorSets(drawCommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayouts.terrain, 0, 1, &descriptorSets.terrain, 0, nullptr);
+			vkCmdBindVertexBuffers(drawCommandBuffers[i], 0, 1, &terrain.vertices.buffer, offsets);
+			vkCmdBindIndexBuffer(drawCommandBuffers[i], terrain.indices.buffer, 0, VK_INDEX_TYPE_UINT32);
+			vkCmdDrawIndexed(drawCommandBuffers[i], terrain.indices.count, 1, 0, 0, 0);
 			if (m_adapter.deviceFeatures.pipelineStatisticsQuery) {
 				// End pipeline statistics query
-				vkCmdEndQuery(drawCmdBuffers[i], queryPool, 0);
+				vkCmdEndQuery(drawCommandBuffers[i], queryPool, 0);
 			}
 
-			DrawUI(drawCmdBuffers[i]);
+			DrawUI(drawCommandBuffers[i]);
 
-			vkCmdEndRenderPass(drawCmdBuffers[i]);
+			vkCmdEndRenderPass(drawCommandBuffers[i]);
 
-			VK_CHECK_RESULT(vkEndCommandBuffer(drawCmdBuffers[i]));
+			VK_CHECK_RESULT(vkEndCommandBuffer(drawCommandBuffers[i]));
 		}
 	}
 
@@ -656,7 +656,7 @@ private:
 	{
 		prepareFrame();
 		submitInfo.commandBufferCount = 1;
-		submitInfo.pCommandBuffers = &drawCmdBuffers[currentBuffer];
+		submitInfo.pCommandBuffers = &drawCommandBuffers[currentBuffer];
 		VK_CHECK_RESULT(vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE));
 		// Read query results for displaying in next frame (if the device supports pipeline statistics)
 		if (m_adapter.deviceFeatures.pipelineStatisticsQuery) {

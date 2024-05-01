@@ -51,15 +51,13 @@ bool VulkanApp::initVulkan(const RenderSystemCreateInfo& createInfo)
 
 	// Derived examples can override this to set actual features (based on above readings) to enable for logical device creation
 	getEnabledFeatures();
-
 	// Vulkan device creation
 	// This is handled by a separate class that gets a logical device representation and encapsulates functions related to a device
 	m_vulkanDevice = new VulkanDevice(m_adapter.physicalDevice);
-
 	// Derived examples can enable extensions based on the list of supported extensions read from the physical device
 	getEnabledExtensions();
 
-	VkResult result = m_vulkanDevice->createLogicalDevice(enabledFeatures, enabledDeviceExtensions, deviceCreatepNextChain);
+	VkResult result = m_vulkanDevice->CreateLogicalDevice(enabledFeatures, enabledDeviceExtensions, deviceCreatepNextChain);
 	if (result != VK_SUCCESS)
 	{
 		Fatal("Could not create Vulkan device: \n" + std::string(string_VkResult(result)));
@@ -82,8 +80,6 @@ bool VulkanApp::initVulkan(const RenderSystemCreateInfo& createInfo)
 		validFormat = vks::tools::getSupportedDepthFormat(m_adapter.physicalDevice, &depthFormat);
 	}
 	assert(validFormat);
-
-	swapChain.Connect(m_instance.vkInstance, m_adapter.physicalDevice, device);
 
 	// Create synchronization objects
 	VkSemaphoreCreateInfo semaphoreCreateInfo = vks::initializers::semaphoreCreateInfo();
@@ -110,8 +106,7 @@ bool VulkanApp::initVulkan(const RenderSystemCreateInfo& createInfo)
 void VulkanApp::setupDepthStencil(uint32_t width, uint32_t height)
 {
 	// Create an optimal image used as the depth stencil attachment
-	VkImageCreateInfo imageCI{};
-	imageCI.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+	VkImageCreateInfo imageCI{ .sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO };
 	imageCI.imageType = VK_IMAGE_TYPE_2D;
 	imageCI.format = depthFormat;
 	imageCI.extent = { width, height, 1 };
@@ -124,12 +119,10 @@ void VulkanApp::setupDepthStencil(uint32_t width, uint32_t height)
 	VK_CHECK_RESULT(vkCreateImage(device, &imageCI, nullptr, &depthStencil.image));
 
 	// Allocate memory for the image (device local) and bind it to our image
-	VkMemoryAllocateInfo memAlloc{};
-	memAlloc.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
 	VkMemoryRequirements memReqs{};
 	vkGetImageMemoryRequirements(device, depthStencil.image, &memReqs);
 
-
+	VkMemoryAllocateInfo memAlloc{ .sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO };
 	memAlloc.allocationSize = memReqs.size;
 	memAlloc.memoryTypeIndex = m_vulkanDevice->getMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 	VK_CHECK_RESULT(vkAllocateMemory(device, &memAlloc, nullptr, &depthStencil.memory));
@@ -138,8 +131,7 @@ void VulkanApp::setupDepthStencil(uint32_t width, uint32_t height)
 	// Create a view for the depth stencil image
 	// Images aren't directly accessed in Vulkan, but rather through views described by a subresource range
 	// This allows for multiple views of one image with differing ranges (e.g. for different layers)
-	VkImageViewCreateInfo depthStencilViewCI{};
-	depthStencilViewCI.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+	VkImageViewCreateInfo depthStencilViewCI{ .sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO };
 	depthStencilViewCI.viewType = VK_IMAGE_VIEW_TYPE_2D;
 	depthStencilViewCI.image = depthStencil.image;
 	depthStencilViewCI.format = depthFormat;
@@ -149,7 +141,8 @@ void VulkanApp::setupDepthStencil(uint32_t width, uint32_t height)
 	depthStencilViewCI.subresourceRange.layerCount = 1;
 	depthStencilViewCI.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
 	// Stencil aspect should only be set on depth + stencil formats (VK_FORMAT_D16_UNORM_S8_UINT..VK_FORMAT_D32_SFLOAT_S8_UINT
-	if (depthFormat >= VK_FORMAT_D16_UNORM_S8_UINT) {
+	if (depthFormat >= VK_FORMAT_D16_UNORM_S8_UINT)
+	{
 		depthStencilViewCI.subresourceRange.aspectMask |= VK_IMAGE_ASPECT_STENCIL_BIT;
 	}
 	VK_CHECK_RESULT(vkCreateImageView(device, &depthStencilViewCI, nullptr, &depthStencil.view));
@@ -215,8 +208,7 @@ void VulkanApp::setupRenderPass()
 	dependencies[1].dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_COLOR_ATTACHMENT_READ_BIT;
 	dependencies[1].dependencyFlags = 0;
 
-	VkRenderPassCreateInfo renderPassInfo = {};
-	renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+	VkRenderPassCreateInfo renderPassInfo = { .sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO };
 	renderPassInfo.attachmentCount = static_cast<uint32_t>(attachments.size());
 	renderPassInfo.pAttachments = attachments.data();
 	renderPassInfo.subpassCount = 1;
@@ -234,9 +226,7 @@ void VulkanApp::setupFrameBuffer(uint32_t width, uint32_t height)
 	// Depth/Stencil attachment is the same for all frame buffers
 	attachments[1] = depthStencil.view;
 
-	VkFramebufferCreateInfo frameBufferCreateInfo = {};
-	frameBufferCreateInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-	frameBufferCreateInfo.pNext = NULL;
+	VkFramebufferCreateInfo frameBufferCreateInfo = { .sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO };
 	frameBufferCreateInfo.renderPass = renderPass;
 	frameBufferCreateInfo.attachmentCount = 2;
 	frameBufferCreateInfo.pAttachments = attachments;
@@ -256,8 +246,7 @@ void VulkanApp::setupFrameBuffer(uint32_t width, uint32_t height)
 //-----------------------------------------------------------------------------
 VkPipelineShaderStageCreateInfo VulkanApp::loadShader(std::string fileName, VkShaderStageFlagBits stage)
 {
-	VkPipelineShaderStageCreateInfo shaderStage = {};
-	shaderStage.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+	VkPipelineShaderStageCreateInfo shaderStage = { .sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO };
 	shaderStage.stage = stage;
 	shaderStage.module = vks::tools::loadShader(fileName.c_str(), device);
 	shaderStage.pName = "main";
@@ -277,7 +266,7 @@ void VulkanApp::renderFinal()
 //-----------------------------------------------------------------------------
 void VulkanApp::closeVulkanApp()
 {
-	swapChain.cleanup();
+	swapChain.Cleanup();
 	if (descriptorPool != VK_NULL_HANDLE)
 		vkDestroyDescriptorPool(device, descriptorPool, nullptr);
 
@@ -297,7 +286,7 @@ void VulkanApp::closeVulkanApp()
 
 	vkDestroyPipelineCache(device, pipelineCache, nullptr);
 
-	vkDestroyCommandPool(device, cmdPool, nullptr);
+	vkDestroyCommandPool(device, commandPool, nullptr);
 
 	vkDestroySemaphore(device, semaphores.presentComplete, nullptr);
 	vkDestroySemaphore(device, semaphores.renderComplete, nullptr);
@@ -325,7 +314,7 @@ void VulkanApp::resizeRender(uint32_t destWidth, uint32_t destHeight)
 	vkDeviceWaitIdle(device);
 
 	// Recreate swap chain
-	setupSwapChain(m_vsync, &destWidth, &destHeight, m_fullscreen);
+	setupSwapChain(m_vsync, &destWidth, &destHeight);
 
 	// Recreate the frame buffers
 	vkDestroyImageView(device, depthStencil.view, nullptr);
@@ -364,7 +353,7 @@ void VulkanApp::resizeRender(uint32_t destWidth, uint32_t destHeight)
 void VulkanApp::prepareFrame()
 {
 	// Acquire the next image from the swap chain
-	VkResult result = swapChain.acquireNextImage(semaphores.presentComplete, &currentBuffer);
+	VkResult result = swapChain.AcquireNextImage(semaphores.presentComplete, &currentBuffer);
 	// Recreate the swapchain if it's no longer compatible with the surface (OUT_OF_DATE)
 	// SRS - If no longer optimal (VK_SUBOPTIMAL_KHR), wait until submitFrame() in case number of swapchain images will change on resize
 	if ((result == VK_ERROR_OUT_OF_DATE_KHR) || (result == VK_SUBOPTIMAL_KHR))
@@ -382,7 +371,7 @@ void VulkanApp::prepareFrame()
 //-----------------------------------------------------------------------------
 void VulkanApp::submitFrame()
 {
-	VkResult result = swapChain.queuePresent(queue, currentBuffer, semaphores.renderComplete);
+	VkResult result = swapChain.QueuePresent(queue, currentBuffer, semaphores.renderComplete);
 	// Recreate the swapchain if it's no longer compatible with the surface (OUT_OF_DATE) or no longer optimal for presentation (SUBOPTIMAL)
 	if ((result == VK_ERROR_OUT_OF_DATE_KHR) || (result == VK_SUBOPTIMAL_KHR)) {
 		windowResize(destWidth, destHeight);
@@ -400,18 +389,19 @@ void VulkanApp::renderFrame()
 {
 	prepareFrame();
 	submitInfo.commandBufferCount = 1;
-	submitInfo.pCommandBuffers = &drawCmdBuffers[currentBuffer];
+	submitInfo.pCommandBuffers = &drawCommandBuffers[currentBuffer];
 	VK_CHECK_RESULT(vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE));
 	submitFrame();
 }
 //-----------------------------------------------------------------------------
 bool VulkanApp::prepareRender(const RenderSystemCreateInfo& createInfo, bool fullscreen)
 {
+	m_fullscreen = fullscreen;
 	UIOverlay.subpass = createInfo.overlay.subpass;
 
 	initSwapchain();
+	setupSwapChain(createInfo.vsync, &destWidth, &destHeight);
 	createCommandPool();
-	setupSwapChain(createInfo.vsync, &destWidth, &destHeight, fullscreen);
 	createCommandBuffers();
 	createSynchronizationPrimitives();
 	setupDepthStencil(destWidth, destHeight);
@@ -436,44 +426,44 @@ bool VulkanApp::prepareRender(const RenderSystemCreateInfo& createInfo, bool ful
 //-----------------------------------------------------------------------------
 void VulkanApp::initSwapchain()
 {
-	swapChain.initSurface(GetHINSTANCE(), GetHWND());
+	swapChain.Connect(m_instance.vkInstance, m_adapter.physicalDevice, device);
+	swapChain.InitSurface(GetHINSTANCE(), GetHWND());
+}
+//-----------------------------------------------------------------------------
+void VulkanApp::setupSwapChain(bool vsync, uint32_t* width, uint32_t* height)
+{
+	m_vsync = vsync;
+
+	swapChain.Create(width, height, m_vsync);
 }
 //-----------------------------------------------------------------------------
 void VulkanApp::createCommandPool()
 {
-	VkCommandPoolCreateInfo cmdPoolInfo = {};
-	cmdPoolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+	VkCommandPoolCreateInfo cmdPoolInfo = { .sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO };
 	cmdPoolInfo.queueFamilyIndex = swapChain.queueNodeIndex;
 	cmdPoolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
-	VK_CHECK_RESULT(vkCreateCommandPool(device, &cmdPoolInfo, nullptr, &cmdPool));
-}
-//-----------------------------------------------------------------------------
-void VulkanApp::setupSwapChain(bool vsync, uint32_t* width, uint32_t* height, bool fullscreen)
-{
-	m_vsync = vsync;
-	m_fullscreen = fullscreen;
-	swapChain.create(width, height, m_vsync, m_fullscreen);
+	VK_CHECK_RESULT(vkCreateCommandPool(device, &cmdPoolInfo, nullptr, &commandPool));
 }
 //-----------------------------------------------------------------------------
 void VulkanApp::createCommandBuffers()
 {
 	// Create one command buffer for each swap chain image and reuse for rendering
-	drawCmdBuffers.resize(swapChain.imageCount);
+	drawCommandBuffers.resize(swapChain.imageCount);
 
 	VkCommandBufferAllocateInfo cmdBufAllocateInfo =
 		vks::initializers::commandBufferAllocateInfo(
-			cmdPool,
+			commandPool,
 			VK_COMMAND_BUFFER_LEVEL_PRIMARY,
-			static_cast<uint32_t>(drawCmdBuffers.size()));
+			static_cast<uint32_t>(drawCommandBuffers.size()));
 
-	VK_CHECK_RESULT(vkAllocateCommandBuffers(device, &cmdBufAllocateInfo, drawCmdBuffers.data()));
+	VK_CHECK_RESULT(vkAllocateCommandBuffers(device, &cmdBufAllocateInfo, drawCommandBuffers.data()));
 }
 //-----------------------------------------------------------------------------
 void VulkanApp::createSynchronizationPrimitives()
 {
 	// Wait fences to sync command buffer access
 	VkFenceCreateInfo fenceCreateInfo = vks::initializers::fenceCreateInfo(VK_FENCE_CREATE_SIGNALED_BIT);
-	waitFences.resize(drawCmdBuffers.size());
+	waitFences.resize(drawCommandBuffers.size());
 	for (auto& fence : waitFences)
 	{
 		VK_CHECK_RESULT(vkCreateFence(device, &fenceCreateInfo, nullptr, &fence));
@@ -482,13 +472,12 @@ void VulkanApp::createSynchronizationPrimitives()
 //-----------------------------------------------------------------------------
 void VulkanApp::createPipelineCache()
 {
-	VkPipelineCacheCreateInfo pipelineCacheCreateInfo = {};
-	pipelineCacheCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
+	VkPipelineCacheCreateInfo pipelineCacheCreateInfo = { .sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO };
 	VK_CHECK_RESULT(vkCreatePipelineCache(device, &pipelineCacheCreateInfo, nullptr, &pipelineCache));
 }
 //-----------------------------------------------------------------------------
 void VulkanApp::destroyCommandBuffers()
 {
-	vkFreeCommandBuffers(device, cmdPool, static_cast<uint32_t>(drawCmdBuffers.size()), drawCmdBuffers.data());
+	vkFreeCommandBuffers(device, commandPool, static_cast<uint32_t>(drawCommandBuffers.size()), drawCommandBuffers.data());
 }
 //-----------------------------------------------------------------------------

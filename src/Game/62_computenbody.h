@@ -45,7 +45,7 @@ private:
 
 	// We use a shader storage buffer object to store the particlces
 	// This is updated by the compute pipeline and displayed as a vertex buffer by the graphics pipeline
-	vks::Buffer storageBuffer;
+	vks::VulkanBuffer storageBuffer;
 
 	// Resources for the graphics part of the example
 	struct Graphics {
@@ -60,7 +60,7 @@ private:
 			glm::mat4 view;
 			glm::vec2 screenDim;
 		} uniformData;
-		vks::Buffer uniformBuffer;					// Contains scene matrices
+		vks::VulkanBuffer uniformBuffer;					// Contains scene matrices
 	} graphics;
 
 	// Resources for the compute part of the example
@@ -83,7 +83,7 @@ private:
 			float power{ 0.75f };
 			float soften{ 0.05f };
 		} uniformData;
-		vks::Buffer uniformBuffer;					// Uniform buffer object containing particle system parameters
+		vks::VulkanBuffer uniformBuffer;					// Uniform buffer object containing particle system parameters
 	} compute;
 
 	void loadAssets()
@@ -109,12 +109,12 @@ private:
 		renderPassBeginInfo.clearValueCount = 2;
 		renderPassBeginInfo.pClearValues = clearValues;
 
-		for (int32_t i = 0; i < drawCmdBuffers.size(); ++i)
+		for (int32_t i = 0; i < drawCommandBuffers.size(); ++i)
 		{
 			// Set target frame buffer
 			renderPassBeginInfo.framebuffer = frameBuffers[i];
 
-			VK_CHECK_RESULT(vkBeginCommandBuffer(drawCmdBuffers[i], &cmdBufInfo));
+			VK_CHECK_RESULT(vkBeginCommandBuffer(drawCommandBuffers[i], &cmdBufInfo));
 
 			// Acquire barrier
 			if (graphics.queueFamilyIndex != compute.queueFamilyIndex)
@@ -133,7 +133,7 @@ private:
 				};
 
 				vkCmdPipelineBarrier(
-					drawCmdBuffers[i],
+					drawCommandBuffers[i],
 					VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
 					VK_PIPELINE_STAGE_VERTEX_INPUT_BIT,
 					0,
@@ -143,24 +143,24 @@ private:
 			}
 
 			// Draw the particle system using the update vertex buffer
-			vkCmdBeginRenderPass(drawCmdBuffers[i], &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
+			vkCmdBeginRenderPass(drawCommandBuffers[i], &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 
 			VkViewport viewport = vks::initializers::viewport((float)destWidth, (float)destHeight, 0.0f, 1.0f);
-			vkCmdSetViewport(drawCmdBuffers[i], 0, 1, &viewport);
+			vkCmdSetViewport(drawCommandBuffers[i], 0, 1, &viewport);
 
 			VkRect2D scissor = vks::initializers::rect2D(destWidth, destHeight, 0, 0);
-			vkCmdSetScissor(drawCmdBuffers[i], 0, 1, &scissor);
+			vkCmdSetScissor(drawCommandBuffers[i], 0, 1, &scissor);
 
-			vkCmdBindPipeline(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, graphics.pipeline);
-			vkCmdBindDescriptorSets(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, graphics.pipelineLayout, 0, 1, &graphics.descriptorSet, 0, nullptr);
+			vkCmdBindPipeline(drawCommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, graphics.pipeline);
+			vkCmdBindDescriptorSets(drawCommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, graphics.pipelineLayout, 0, 1, &graphics.descriptorSet, 0, nullptr);
 
 			VkDeviceSize offsets[1] = { 0 };
-			vkCmdBindVertexBuffers(drawCmdBuffers[i], 0, 1, &storageBuffer.buffer, offsets);
-			vkCmdDraw(drawCmdBuffers[i], numParticles, 1, 0, 0);
+			vkCmdBindVertexBuffers(drawCommandBuffers[i], 0, 1, &storageBuffer.buffer, offsets);
+			vkCmdDraw(drawCommandBuffers[i], numParticles, 1, 0, 0);
 
-			DrawUI(drawCmdBuffers[i]);
+			DrawUI(drawCommandBuffers[i]);
 
-			vkCmdEndRenderPass(drawCmdBuffers[i]);
+			vkCmdEndRenderPass(drawCommandBuffers[i]);
 
 			// Release barrier
 			if (graphics.queueFamilyIndex != compute.queueFamilyIndex)
@@ -179,7 +179,7 @@ private:
 				};
 
 				vkCmdPipelineBarrier(
-					drawCmdBuffers[i],
+					drawCommandBuffers[i],
 					VK_PIPELINE_STAGE_VERTEX_INPUT_BIT,
 					VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
 					0,
@@ -188,7 +188,7 @@ private:
 					0, nullptr);
 			}
 
-			VK_CHECK_RESULT(vkEndCommandBuffer(drawCmdBuffers[i]));
+			VK_CHECK_RESULT(vkEndCommandBuffer(drawCommandBuffers[i]));
 		}
 
 	}
@@ -345,7 +345,7 @@ private:
 		// Staging
 		// SSBO won't be changed on the host after upload so copy to device local memory
 
-		vks::Buffer stagingBuffer;
+		vks::VulkanBuffer stagingBuffer;
 
 		m_vulkanDevice->createBuffer(VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &stagingBuffer, storageBufferSize, particleBuffer.data());
 		// The SSBO will be used as a storage buffer for the compute pipeline and as a vertex buffer in the graphics pipeline
@@ -611,7 +611,7 @@ private:
 
 		// Submit graphics commands
 		submitInfo.commandBufferCount = 1;
-		submitInfo.pCommandBuffers = &drawCmdBuffers[currentBuffer];
+		submitInfo.pCommandBuffers = &drawCommandBuffers[currentBuffer];
 		submitInfo.waitSemaphoreCount = 2;
 		submitInfo.pWaitSemaphores = graphicsWaitSemaphores;
 		submitInfo.pWaitDstStageMask = graphicsWaitStageMasks;

@@ -33,10 +33,10 @@ private:
 	};
 
 	// Contains the instanced data
-	vks::Buffer instanceBuffer;
+	vks::VulkanBuffer instanceBuffer;
 	// Contains the indirect drawing commands
-	vks::Buffer indirectCommandsBuffer;
-	vks::Buffer indirectDrawCountBuffer;
+	vks::VulkanBuffer indirectCommandsBuffer;
+	vks::VulkanBuffer indirectDrawCountBuffer;
 
 	// Indirect draw statistics (updated via compute)
 	struct {
@@ -55,7 +55,7 @@ private:
 	} uboScene;
 
 	struct {
-		vks::Buffer scene;
+		vks::VulkanBuffer scene;
 	} uniformData;
 
 	struct {
@@ -68,7 +68,7 @@ private:
 
 	// Resources for the compute part of the example
 	struct {
-		vks::Buffer lodLevelsBuffers;				// Contains index start and counts for the different lod levels
+		vks::VulkanBuffer lodLevelsBuffers;				// Contains index start and counts for the different lod levels
 		VkQueue queue;								// Separate queue for compute commands (queue family may differ from the one used for graphics)
 		VkCommandPool commandPool;					// Use a separate command pool (queue family may differ from the one used for graphics)
 		VkCommandBuffer commandBuffer;				// Command buffer storing the dispatch commands and barriers
@@ -108,12 +108,12 @@ private:
 		renderPassBeginInfo.clearValueCount = 2;
 		renderPassBeginInfo.pClearValues = clearValues;
 
-		for (int32_t i = 0; i < drawCmdBuffers.size(); ++i)
+		for (int32_t i = 0; i < drawCommandBuffers.size(); ++i)
 		{
 			// Set target frame buffer
 			renderPassBeginInfo.framebuffer = frameBuffers[i];
 
-			VK_CHECK_RESULT(vkBeginCommandBuffer(drawCmdBuffers[i], &cmdBufInfo));
+			VK_CHECK_RESULT(vkBeginCommandBuffer(drawCommandBuffers[i], &cmdBufInfo));
 
 			// Acquire barrier
 			if (m_vulkanDevice->queueFamilyIndices.graphics != m_vulkanDevice->queueFamilyIndices.compute)
@@ -132,7 +132,7 @@ private:
 				};
 
 				vkCmdPipelineBarrier(
-					drawCmdBuffers[i],
+					drawCommandBuffers[i],
 					VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
 					VK_PIPELINE_STAGE_DRAW_INDIRECT_BIT,
 					0,
@@ -141,40 +141,40 @@ private:
 					0, nullptr);
 			}
 
-			vkCmdBeginRenderPass(drawCmdBuffers[i], &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
+			vkCmdBeginRenderPass(drawCommandBuffers[i], &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 
 			VkViewport viewport = vks::initializers::viewport((float)destWidth, (float)destHeight, 0.0f, 1.0f);
-			vkCmdSetViewport(drawCmdBuffers[i], 0, 1, &viewport);
+			vkCmdSetViewport(drawCommandBuffers[i], 0, 1, &viewport);
 
 			VkRect2D scissor = vks::initializers::rect2D(destWidth, destHeight, 0, 0);
-			vkCmdSetScissor(drawCmdBuffers[i], 0, 1, &scissor);
+			vkCmdSetScissor(drawCommandBuffers[i], 0, 1, &scissor);
 
 			VkDeviceSize offsets[1] = { 0 };
-			vkCmdBindDescriptorSets(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSet, 0, NULL);
+			vkCmdBindDescriptorSets(drawCommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSet, 0, NULL);
 
 			// Mesh containing the LODs
-			vkCmdBindPipeline(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines.plants);
-			vkCmdBindVertexBuffers(drawCmdBuffers[i], 0, 1, &lodModel.vertices.buffer, offsets);
-			vkCmdBindVertexBuffers(drawCmdBuffers[i], 1, 1, &instanceBuffer.buffer, offsets);
+			vkCmdBindPipeline(drawCommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines.plants);
+			vkCmdBindVertexBuffers(drawCommandBuffers[i], 0, 1, &lodModel.vertices.buffer, offsets);
+			vkCmdBindVertexBuffers(drawCommandBuffers[i], 1, 1, &instanceBuffer.buffer, offsets);
 
-			vkCmdBindIndexBuffer(drawCmdBuffers[i], lodModel.indices.buffer, 0, VK_INDEX_TYPE_UINT32);
+			vkCmdBindIndexBuffer(drawCommandBuffers[i], lodModel.indices.buffer, 0, VK_INDEX_TYPE_UINT32);
 
 			if (m_vulkanDevice->features.multiDrawIndirect)
 			{
-				vkCmdDrawIndexedIndirect(drawCmdBuffers[i], indirectCommandsBuffer.buffer, 0, static_cast<uint32_t>(indirectCommands.size()), sizeof(VkDrawIndexedIndirectCommand));
+				vkCmdDrawIndexedIndirect(drawCommandBuffers[i], indirectCommandsBuffer.buffer, 0, static_cast<uint32_t>(indirectCommands.size()), sizeof(VkDrawIndexedIndirectCommand));
 			}
 			else
 			{
 				// If multi draw is not available, we must issue separate draw commands
 				for (auto j = 0; j < indirectCommands.size(); j++)
 				{
-					vkCmdDrawIndexedIndirect(drawCmdBuffers[i], indirectCommandsBuffer.buffer, j * sizeof(VkDrawIndexedIndirectCommand), 1, sizeof(VkDrawIndexedIndirectCommand));
+					vkCmdDrawIndexedIndirect(drawCommandBuffers[i], indirectCommandsBuffer.buffer, j * sizeof(VkDrawIndexedIndirectCommand), 1, sizeof(VkDrawIndexedIndirectCommand));
 				}
 			}
 
-			DrawUI(drawCmdBuffers[i]);
+			DrawUI(drawCommandBuffers[i]);
 
-			vkCmdEndRenderPass(drawCmdBuffers[i]);
+			vkCmdEndRenderPass(drawCommandBuffers[i]);
 
 			// Release barrier
 			if (m_vulkanDevice->queueFamilyIndices.graphics != m_vulkanDevice->queueFamilyIndices.compute)
@@ -193,7 +193,7 @@ private:
 				};
 
 				vkCmdPipelineBarrier(
-					drawCmdBuffers[i],
+					drawCommandBuffers[i],
 					VK_PIPELINE_STAGE_DRAW_INDIRECT_BIT,
 					VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
 					0,
@@ -202,7 +202,7 @@ private:
 					0, nullptr);
 			}
 
-			VK_CHECK_RESULT(vkEndCommandBuffer(drawCmdBuffers[i]));
+			VK_CHECK_RESULT(vkEndCommandBuffer(drawCommandBuffers[i]));
 		}
 	}
 
@@ -400,7 +400,7 @@ private:
 	{
 		objectCount = OBJECT_COUNT * OBJECT_COUNT * OBJECT_COUNT;
 
-		vks::Buffer stagingBuffer;
+		vks::VulkanBuffer stagingBuffer;
 
 		std::vector<InstanceData> instanceData(objectCount);
 		indirectCommands.resize(objectCount);
@@ -728,7 +728,7 @@ private:
 		// Submit graphics command buffer
 
 		submitInfo.commandBufferCount = 1;
-		submitInfo.pCommandBuffers = &drawCmdBuffers[currentBuffer];
+		submitInfo.pCommandBuffers = &drawCommandBuffers[currentBuffer];
 
 		// Wait on present and compute semaphores
 		std::array<VkPipelineStageFlags, 2> stageFlags = {

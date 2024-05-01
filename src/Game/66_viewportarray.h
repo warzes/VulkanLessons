@@ -30,7 +30,7 @@ private:
 		glm::mat4 modelview[2];
 		glm::vec4 lightPos = glm::vec4(-2.5f, -3.5f, 0.0f, 1.0f);
 	} uniformDataGS;
-	vks::Buffer uniformBufferGS;
+	vks::VulkanBuffer uniformBufferGS;
 
 	VkPipeline pipeline{ VK_NULL_HANDLE };
 	VkPipelineLayout pipelineLayout{ VK_NULL_HANDLE };
@@ -80,14 +80,14 @@ private:
 		renderPassBeginInfo.clearValueCount = 2;
 		renderPassBeginInfo.pClearValues = clearValues;
 
-		for (int32_t i = 0; i < drawCmdBuffers.size(); ++i)
+		for (int32_t i = 0; i < drawCommandBuffers.size(); ++i)
 		{
 			// Set target frame buffer
 			renderPassBeginInfo.framebuffer = frameBuffers[i];
 
-			VK_CHECK_RESULT(vkBeginCommandBuffer(drawCmdBuffers[i], &cmdBufInfo));
+			VK_CHECK_RESULT(vkBeginCommandBuffer(drawCommandBuffers[i], &cmdBufInfo));
 
-			vkCmdBeginRenderPass(drawCmdBuffers[i], &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
+			vkCmdBeginRenderPass(drawCommandBuffers[i], &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 
 			// We render to two viewports simultaneously, so we need to viewports and two scissor rectangles
 			// 0 = right, 1 = left
@@ -95,25 +95,25 @@ private:
 				{ (float)destWidth / 2.0f, 0, (float)destWidth / 2.0f, (float)destHeight, 0.0, 1.0f },
 				{ 0, 0, (float)destWidth / 2.0f, (float)destHeight, 0.0, 1.0f },
 			};
-			vkCmdSetViewport(drawCmdBuffers[i], 0, 2, viewports);
+			vkCmdSetViewport(drawCommandBuffers[i], 0, 2, viewports);
 
 			VkRect2D scissorRects[2] = {
 				vks::initializers::rect2D(destWidth / 2, destHeight, destWidth / 2, 0),
 				vks::initializers::rect2D(destWidth / 2, destHeight, 0, 0),
 			};
-			vkCmdSetScissor(drawCmdBuffers[i], 0, 2, scissorRects);
+			vkCmdSetScissor(drawCommandBuffers[i], 0, 2, scissorRects);
 
-			vkCmdSetLineWidth(drawCmdBuffers[i], 1.0f);
+			vkCmdSetLineWidth(drawCommandBuffers[i], 1.0f);
 
-			vkCmdBindDescriptorSets(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSet, 0, nullptr);
-			vkCmdBindPipeline(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
-			scene.draw(drawCmdBuffers[i]);
+			vkCmdBindDescriptorSets(drawCommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSet, 0, nullptr);
+			vkCmdBindPipeline(drawCommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
+			scene.draw(drawCommandBuffers[i]);
 
-			DrawUI(drawCmdBuffers[i]);
+			DrawUI(drawCommandBuffers[i]);
 
-			vkCmdEndRenderPass(drawCmdBuffers[i]);
+			vkCmdEndRenderPass(drawCommandBuffers[i]);
 
-			VK_CHECK_RESULT(vkEndCommandBuffer(drawCmdBuffers[i]));
+			VK_CHECK_RESULT(vkEndCommandBuffer(drawCommandBuffers[i]));
 		}
 	}
 
@@ -249,7 +249,7 @@ private:
 	{
 		prepareFrame();
 		submitInfo.commandBufferCount = 1;
-		submitInfo.pCommandBuffers = &drawCmdBuffers[currentBuffer];
+		submitInfo.pCommandBuffers = &drawCommandBuffers[currentBuffer];
 		VK_CHECK_RESULT(vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE));
 		submitFrame();
 	}

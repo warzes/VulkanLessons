@@ -48,7 +48,7 @@ private:
 		glm::vec4 lightPos = glm::vec4(-2.5f, -3.5f, 0.0f, 1.0f);
 		float distortionAlpha = 0.2f;
 	} uniformData;
-	vks::Buffer uniformBuffer;
+	vks::VulkanBuffer uniformBuffer;
 
 	VkPipeline pipeline{ VK_NULL_HANDLE };
 	VkPipelineLayout pipelineLayout{ VK_NULL_HANDLE };
@@ -330,35 +330,35 @@ private:
 			renderPassBeginInfo.clearValueCount = 2;
 			renderPassBeginInfo.pClearValues = clearValues;
 
-			for (int32_t i = 0; i < drawCmdBuffers.size(); ++i) {
+			for (int32_t i = 0; i < drawCommandBuffers.size(); ++i) {
 				renderPassBeginInfo.framebuffer = frameBuffers[i];
 
-				VK_CHECK_RESULT(vkBeginCommandBuffer(drawCmdBuffers[i], &cmdBufInfo));
-				vkCmdBeginRenderPass(drawCmdBuffers[i], &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
+				VK_CHECK_RESULT(vkBeginCommandBuffer(drawCommandBuffers[i], &cmdBufInfo));
+				vkCmdBeginRenderPass(drawCommandBuffers[i], &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 				VkViewport viewport = vks::initializers::viewport((float)destWidth / 2.0f, (float)destHeight, 0.0f, 1.0f);
 				VkRect2D scissor = vks::initializers::rect2D(destWidth / 2, destHeight, 0, 0);
-				vkCmdSetViewport(drawCmdBuffers[i], 0, 1, &viewport);
-				vkCmdSetScissor(drawCmdBuffers[i], 0, 1, &scissor);
+				vkCmdSetViewport(drawCommandBuffers[i], 0, 1, &viewport);
+				vkCmdSetScissor(drawCommandBuffers[i], 0, 1, &scissor);
 
-				vkCmdBindDescriptorSets(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSet, 0, nullptr);
+				vkCmdBindDescriptorSets(drawCommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSet, 0, nullptr);
 
 				// Left eye
-				vkCmdBindPipeline(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, viewDisplayPipelines[0]);
-				vkCmdDraw(drawCmdBuffers[i], 3, 1, 0, 0);
+				vkCmdBindPipeline(drawCommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, viewDisplayPipelines[0]);
+				vkCmdDraw(drawCommandBuffers[i], 3, 1, 0, 0);
 
 				// Right eye
 				viewport.x = (float)destWidth / 2;
 				scissor.offset.x = destWidth / 2;
-				vkCmdSetViewport(drawCmdBuffers[i], 0, 1, &viewport);
-				vkCmdSetScissor(drawCmdBuffers[i], 0, 1, &scissor);
+				vkCmdSetViewport(drawCommandBuffers[i], 0, 1, &viewport);
+				vkCmdSetScissor(drawCommandBuffers[i], 0, 1, &scissor);
 
-				vkCmdBindPipeline(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, viewDisplayPipelines[1]);
-				vkCmdDraw(drawCmdBuffers[i], 3, 1, 0, 0);
+				vkCmdBindPipeline(drawCommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, viewDisplayPipelines[1]);
+				vkCmdDraw(drawCommandBuffers[i], 3, 1, 0, 0);
 
-				DrawUI(drawCmdBuffers[i]);
+				DrawUI(drawCommandBuffers[i]);
 
-				vkCmdEndRenderPass(drawCmdBuffers[i]);
-				VK_CHECK_RESULT(vkEndCommandBuffer(drawCmdBuffers[i]));
+				vkCmdEndRenderPass(drawCommandBuffers[i]);
+				VK_CHECK_RESULT(vkEndCommandBuffer(drawCommandBuffers[i]));
 			}
 		}
 
@@ -623,10 +623,10 @@ private:
 		updateDescriptors();
 
 		// SRS - Recreate Multiview command buffers in case number of swapchain images has changed on resize
-		vkFreeCommandBuffers(device, cmdPool, static_cast<uint32_t>(multiviewPass.commandBuffers.size()), multiviewPass.commandBuffers.data());
+		vkFreeCommandBuffers(device, commandPool, static_cast<uint32_t>(multiviewPass.commandBuffers.size()), multiviewPass.commandBuffers.data());
 
-		VkCommandBufferAllocateInfo cmdBufAllocateInfo = vks::initializers::commandBufferAllocateInfo(cmdPool, VK_COMMAND_BUFFER_LEVEL_PRIMARY, static_cast<uint32_t>(drawCmdBuffers.size()));
-		multiviewPass.commandBuffers.resize(drawCmdBuffers.size());
+		VkCommandBufferAllocateInfo cmdBufAllocateInfo = vks::initializers::commandBufferAllocateInfo(commandPool, VK_COMMAND_BUFFER_LEVEL_PRIMARY, static_cast<uint32_t>(drawCommandBuffers.size()));
+		multiviewPass.commandBuffers.resize(drawCommandBuffers.size());
 		VK_CHECK_RESULT(vkAllocateCommandBuffers(device, &cmdBufAllocateInfo, multiviewPass.commandBuffers.data()));
 
 		resized = false;
@@ -663,7 +663,7 @@ private:
 		submitInfo.pWaitSemaphores = &multiviewPass.semaphore;
 		submitInfo.pSignalSemaphores = &semaphores.renderComplete;
 		submitInfo.commandBufferCount = 1;
-		submitInfo.pCommandBuffers = &drawCmdBuffers[currentBuffer];
+		submitInfo.pCommandBuffers = &drawCommandBuffers[currentBuffer];
 		VK_CHECK_RESULT(vkQueueSubmit(queue, 1, &submitInfo, waitFences[currentBuffer]));
 
 		submitFrame();

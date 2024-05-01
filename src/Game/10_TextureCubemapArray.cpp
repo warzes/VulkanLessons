@@ -186,7 +186,7 @@ void TextureCubemapArrayApp::loadCubemapArray(std::string filename, VkFormat for
 	ktx_uint8_t* ktxTextureData = ktxTexture_GetData(ktxTexture);
 	ktx_size_t ktxTextureSize = ktxTexture_GetSize(ktxTexture);
 
-	vks::Buffer sourceData;
+	vks::VulkanBuffer sourceData;
 
 	// Create a host-visible source buffer that contains the raw image data
 	VkBufferCreateInfo bufferCreateInfo = vks::initializers::bufferCreateInfo();
@@ -362,39 +362,39 @@ void TextureCubemapArrayApp::buildCommandBuffers()
 	renderPassBeginInfo.clearValueCount = 2;
 	renderPassBeginInfo.pClearValues = clearValues;
 
-	for (int32_t i = 0; i < drawCmdBuffers.size(); ++i)
+	for (int32_t i = 0; i < drawCommandBuffers.size(); ++i)
 	{
 		// Set target frame buffer
 		renderPassBeginInfo.framebuffer = frameBuffers[i];
 
-		VK_CHECK_RESULT(vkBeginCommandBuffer(drawCmdBuffers[i], &cmdBufInfo));
+		VK_CHECK_RESULT(vkBeginCommandBuffer(drawCommandBuffers[i], &cmdBufInfo));
 
-		vkCmdBeginRenderPass(drawCmdBuffers[i], &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
+		vkCmdBeginRenderPass(drawCommandBuffers[i], &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 
 		VkViewport viewport = vks::initializers::viewport((float)destWidth, (float)destHeight, 0.0f, 1.0f);
-		vkCmdSetViewport(drawCmdBuffers[i], 0, 1, &viewport);
+		vkCmdSetViewport(drawCommandBuffers[i], 0, 1, &viewport);
 
 		VkRect2D scissor = vks::initializers::rect2D(destWidth, destHeight, 0, 0);
-		vkCmdSetScissor(drawCmdBuffers[i], 0, 1, &scissor);
+		vkCmdSetScissor(drawCommandBuffers[i], 0, 1, &scissor);
 
-		vkCmdBindDescriptorSets(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSet, 0, nullptr);
+		vkCmdBindDescriptorSets(drawCommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSet, 0, nullptr);
 
 		// Skybox
 		if (displaySkybox)
 		{
-			vkCmdBindPipeline(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines.skybox);
-			models.skybox.draw(drawCmdBuffers[i]);
+			vkCmdBindPipeline(drawCommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines.skybox);
+			models.skybox.draw(drawCommandBuffers[i]);
 		}
 
 		// 3D object
-		vkCmdBindPipeline(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines.reflect);
-		models.objects[models.objectIndex].draw(drawCmdBuffers[i]);
+		vkCmdBindPipeline(drawCommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines.reflect);
+		models.objects[models.objectIndex].draw(drawCommandBuffers[i]);
 
-		DrawUI(drawCmdBuffers[i]);
+		DrawUI(drawCommandBuffers[i]);
 
-		vkCmdEndRenderPass(drawCmdBuffers[i]);
+		vkCmdEndRenderPass(drawCommandBuffers[i]);
 
-		VK_CHECK_RESULT(vkEndCommandBuffer(drawCmdBuffers[i]));
+		VK_CHECK_RESULT(vkEndCommandBuffer(drawCommandBuffers[i]));
 	}
 }
 //-----------------------------------------------------------------------------
@@ -518,7 +518,7 @@ void TextureCubemapArrayApp::draw()
 {
 	EngineApp::prepareFrame();
 	submitInfo.commandBufferCount = 1;
-	submitInfo.pCommandBuffers = &drawCmdBuffers[currentBuffer];
+	submitInfo.pCommandBuffers = &drawCommandBuffers[currentBuffer];
 	VK_CHECK_RESULT(vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE));
 	EngineApp::submitFrame();
 }

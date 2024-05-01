@@ -111,7 +111,7 @@ private:
 		// base class, and create a single primary command buffer instead
 		VkCommandBufferAllocateInfo cmdBufAllocateInfo =
 			vks::initializers::commandBufferAllocateInfo(
-				cmdPool,
+				commandPool,
 				VK_COMMAND_BUFFER_LEVEL_PRIMARY,
 				1);
 		VK_CHECK_RESULT(vkAllocateCommandBuffers(device, &cmdBufAllocateInfo, &primaryCommandBuffer));

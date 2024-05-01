@@ -167,8 +167,8 @@ namespace vks
 		}
 
 		inline VkRect2D rect2D(
-			int32_t width,
-			int32_t height,
+			uint32_t width,
+			uint32_t height,
 			int32_t offsetX,
 			int32_t offsetY)
 		{

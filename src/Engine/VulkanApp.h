@@ -70,75 +70,51 @@ protected:
 	/** @brief (Virtual) Default image acquire + submission and command buffer submission function */
 	virtual void renderFrame();
 
-	VulkanInstance m_instance;
-	VulkanAdapter m_adapter;
-	VulkanDevice* m_vulkanDevice;
-
-
-	/** @brief Set of physical device features to be enabled for this example (must be set in the derived constructor) */
-	VkPhysicalDeviceFeatures enabledFeatures{};
-	/** @brief Set of device extensions to be enabled for this example (must be set in the derived constructor) */
-	std::vector<const char*> enabledDeviceExtensions;
-	/** @brief Optional pNext structure for passing extension structures to device creation */
-	void* deviceCreatepNextChain = nullptr;
-	/** @brief Logical device, application's view of the physical device (GPU) */
-	VkDevice device{ VK_NULL_HANDLE }; // TODO: копия из m_vulkanDevice
-	// Handle to the device graphics queue that command buffers are submitted to
-	VkQueue queue{ VK_NULL_HANDLE };
-	// Depth buffer format (selected during Vulkan initialization)
-	VkFormat depthFormat;
-	// Command buffer pool
-	VkCommandPool cmdPool{ VK_NULL_HANDLE };
-	/** @brief Pipeline stages used to wait at for graphics queue submissions */
-	VkPipelineStageFlags submitPipelineStages = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-	// Contains command buffers and semaphores to be presented to the queue
-	VkSubmitInfo submitInfo;
-	// Command buffers used for rendering
-	std::vector<VkCommandBuffer> drawCmdBuffers;
-
-	// Global render pass for frame buffer writes
-	VkRenderPass renderPass{ VK_NULL_HANDLE };
-	// List of available frame buffers (same as number of swap chain images)
-	std::vector<VkFramebuffer> frameBuffers;
-	// Active frame buffer index
-	uint32_t currentBuffer = 0;
-	// Descriptor set pool
-	VkDescriptorPool descriptorPool{ VK_NULL_HANDLE };
-	// List of shader modules created (stored for cleanup)
-	std::vector<VkShaderModule> shaderModules;
-	// Pipeline cache object
-	VkPipelineCache pipelineCache{ VK_NULL_HANDLE };
-	// Wraps the swap chain to present images (framebuffers) to the windowing system
-	VulkanSwapChain swapChain;
-	// Synchronization semaphores
+	VulkanInstance m_instance{};
+	VulkanAdapter m_adapter{};
+	VulkanDevice* m_vulkanDevice = nullptr;
+	// эти опции устанавливать в getEnabledFeatures или getEnabledExtensions
+	VkPhysicalDeviceFeatures enabledFeatures{}; // Set of physical device features to be enabled for this example (must be set in the derived constructor)
+	std::vector<const char*> enabledDeviceExtensions; // Set of device extensions to be enabled for this example (must be set in the derived constructor)
+	void* deviceCreatepNextChain = nullptr; // Optional pNext structure for passing extension structures to device creation
+	VkDevice device{ VK_NULL_HANDLE };
+	VkQueue queue{ VK_NULL_HANDLE }; // Handle to the device graphics queue that command buffers are submitted to
+	VkFormat depthFormat{}; // Depth buffer format (selected during Vulkan initialization)
 	struct {
 		// Swap chain image presentation
-		VkSemaphore presentComplete;
+		VkSemaphore presentComplete{ VK_NULL_HANDLE };
 		// Command buffer submission and execution
-		VkSemaphore renderComplete;
-	} semaphores;
+		VkSemaphore renderComplete{ VK_NULL_HANDLE };
+	} semaphores; 	// Synchronization semaphores
+	VkSubmitInfo submitInfo{}; // Contains command buffers and semaphores to be presented to the queue
+	VkPipelineStageFlags submitPipelineStages = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT; // @brief Pipeline stages used to wait at for graphics queue submissions
+	VulkanSwapChain swapChain; // Wraps the swap chain to present images (framebuffers) to the windowing system
+	VkCommandPool commandPool{ VK_NULL_HANDLE };
+	std::vector<VkCommandBuffer> drawCommandBuffers; // Command buffers used for rendering
 	std::vector<VkFence> waitFences;
-	bool requiresStencil{ false };
-
-	VkClearColorValue defaultClearColor = { { 0.025f, 0.025f, 0.025f, 1.0f } };
-
-	/** @brief Default depth stencil attachment used by the default render pass */
 	struct {
-		VkImage image;
-		VkDeviceMemory memory;
-		VkImageView view;
-	} depthStencil{};
-
+		VkImage image{};
+		VkDeviceMemory memory{};
+		VkImageView view{};
+	} depthStencil{};// @brief Default depth stencil attachment used by the default render pass
+	VkRenderPass renderPass{ VK_NULL_HANDLE }; // Global render pass for frame buffer writes
+	VkPipelineCache pipelineCache{ VK_NULL_HANDLE };
+	std::vector<VkFramebuffer> frameBuffers; // List of available frame buffers (same as number of swap chain images)
+	uint32_t currentBuffer = 0; // Active frame buffer index
+	std::vector<VkShaderModule> shaderModules; // List of shader modules created (stored for cleanup)
+	VkDescriptorPool descriptorPool{ VK_NULL_HANDLE };
+	
+	bool requiresStencil{ false };
+	VkClearColorValue defaultClearColor = { { 0.025f, 0.025f, 0.025f, 1.0f } };
 	vks::Benchmark benchmark;
-
 	bool resized = false;
 
 private:
 	bool initVulkan(const RenderSystemCreateInfo& createInfo);
 	bool prepareRender(const RenderSystemCreateInfo& createInfo, bool fullscreen);
 	void initSwapchain();
+	void setupSwapChain(bool vsync, uint32_t* width, uint32_t* height);
 	void createCommandPool();
-	void setupSwapChain(bool vsync, uint32_t* width, uint32_t* height, bool fullscreen);
 	void createCommandBuffers();
 	void createSynchronizationPrimitives();
 	void createPipelineCache();

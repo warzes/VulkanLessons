@@ -41,16 +41,16 @@ private:
 	struct GeometryPass {
 		VkRenderPass renderPass{ VK_NULL_HANDLE };
 		VkFramebuffer framebuffer{ VK_NULL_HANDLE };
-		vks::Buffer geometry;
+		vks::VulkanBuffer geometry;
 		vks::Texture headIndex;
-		vks::Buffer linkedList;
+		vks::VulkanBuffer linkedList;
 	} geometryPass;
 
 	struct RenderPassUniformData {
 		glm::mat4 projection;
 		glm::mat4 view;
 	} renderPassUniformData;
-	vks::Buffer renderPassUniformBuffer;
+	vks::VulkanBuffer renderPassUniformBuffer;
 
 	struct ObjectData {
 		glm::mat4 model;
@@ -128,7 +128,7 @@ private:
 		VK_CHECK_RESULT(vkCreateFramebuffer(device, &fbufCreateInfo, nullptr, &geometryPass.framebuffer));
 
 		// Create a buffer for GeometrySBO
-		vks::Buffer stagingBuffer;
+		vks::VulkanBuffer stagingBuffer;
 
 		VK_CHECK_RESULT(m_vulkanDevice->createBuffer(
 			VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
@@ -221,7 +221,7 @@ private:
 			sizeof(Node) * geometrySBO.maxNodeCount));
 
 		// Change HeadIndex image's layout from UNDEFINED to GENERAL
-		VkCommandBufferAllocateInfo cmdBufAllocInfo = vks::initializers::commandBufferAllocateInfo(cmdPool, VK_COMMAND_BUFFER_LEVEL_PRIMARY, 1);
+		VkCommandBufferAllocateInfo cmdBufAllocInfo = vks::initializers::commandBufferAllocateInfo(commandPool, VK_COMMAND_BUFFER_LEVEL_PRIMARY, 1);
 
 		VkCommandBuffer cmdBuf;
 		VK_CHECK_RESULT(vkAllocateCommandBuffers(device, &cmdBufAllocInfo, &cmdBuf));
@@ -412,15 +412,15 @@ private:
 		VkViewport viewport = vks::initializers::viewport((float)destWidth, (float)destHeight, 0.0f, 1.0f);
 		VkRect2D scissor = vks::initializers::rect2D(destWidth, destHeight, 0, 0);
 
-		for (int32_t i = 0; i < drawCmdBuffers.size(); ++i)
+		for (int32_t i = 0; i < drawCommandBuffers.size(); ++i)
 		{
-			VK_CHECK_RESULT(vkBeginCommandBuffer(drawCmdBuffers[i], &cmdBufInfo));
+			VK_CHECK_RESULT(vkBeginCommandBuffer(drawCommandBuffers[i], &cmdBufInfo));
 
 			// Update dynamic viewport state
-			vkCmdSetViewport(drawCmdBuffers[i], 0, 1, &viewport);
+			vkCmdSetViewport(drawCommandBuffers[i], 0, 1, &viewport);
 
 			// Update dynamic scissor state
-			vkCmdSetScissor(drawCmdBuffers[i], 0, 1, &scissor);
+			vkCmdSetScissor(drawCommandBuffers[i], 0, 1, &scissor);
 
 			VkClearColorValue clearColor;
 			clearColor.uint32[0] = 0xffffffff;
@@ -431,16 +431,16 @@ private:
 			subresRange.levelCount = 1;
 			subresRange.layerCount = 1;
 
-			vkCmdClearColorImage(drawCmdBuffers[i], geometryPass.headIndex.image, VK_IMAGE_LAYOUT_GENERAL, &clearColor, 1, &subresRange);
+			vkCmdClearColorImage(drawCommandBuffers[i], geometryPass.headIndex.image, VK_IMAGE_LAYOUT_GENERAL, &clearColor, 1, &subresRange);
 
 			// Clear previous geometry pass data
-			vkCmdFillBuffer(drawCmdBuffers[i], geometryPass.geometry.buffer, 0, sizeof(uint32_t), 0);
+			vkCmdFillBuffer(drawCommandBuffers[i], geometryPass.geometry.buffer, 0, sizeof(uint32_t), 0);
 
 			// We need a barrier to make sure all writes are finished before starting to write again
 			VkMemoryBarrier memoryBarrier = vks::initializers::memoryBarrier();
 			memoryBarrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
 			memoryBarrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT | VK_ACCESS_SHADER_WRITE_BIT;
-			vkCmdPipelineBarrier(drawCmdBuffers[i], VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 0, 1, &memoryBarrier, 0, nullptr, 0, nullptr);
+			vkCmdPipelineBarrier(drawCommandBuffers[i], VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 0, 1, &memoryBarrier, 0, nullptr, 0, nullptr);
 
 			// Begin the geometry render pass
 			renderPassBeginInfo.renderPass = geometryPass.renderPass;
@@ -448,15 +448,15 @@ private:
 			renderPassBeginInfo.clearValueCount = 0;
 			renderPassBeginInfo.pClearValues = nullptr;
 
-			vkCmdBeginRenderPass(drawCmdBuffers[i], &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
-			vkCmdBindPipeline(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines.geometry);
+			vkCmdBeginRenderPass(drawCommandBuffers[i], &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
+			vkCmdBindPipeline(drawCommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines.geometry);
 			uint32_t dynamicOffset = 0;
-			models.sphere.bindBuffers(drawCmdBuffers[i]);
+			models.sphere.bindBuffers(drawCommandBuffers[i]);
 
 			// Render the scene
 			ObjectData objectData;
 
-			vkCmdBindDescriptorSets(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayouts.geometry, 0, 1, &descriptorSets.geometry, 0, nullptr);
+			vkCmdBindDescriptorSets(drawCommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayouts.geometry, 0, 1, &descriptorSets.geometry, 0, nullptr);
 			objectData.color = glm::vec4(1.0f, 0.0f, 0.0f, 0.5f);
 			for (int32_t x = 0; x < 5; x++)
 			{
@@ -467,33 +467,33 @@ private:
 						glm::mat4 T = glm::translate(glm::mat4(1.0f), glm::vec3(x - 2, y - 2, z - 2));
 						glm::mat4 S = glm::scale(glm::mat4(1.0f), glm::vec3(0.3f));
 						objectData.model = T * S;
-						vkCmdPushConstants(drawCmdBuffers[i], pipelineLayouts.geometry, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(ObjectData), &objectData);
-						models.sphere.draw(drawCmdBuffers[i]);
+						vkCmdPushConstants(drawCommandBuffers[i], pipelineLayouts.geometry, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(ObjectData), &objectData);
+						models.sphere.draw(drawCommandBuffers[i]);
 					}
 				}
 			}
 
-			models.cube.bindBuffers(drawCmdBuffers[i]);
+			models.cube.bindBuffers(drawCommandBuffers[i]);
 			objectData.color = glm::vec4(0.0f, 0.0f, 1.0f, 0.5f);
 			for (uint32_t x = 0; x < 2; x++)
 			{
 				glm::mat4 T = glm::translate(glm::mat4(1.0f), glm::vec3(3.0f * x - 1.5f, 0.0f, 0.0f));
 				glm::mat4 S = glm::scale(glm::mat4(1.0f), glm::vec3(0.2f));
 				objectData.model = T * S;
-				vkCmdPushConstants(drawCmdBuffers[i], pipelineLayouts.geometry, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(ObjectData), &objectData);
-				models.cube.draw(drawCmdBuffers[i]);
+				vkCmdPushConstants(drawCommandBuffers[i], pipelineLayouts.geometry, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(ObjectData), &objectData);
+				models.cube.draw(drawCommandBuffers[i]);
 			}
 
-			vkCmdEndRenderPass(drawCmdBuffers[i]);
+			vkCmdEndRenderPass(drawCommandBuffers[i]);
 
 			// Make a pipeline barrier to guarantee the geometry pass is done
-			vkCmdPipelineBarrier(drawCmdBuffers[i], VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 0, 0, nullptr, 0, nullptr, 0, nullptr);
+			vkCmdPipelineBarrier(drawCommandBuffers[i], VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 0, 0, nullptr, 0, nullptr, 0, nullptr);
 
 			// We need a barrier to make sure all writes are finished before starting to write again
 			memoryBarrier = vks::initializers::memoryBarrier();
 			memoryBarrier.srcAccessMask = VK_ACCESS_SHADER_READ_BIT | VK_ACCESS_SHADER_WRITE_BIT;
 			memoryBarrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT | VK_ACCESS_SHADER_WRITE_BIT;
-			vkCmdPipelineBarrier(drawCmdBuffers[i], VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 0, 1, &memoryBarrier, 0, nullptr, 0, nullptr);
+			vkCmdPipelineBarrier(drawCommandBuffers[i], VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 0, 1, &memoryBarrier, 0, nullptr, 0, nullptr);
 
 			// Begin the color render pass
 			renderPassBeginInfo.renderPass = renderPass;
@@ -501,14 +501,14 @@ private:
 			renderPassBeginInfo.clearValueCount = 2;
 			renderPassBeginInfo.pClearValues = clearValues;
 
-			vkCmdBeginRenderPass(drawCmdBuffers[i], &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
-			vkCmdBindPipeline(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines.color);
-			vkCmdBindDescriptorSets(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayouts.color, 0, 1, &descriptorSets.color, 0, nullptr);
-			vkCmdDraw(drawCmdBuffers[i], 3, 1, 0, 0);
-			DrawUI(drawCmdBuffers[i]);
-			vkCmdEndRenderPass(drawCmdBuffers[i]);
+			vkCmdBeginRenderPass(drawCommandBuffers[i], &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
+			vkCmdBindPipeline(drawCommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines.color);
+			vkCmdBindDescriptorSets(drawCommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayouts.color, 0, 1, &descriptorSets.color, 0, nullptr);
+			vkCmdDraw(drawCommandBuffers[i], 3, 1, 0, 0);
+			DrawUI(drawCommandBuffers[i]);
+			vkCmdEndRenderPass(drawCommandBuffers[i]);
 
-			VK_CHECK_RESULT(vkEndCommandBuffer(drawCmdBuffers[i]));
+			VK_CHECK_RESULT(vkEndCommandBuffer(drawCommandBuffers[i]));
 		}
 	}
 
@@ -532,7 +532,7 @@ private:
 	{
 		prepareFrame();
 		submitInfo.commandBufferCount = 1;
-		submitInfo.pCommandBuffers = &drawCmdBuffers[currentBuffer];
+		submitInfo.pCommandBuffers = &drawCommandBuffers[currentBuffer];
 		VK_CHECK_RESULT(vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE));
 		submitFrame();
 	}

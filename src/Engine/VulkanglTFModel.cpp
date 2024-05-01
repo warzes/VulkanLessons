@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "VulkanglTFModel.h"
+#include "VulkanTools.h"
 #include "Log.h"
 #define TINYGLTF_IMPLEMENTATION
 #define STB_IMAGE_IMPLEMENTATION
