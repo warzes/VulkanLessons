@@ -348,13 +348,13 @@ private:
 				Fills the attachments
 			*/
 			{
-				vks::debugutils::cmdBeginLabel(drawCmdBuffers[i], "Subpass 0: Writing attachments", { 1.0f, 0.78f, 0.05f, 1.0f });
+				vks::debugutils::CmdBeginLabel(drawCmdBuffers[i], "Subpass 0: Writing attachments", { 1.0f, 0.78f, 0.05f, 1.0f });
 
 				vkCmdBindPipeline(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines.attachmentWrite);
 				vkCmdBindDescriptorSets(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayouts.attachmentWrite, 0, 1, &descriptorSets.attachmentWrite, 0, NULL);
 				scene.draw(drawCmdBuffers[i]);
 
-				vks::debugutils::cmdEndLabel(drawCmdBuffers[i]);
+				vks::debugutils::CmdEndLabel(drawCmdBuffers[i]);
 			}
 
 			/*
@@ -362,7 +362,7 @@ private:
 				Render a full screen quad, reading from the previously written attachments via input attachments
 			*/
 			{
-				vks::debugutils::cmdBeginLabel(drawCmdBuffers[i], "Subpass 1: Reading attachments", { 0.0f, 0.5f, 1.0f, 1.0f });
+				vks::debugutils::CmdBeginLabel(drawCmdBuffers[i], "Subpass 1: Reading attachments", { 0.0f, 0.5f, 1.0f, 1.0f });
 
 				vkCmdNextSubpass(drawCmdBuffers[i], VK_SUBPASS_CONTENTS_INLINE);
 
@@ -370,7 +370,7 @@ private:
 				vkCmdBindDescriptorSets(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayouts.attachmentRead, 0, 1, &descriptorSets.attachmentRead[i], 0, NULL);
 				vkCmdDraw(drawCmdBuffers[i], 3, 1, 0, 0);
 
-				vks::debugutils::cmdEndLabel(drawCmdBuffers[i]);
+				vks::debugutils::CmdEndLabel(drawCmdBuffers[i]);
 			}
 
 			DrawUI(drawCmdBuffers[i]);

@@ -425,19 +425,19 @@ private:
 			// First sub pass
 			// Renders the components of the scene to the G-Buffer attachments
 			{
-				vks::debugutils::cmdBeginLabel(drawCmdBuffers[i], "Subpass 0: Deferred G-Buffer creation", { 1.0f, 0.78f, 0.05f, 1.0f });
+				vks::debugutils::CmdBeginLabel(drawCmdBuffers[i], "Subpass 0: Deferred G-Buffer creation", { 1.0f, 0.78f, 0.05f, 1.0f });
 
 				vkCmdBindPipeline(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines.offscreen);
 				vkCmdBindDescriptorSets(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayouts.offscreen, 0, 1, &descriptorSets.scene, 0, NULL);
 				models.scene.draw(drawCmdBuffers[i]);
 
-				vks::debugutils::cmdEndLabel(drawCmdBuffers[i]);
+				vks::debugutils::CmdEndLabel(drawCmdBuffers[i]);
 			}
 
 			// Second sub pass
 			// This subpass will use the G-Buffer components that have been filled in the first subpass as input attachment for the final compositing
 			{
-				vks::debugutils::cmdBeginLabel(drawCmdBuffers[i], "Subpass 1: Deferred composition", { 0.0f, 0.5f, 1.0f, 1.0f });
+				vks::debugutils::CmdBeginLabel(drawCmdBuffers[i], "Subpass 1: Deferred composition", { 0.0f, 0.5f, 1.0f, 1.0f });
 
 				vkCmdNextSubpass(drawCmdBuffers[i], VK_SUBPASS_CONTENTS_INLINE);
 
@@ -445,13 +445,13 @@ private:
 				vkCmdBindDescriptorSets(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayouts.composition, 0, 1, &descriptorSets.composition, 0, NULL);
 				vkCmdDraw(drawCmdBuffers[i], 3, 1, 0, 0);
 
-				vks::debugutils::cmdEndLabel(drawCmdBuffers[i]);
+				vks::debugutils::CmdEndLabel(drawCmdBuffers[i]);
 			}
 
 			// Third subpass
 			// Render transparent geometry using a forward pass that compares against depth generated during G-Buffer fill
 			{
-				vks::debugutils::cmdBeginLabel(drawCmdBuffers[i], "Subpass 2: Forward transparency", { 0.5f, 0.76f, 0.34f, 1.0f });
+				vks::debugutils::CmdBeginLabel(drawCmdBuffers[i], "Subpass 2: Forward transparency", { 0.5f, 0.76f, 0.34f, 1.0f });
 
 				vkCmdNextSubpass(drawCmdBuffers[i], VK_SUBPASS_CONTENTS_INLINE);
 
@@ -459,7 +459,7 @@ private:
 				vkCmdBindDescriptorSets(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayouts.transparent, 0, 1, &descriptorSets.transparent, 0, NULL);
 				models.transparent.draw(drawCmdBuffers[i]);
 
-				vks::debugutils::cmdEndLabel(drawCmdBuffers[i]);
+				vks::debugutils::CmdEndLabel(drawCmdBuffers[i]);
 			}
 
 			DrawUI(drawCmdBuffers[i]);

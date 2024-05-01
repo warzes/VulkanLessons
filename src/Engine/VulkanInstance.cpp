@@ -38,7 +38,7 @@ bool VulkanInstance::Create(bool enableValidationLayers, const std::vector<const
 	if (enableValidationLayers)
 	{
 		VkDebugUtilsMessengerCreateInfoEXT debugUtilsMessengerCI{};
-		vks::debug::setupDebugingMessengerCreateInfo(debugUtilsMessengerCI);
+		vks::debug::SetupDebuggingMessengerCreateInfo(debugUtilsMessengerCI);
 		debugUtilsMessengerCI.pNext = instanceCreateInfo.pNext;
 		instanceCreateInfo.pNext = &debugUtilsMessengerCI;
 	}
@@ -62,13 +62,13 @@ bool VulkanInstance::Create(bool enableValidationLayers, const std::vector<const
 		return {};
 	}
 
-	// If the debug utils extension is present we set up debug functions, so samples can label objects for debugging
-	if (hasDebugUtilsExtension)
-		vks::debugutils::setup(vkInstance);
-
 	// If requested, we enable the default validation layers for debugging
 	if (enableValidationLayers)
-		vks::debug::setupDebugging(vkInstance);
+		vks::debug::SetupDebugging(vkInstance);
+
+	// If the debug utils extension is present we set up debug functions, so samples can label objects for debugging
+	if (hasDebugUtilsExtension)
+		vks::debugutils::Setup(vkInstance);
 
 	return true;
 }
@@ -76,7 +76,7 @@ bool VulkanInstance::Create(bool enableValidationLayers, const std::vector<const
 void VulkanInstance::Destroy()
 {
 	if (validationLayers)
-		vks::debug::freeDebugCallback(vkInstance);
+		vks::debug::FreeDebugCallback(vkInstance);
 	vkDestroyInstance(vkInstance, nullptr);
 	vkInstance = nullptr;
 }

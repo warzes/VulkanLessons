@@ -8,7 +8,6 @@ bool DebugUtilsApp::OnCreate()
 	camera.setPosition(glm::vec3(0.1f, 1.1f, -8.5f));
 	camera.setPerspective(60.0f, (float)destWidth / (float)destHeight, 0.1f, 256.0f);
 
-	setupDebugUtils();
 	loadAssets();
 	prepareOffscreen();
 	prepareUniformBuffers();
@@ -66,7 +65,7 @@ void DebugUtilsApp::OnFrame()
 void DebugUtilsApp::OnUpdateUIOverlay(vks::UIOverlay* overlay)
 {
 	if (overlay->header("Info")) {
-		overlay->text("VK_EXT_debug_utils %s", (debugUtilsSupported ? "supported" : "not supported"));
+		overlay->text("VK_EXT_debug_utils %s", (m_instance.hasDebugUtilsExtension ? "supported" : "not supported"));
 	}
 	if (overlay->header("Settings")) {
 		if (overlay->checkBox("Glow", &glow)) {
