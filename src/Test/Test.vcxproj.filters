@@ -1,0 +1,537 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="stdafx.cpp" />
+    <ClCompile Include="GameApp.cpp">
+      <Filter>App</Filter>
+    </ClCompile>
+    <ClCompile Include="01_TriangleApp.cpp">
+      <Filter>App\Examples\1_Base</Filter>
+    </ClCompile>
+    <ClCompile Include="02_PipelinesApp.cpp">
+      <Filter>App\Examples\1_Base</Filter>
+    </ClCompile>
+    <ClCompile Include="03_DescriptorSets.cpp">
+      <Filter>App\Examples\1_Base</Filter>
+    </ClCompile>
+    <ClCompile Include="04_DynamicUniformBuffer.cpp">
+      <Filter>App\Examples\1_Base</Filter>
+    </ClCompile>
+    <ClCompile Include="05_PushConstants.cpp">
+      <Filter>App\Examples\1_Base</Filter>
+    </ClCompile>
+    <ClCompile Include="06_SpecializationConstants.cpp">
+      <Filter>App\Examples\1_Base</Filter>
+    </ClCompile>
+    <ClCompile Include="07_Texture.cpp">
+      <Filter>App\Examples\1_Base</Filter>
+    </ClCompile>
+    <ClCompile Include="08_TextureArrays.cpp">
+      <Filter>App\Examples\1_Base</Filter>
+    </ClCompile>
+    <ClCompile Include="09_TextureCubeMap.cpp">
+      <Filter>App\Examples\1_Base</Filter>
+    </ClCompile>
+    <ClCompile Include="10_TextureCubemapArray.cpp">
+      <Filter>App\Examples\1_Base</Filter>
+    </ClCompile>
+    <ClCompile Include="11_Texture3D.cpp">
+      <Filter>App\Examples\1_Base</Filter>
+    </ClCompile>
+    <ClCompile Include="12_InputAttachments.cpp">
+      <Filter>App\Examples\1_Base</Filter>
+    </ClCompile>
+    <ClCompile Include="13_Subpasses.cpp">
+      <Filter>App\Examples\1_Base</Filter>
+    </ClCompile>
+    <ClCompile Include="14_Offscreen.cpp">
+      <Filter>App\Examples\1_Base</Filter>
+    </ClCompile>
+    <ClCompile Include="15_ParticleSystem.cpp">
+      <Filter>App\Examples\1_Base</Filter>
+    </ClCompile>
+    <ClCompile Include="16_Stencilbuffer.cpp">
+      <Filter>App\Examples\1_Base</Filter>
+    </ClCompile>
+    <ClCompile Include="17_VertexAttributes.cpp">
+      <Filter>App\Examples\1_Base</Filter>
+    </ClCompile>
+    <ClCompile Include="20_gltfloading.cpp">
+      <Filter>App\Examples\2_gltf</Filter>
+    </ClCompile>
+    <ClCompile Include="21_gltfskinning.cpp">
+      <Filter>App\Examples\2_gltf</Filter>
+    </ClCompile>
+    <ClCompile Include="22_gltfscenerendering.cpp">
+      <Filter>App\Examples\2_gltf</Filter>
+    </ClCompile>
+    <ClCompile Include="30_multisampling.cpp">
+      <Filter>App\Examples\3_Advanced</Filter>
+    </ClCompile>
+    <ClCompile Include="31_hdr.cpp">
+      <Filter>App\Examples\3_Advanced</Filter>
+    </ClCompile>
+    <ClCompile Include="32_shadowmapping.cpp">
+      <Filter>App\Examples\3_Advanced</Filter>
+    </ClCompile>
+    <ClCompile Include="33_shadowmappingcascade.cpp">
+      <Filter>App\Examples\3_Advanced</Filter>
+    </ClCompile>
+    <ClCompile Include="34_shadowmappingomni.cpp">
+      <Filter>App\Examples\3_Advanced</Filter>
+    </ClCompile>
+    <ClCompile Include="35_texturemipmapgen.cpp">
+      <Filter>App\Examples\3_Advanced</Filter>
+    </ClCompile>
+    <ClCompile Include="36_screenshot.cpp">
+      <Filter>App\Examples\3_Advanced</Filter>
+    </ClCompile>
+    <ClCompile Include="37_oit.cpp">
+      <Filter>App\Examples\3_Advanced</Filter>
+    </ClCompile>
+    <ClCompile Include="40_multithreading.cpp">
+      <Filter>App\Examples\4_Performance</Filter>
+    </ClCompile>
+    <ClCompile Include="41_Instancing.cpp">
+      <Filter>App\Examples\4_Performance</Filter>
+    </ClCompile>
+    <ClCompile Include="42_indirectdraw.cpp">
+      <Filter>App\Examples\4_Performance</Filter>
+    </ClCompile>
+    <ClCompile Include="43_occlusionquery.cpp">
+      <Filter>App\Examples\4_Performance</Filter>
+    </ClCompile>
+    <ClCompile Include="44_pipelinestatistics.cpp">
+      <Filter>App\Examples\4_Performance</Filter>
+    </ClCompile>
+    <ClCompile Include="50_pbrbasic.cpp">
+      <Filter>App\Examples\5_PBR&amp;Deferred</Filter>
+    </ClCompile>
+    <ClCompile Include="51_pbribl.cpp">
+      <Filter>App\Examples\5_PBR&amp;Deferred</Filter>
+    </ClCompile>
+    <ClCompile Include="52_pbrtexture.cpp">
+      <Filter>App\Examples\5_PBR&amp;Deferred</Filter>
+    </ClCompile>
+    <ClCompile Include="53_deferred.cpp">
+      <Filter>App\Examples\5_PBR&amp;Deferred</Filter>
+    </ClCompile>
+    <ClCompile Include="54_deferredmultisampling.cpp">
+      <Filter>App\Examples\5_PBR&amp;Deferred</Filter>
+    </ClCompile>
+    <ClCompile Include="55_deferredshadows.cpp">
+      <Filter>App\Examples\5_PBR&amp;Deferred</Filter>
+    </ClCompile>
+    <ClCompile Include="56_ssao.cpp">
+      <Filter>App\Examples\5_PBR&amp;Deferred</Filter>
+    </ClCompile>
+    <ClCompile Include="60_computeshader.cpp">
+      <Filter>App\Examples\6_Compute&amp;Geometry&amp;Tessellation</Filter>
+    </ClCompile>
+    <ClCompile Include="61_computeparticles.cpp">
+      <Filter>App\Examples\6_Compute&amp;Geometry&amp;Tessellation</Filter>
+    </ClCompile>
+    <ClCompile Include="62_computenbody.cpp">
+      <Filter>App\Examples\6_Compute&amp;Geometry&amp;Tessellation</Filter>
+    </ClCompile>
+    <ClCompile Include="63_computecullandlod.cpp">
+      <Filter>App\Examples\6_Compute&amp;Geometry&amp;Tessellation</Filter>
+    </ClCompile>
+    <ClCompile Include="65_geometryshader.cpp">
+      <Filter>App\Examples\6_Compute&amp;Geometry&amp;Tessellation</Filter>
+    </ClCompile>
+    <ClCompile Include="66_viewportarray.cpp">
+      <Filter>App\Examples\6_Compute&amp;Geometry&amp;Tessellation</Filter>
+    </ClCompile>
+    <ClCompile Include="67_displacement.cpp">
+      <Filter>App\Examples\6_Compute&amp;Geometry&amp;Tessellation</Filter>
+    </ClCompile>
+    <ClCompile Include="68_terraintessellation.cpp">
+      <Filter>App\Examples\6_Compute&amp;Geometry&amp;Tessellation</Filter>
+    </ClCompile>
+    <ClCompile Include="69_tessellation.cpp">
+      <Filter>App\Examples\6_Compute&amp;Geometry&amp;Tessellation</Filter>
+    </ClCompile>
+    <ClCompile Include="70_textoverlay.cpp">
+      <Filter>App\Examples\7_UI</Filter>
+    </ClCompile>
+    <ClCompile Include="71_distancefieldfonts.cpp">
+      <Filter>App\Examples\7_UI</Filter>
+    </ClCompile>
+    <ClCompile Include="80_radialblur.cpp">
+      <Filter>App\Examples\8_Effects</Filter>
+    </ClCompile>
+    <ClCompile Include="81_bloom.cpp">
+      <Filter>App\Examples\8_Effects</Filter>
+    </ClCompile>
+    <ClCompile Include="82_parallaxmapping.cpp">
+      <Filter>App\Examples\8_Effects</Filter>
+    </ClCompile>
+    <ClCompile Include="83_sphericalenvmapping.cpp">
+      <Filter>App\Examples\8_Effects</Filter>
+    </ClCompile>
+    <ClCompile Include="90_conservativeraster.cpp">
+      <Filter>App\Examples\9_Extensions</Filter>
+    </ClCompile>
+    <ClCompile Include="91_pushdescriptors.cpp">
+      <Filter>App\Examples\9_Extensions</Filter>
+    </ClCompile>
+    <ClCompile Include="92_inlineuniformblocks.cpp">
+      <Filter>App\Examples\9_Extensions</Filter>
+    </ClCompile>
+    <ClCompile Include="93_multiview.cpp">
+      <Filter>App\Examples\9_Extensions</Filter>
+    </ClCompile>
+    <ClCompile Include="94_conditionalrender.cpp">
+      <Filter>App\Examples\9_Extensions</Filter>
+    </ClCompile>
+    <ClCompile Include="95_debugprintf.cpp">
+      <Filter>App\Examples\9_Extensions</Filter>
+    </ClCompile>
+    <ClCompile Include="96_debugutils.cpp">
+      <Filter>App\Examples\9_Extensions</Filter>
+    </ClCompile>
+    <ClCompile Include="97_negativeviewportheight.cpp">
+      <Filter>App\Examples\9_Extensions</Filter>
+    </ClCompile>
+    <ClCompile Include="98_descriptorindexing.cpp">
+      <Filter>App\Examples\9_Extensions</Filter>
+    </ClCompile>
+    <ClCompile Include="99_dynamicrendering.cpp">
+      <Filter>App\Examples\9_Extensions</Filter>
+    </ClCompile>
+    <ClCompile Include="100_texturesparseresidency.cpp">
+      <Filter>App\Examples\9_Extensions</Filter>
+    </ClCompile>
+    <ClCompile Include="101_dynamicstate.cpp">
+      <Filter>App\Examples\9_Extensions</Filter>
+    </ClCompile>
+    <ClCompile Include="64_computeraytracing.cpp">
+      <Filter>App\Examples\6_Compute&amp;Geometry&amp;Tessellation</Filter>
+    </ClCompile>
+    <ClCompile Include="VulkanInfiniteProceduralTerrain.cpp">
+      <Filter>App\Demo\VulkanInfiniteProceduralTerrain</Filter>
+    </ClCompile>
+    <ClCompile Include="IPTAssetManager.cpp">
+      <Filter>App\Demo\VulkanInfiniteProceduralTerrain</Filter>
+    </ClCompile>
+    <ClCompile Include="IPTVulkanContext.cpp">
+      <Filter>App\Demo\VulkanInfiniteProceduralTerrain</Filter>
+    </ClCompile>
+    <ClCompile Include="IPTHeightMapSettings.cpp">
+      <Filter>App\Demo\VulkanInfiniteProceduralTerrain</Filter>
+    </ClCompile>
+    <ClCompile Include="IPTTerrainChunk.cpp">
+      <Filter>App\Demo\VulkanInfiniteProceduralTerrain</Filter>
+    </ClCompile>
+    <ClCompile Include="IPTInfiniteTerrain.cpp">
+      <Filter>App\Demo\VulkanInfiniteProceduralTerrain</Filter>
+    </ClCompile>
+    <ClCompile Include="IPTNoise.cpp">
+      <Filter>App\Demo\VulkanInfiniteProceduralTerrain</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="GameApp.h">
+      <Filter>App</Filter>
+    </ClInclude>
+    <ClInclude Include="01_TriangleApp.h">
+      <Filter>App\Examples\1_Base</Filter>
+    </ClInclude>
+    <ClInclude Include="02_PipelinesApp.h">
+      <Filter>App\Examples\1_Base</Filter>
+    </ClInclude>
+    <ClInclude Include="03_DescriptorSets.h">
+      <Filter>App\Examples\1_Base</Filter>
+    </ClInclude>
+    <ClInclude Include="04_DynamicUniformBuffer.h">
+      <Filter>App\Examples\1_Base</Filter>
+    </ClInclude>
+    <ClInclude Include="05_PushConstants.h">
+      <Filter>App\Examples\1_Base</Filter>
+    </ClInclude>
+    <ClInclude Include="06_SpecializationConstants.h">
+      <Filter>App\Examples\1_Base</Filter>
+    </ClInclude>
+    <ClInclude Include="07_Texture.h">
+      <Filter>App\Examples\1_Base</Filter>
+    </ClInclude>
+    <ClInclude Include="08_TextureArrays.h">
+      <Filter>App\Examples\1_Base</Filter>
+    </ClInclude>
+    <ClInclude Include="09_TextureCubeMap.h">
+      <Filter>App\Examples\1_Base</Filter>
+    </ClInclude>
+    <ClInclude Include="10_TextureCubemapArray.h">
+      <Filter>App\Examples\1_Base</Filter>
+    </ClInclude>
+    <ClInclude Include="11_Texture3D.h">
+      <Filter>App\Examples\1_Base</Filter>
+    </ClInclude>
+    <ClInclude Include="12_InputAttachments.h">
+      <Filter>App\Examples\1_Base</Filter>
+    </ClInclude>
+    <ClInclude Include="13_Subpasses.h">
+      <Filter>App\Examples\1_Base</Filter>
+    </ClInclude>
+    <ClInclude Include="14_Offscreen.h">
+      <Filter>App\Examples\1_Base</Filter>
+    </ClInclude>
+    <ClInclude Include="15_ParticleSystem.h">
+      <Filter>App\Examples\1_Base</Filter>
+    </ClInclude>
+    <ClInclude Include="16_Stencilbuffer.h">
+      <Filter>App\Examples\1_Base</Filter>
+    </ClInclude>
+    <ClInclude Include="17_VertexAttributes.h">
+      <Filter>App\Examples\1_Base</Filter>
+    </ClInclude>
+    <ClInclude Include="22_gltfscenerendering.h">
+      <Filter>App\Examples\2_gltf</Filter>
+    </ClInclude>
+    <ClInclude Include="20_gltfloading.h">
+      <Filter>App\Examples\2_gltf</Filter>
+    </ClInclude>
+    <ClInclude Include="21_gltfskinning.h">
+      <Filter>App\Examples\2_gltf</Filter>
+    </ClInclude>
+    <ClInclude Include="30_multisampling.h">
+      <Filter>App\Examples\3_Advanced</Filter>
+    </ClInclude>
+    <ClInclude Include="31_hdr.h">
+      <Filter>App\Examples\3_Advanced</Filter>
+    </ClInclude>
+    <ClInclude Include="32_shadowmapping.h">
+      <Filter>App\Examples\3_Advanced</Filter>
+    </ClInclude>
+    <ClInclude Include="33_shadowmappingcascade.h">
+      <Filter>App\Examples\3_Advanced</Filter>
+    </ClInclude>
+    <ClInclude Include="34_shadowmappingomni.h">
+      <Filter>App\Examples\3_Advanced</Filter>
+    </ClInclude>
+    <ClInclude Include="35_texturemipmapgen.h">
+      <Filter>App\Examples\3_Advanced</Filter>
+    </ClInclude>
+    <ClInclude Include="36_screenshot.h">
+      <Filter>App\Examples\3_Advanced</Filter>
+    </ClInclude>
+    <ClInclude Include="37_oit.h">
+      <Filter>App\Examples\3_Advanced</Filter>
+    </ClInclude>
+    <ClInclude Include="40_multithreading.h">
+      <Filter>App\Examples\4_Performance</Filter>
+    </ClInclude>
+    <ClInclude Include="41_Instancing.h">
+      <Filter>App\Examples\4_Performance</Filter>
+    </ClInclude>
+    <ClInclude Include="42_indirectdraw.h">
+      <Filter>App\Examples\4_Performance</Filter>
+    </ClInclude>
+    <ClInclude Include="43_occlusionquery.h">
+      <Filter>App\Examples\4_Performance</Filter>
+    </ClInclude>
+    <ClInclude Include="44_pipelinestatistics.h">
+      <Filter>App\Examples\4_Performance</Filter>
+    </ClInclude>
+    <ClInclude Include="50_pbrbasic.h">
+      <Filter>App\Examples\5_PBR&amp;Deferred</Filter>
+    </ClInclude>
+    <ClInclude Include="51_pbribl.h">
+      <Filter>App\Examples\5_PBR&amp;Deferred</Filter>
+    </ClInclude>
+    <ClInclude Include="52_pbrtexture.h">
+      <Filter>App\Examples\5_PBR&amp;Deferred</Filter>
+    </ClInclude>
+    <ClInclude Include="53_deferred.h">
+      <Filter>App\Examples\5_PBR&amp;Deferred</Filter>
+    </ClInclude>
+    <ClInclude Include="54_deferredmultisampling.h">
+      <Filter>App\Examples\5_PBR&amp;Deferred</Filter>
+    </ClInclude>
+    <ClInclude Include="55_deferredshadows.h">
+      <Filter>App\Examples\5_PBR&amp;Deferred</Filter>
+    </ClInclude>
+    <ClInclude Include="56_ssao.h">
+      <Filter>App\Examples\5_PBR&amp;Deferred</Filter>
+    </ClInclude>
+    <ClInclude Include="60_computeshader.h">
+      <Filter>App\Examples\6_Compute&amp;Geometry&amp;Tessellation</Filter>
+    </ClInclude>
+    <ClInclude Include="61_computeparticles.h">
+      <Filter>App\Examples\6_Compute&amp;Geometry&amp;Tessellation</Filter>
+    </ClInclude>
+    <ClInclude Include="62_computenbody.h">
+      <Filter>App\Examples\6_Compute&amp;Geometry&amp;Tessellation</Filter>
+    </ClInclude>
+    <ClInclude Include="63_computecullandlod.h">
+      <Filter>App\Examples\6_Compute&amp;Geometry&amp;Tessellation</Filter>
+    </ClInclude>
+    <ClInclude Include="65_geometryshader.h">
+      <Filter>App\Examples\6_Compute&amp;Geometry&amp;Tessellation</Filter>
+    </ClInclude>
+    <ClInclude Include="66_viewportarray.h">
+      <Filter>App\Examples\6_Compute&amp;Geometry&amp;Tessellation</Filter>
+    </ClInclude>
+    <ClInclude Include="67_displacement.h">
+      <Filter>App\Examples\6_Compute&amp;Geometry&amp;Tessellation</Filter>
+    </ClInclude>
+    <ClInclude Include="68_terraintessellation.h">
+      <Filter>App\Examples\6_Compute&amp;Geometry&amp;Tessellation</Filter>
+    </ClInclude>
+    <ClInclude Include="69_tessellation.h">
+      <Filter>App\Examples\6_Compute&amp;Geometry&amp;Tessellation</Filter>
+    </ClInclude>
+    <ClInclude Include="70_textoverlay.h">
+      <Filter>App\Examples\7_UI</Filter>
+    </ClInclude>
+    <ClInclude Include="71_distancefieldfonts.h">
+      <Filter>App\Examples\7_UI</Filter>
+    </ClInclude>
+    <ClInclude Include="80_radialblur.h">
+      <Filter>App\Examples\8_Effects</Filter>
+    </ClInclude>
+    <ClInclude Include="81_bloom.h">
+      <Filter>App\Examples\8_Effects</Filter>
+    </ClInclude>
+    <ClInclude Include="82_parallaxmapping.h">
+      <Filter>App\Examples\8_Effects</Filter>
+    </ClInclude>
+    <ClInclude Include="83_sphericalenvmapping.h">
+      <Filter>App\Examples\8_Effects</Filter>
+    </ClInclude>
+    <ClInclude Include="90_conservativeraster.h">
+      <Filter>App\Examples\9_Extensions</Filter>
+    </ClInclude>
+    <ClInclude Include="91_pushdescriptors.h">
+      <Filter>App\Examples\9_Extensions</Filter>
+    </ClInclude>
+    <ClInclude Include="92_inlineuniformblocks.h">
+      <Filter>App\Examples\9_Extensions</Filter>
+    </ClInclude>
+    <ClInclude Include="93_multiview.h">
+      <Filter>App\Examples\9_Extensions</Filter>
+    </ClInclude>
+    <ClInclude Include="94_conditionalrender.h">
+      <Filter>App\Examples\9_Extensions</Filter>
+    </ClInclude>
+    <ClInclude Include="95_debugprintf.h">
+      <Filter>App\Examples\9_Extensions</Filter>
+    </ClInclude>
+    <ClInclude Include="96_debugutils.h">
+      <Filter>App\Examples\9_Extensions</Filter>
+    </ClInclude>
+    <ClInclude Include="97_negativeviewportheight.h">
+      <Filter>App\Examples\9_Extensions</Filter>
+    </ClInclude>
+    <ClInclude Include="98_descriptorindexing.h">
+      <Filter>App\Examples\9_Extensions</Filter>
+    </ClInclude>
+    <ClInclude Include="99_dynamicrendering.h">
+      <Filter>App\Examples\9_Extensions</Filter>
+    </ClInclude>
+    <ClInclude Include="100_texturesparseresidency.h">
+      <Filter>App\Examples\9_Extensions</Filter>
+    </ClInclude>
+    <ClInclude Include="101_dynamicstate.h">
+      <Filter>App\Examples\9_Extensions</Filter>
+    </ClInclude>
+    <ClInclude Include="64_computeraytracing.h">
+      <Filter>App\Examples\6_Compute&amp;Geometry&amp;Tessellation</Filter>
+    </ClInclude>
+    <ClInclude Include="VulkanInfiniteProceduralTerrain.h">
+      <Filter>App\Demo\VulkanInfiniteProceduralTerrain</Filter>
+    </ClInclude>
+    <ClInclude Include="IPTAssetManager.h">
+      <Filter>App\Demo\VulkanInfiniteProceduralTerrain</Filter>
+    </ClInclude>
+    <ClInclude Include="IPTVulkanContext.h">
+      <Filter>App\Demo\VulkanInfiniteProceduralTerrain</Filter>
+    </ClInclude>
+    <ClInclude Include="IPTHeightMapSettings.h">
+      <Filter>App\Demo\VulkanInfiniteProceduralTerrain</Filter>
+    </ClInclude>
+    <ClInclude Include="IPTTerrainChunk.h">
+      <Filter>App\Demo\VulkanInfiniteProceduralTerrain</Filter>
+    </ClInclude>
+    <ClInclude Include="IPTVulkanHeightmap.h">
+      <Filter>App\Demo\VulkanInfiniteProceduralTerrain</Filter>
+    </ClInclude>
+    <ClInclude Include="IPTCommandBuffer.h">
+      <Filter>App\Demo\VulkanInfiniteProceduralTerrain</Filter>
+    </ClInclude>
+    <ClInclude Include="IPTCommandPool.h">
+      <Filter>App\Demo\VulkanInfiniteProceduralTerrain</Filter>
+    </ClInclude>
+    <ClInclude Include="IPTPipelineLayout.h">
+      <Filter>App\Demo\VulkanInfiniteProceduralTerrain</Filter>
+    </ClInclude>
+    <ClInclude Include="IPTDescriptorSetLayout.h">
+      <Filter>App\Demo\VulkanInfiniteProceduralTerrain</Filter>
+    </ClInclude>
+    <ClInclude Include="IPTDescriptorSet.h">
+      <Filter>App\Demo\VulkanInfiniteProceduralTerrain</Filter>
+    </ClInclude>
+    <ClInclude Include="IPTDescriptorPool.h">
+      <Filter>App\Demo\VulkanInfiniteProceduralTerrain</Filter>
+    </ClInclude>
+    <ClInclude Include="IPTPipeline.h">
+      <Filter>App\Demo\VulkanInfiniteProceduralTerrain</Filter>
+    </ClInclude>
+    <ClInclude Include="IPTInfiniteTerrain.h">
+      <Filter>App\Demo\VulkanInfiniteProceduralTerrain</Filter>
+    </ClInclude>
+    <ClInclude Include="IPTNoise.h">
+      <Filter>App\Demo\VulkanInfiniteProceduralTerrain</Filter>
+    </ClInclude>
+    <ClInclude Include="IPTImage.h">
+      <Filter>App\Demo\VulkanInfiniteProceduralTerrain</Filter>
+    </ClInclude>
+    <ClInclude Include="IPTImageView.h">
+      <Filter>App\Demo\VulkanInfiniteProceduralTerrain</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="App">
+      <UniqueIdentifier>{742a5fa7-921d-46f5-961f-0165aa9ee3e0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="App\Examples">
+      <UniqueIdentifier>{23b7cc76-d248-4e34-92aa-6a6e65d9f6f0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="App\Examples\1_Base">
+      <UniqueIdentifier>{eb13ea95-3038-4726-a906-66a530eef3b2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="App\Examples\2_gltf">
+      <UniqueIdentifier>{a07459d9-5ad4-47a7-9660-04d02c5b17f4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="App\Examples\3_Advanced">
+      <UniqueIdentifier>{e7fea50e-91dd-4a3b-aaf6-09d7b0a672fd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="App\Examples\4_Performance">
+      <UniqueIdentifier>{83541fff-a2aa-425b-a201-fbcf4fe5de98}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="App\Examples\5_PBR&amp;Deferred">
+      <UniqueIdentifier>{8a896a70-5d24-408e-8ccc-0bd685c9914f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="App\Examples\6_Compute&amp;Geometry&amp;Tessellation">
+      <UniqueIdentifier>{d5f7e2fe-1fe9-4ced-b430-53425998cd36}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="App\Examples\7_UI">
+      <UniqueIdentifier>{8c3562d0-3617-47a4-9355-b8acc24b64df}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="App\Examples\8_Effects">
+      <UniqueIdentifier>{48382cce-5cd6-44f3-a28f-911a5b7d54af}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="App\Examples\9_Extensions">
+      <UniqueIdentifier>{870746ab-dc89-42be-b47c-b2a5b65436ae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="App\Demo">
+      <UniqueIdentifier>{89ae6e5a-339d-4bed-8601-73dabe26e439}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="App\Demo\VulkanInfiniteProceduralTerrain">
+      <UniqueIdentifier>{6e5854b4-2163-4380-9575-596f741fd5aa}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

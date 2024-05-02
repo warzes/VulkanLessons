@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>17.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{3F535F0A-328D-4F25-9AE2-4AF9BC4CF453}</ProjectGuid>
+    <RootNamespace>Game</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>$(SolutionDir)..\bin\</OutDir>
+    <IntDir>$(SolutionDir)..\_obj\$(Configuration)\$(PlatformTarget)\$(ProjectName)\</IntDir>
+    <TargetName>$(ProjectName)_$(Configuration)</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>$(SolutionDir)..\bin\</OutDir>
+    <IntDir>$(SolutionDir)..\_obj\$(Configuration)\$(PlatformTarget)\$(ProjectName)\</IntDir>
+    <TargetName>$(ProjectName)_$(Configuration)</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>EnableAllWarnings</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <AdditionalIncludeDirectories>$(SolutionDir)3rdparty\;$(ProjectDir);$(SolutionDir);$(VULKAN_SDK)\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(SolutionDir)3rdparty\lib\$(Configuration)\;$(SolutionDir)..\_lib\$(Configuration)\;$(VULKAN_SDK)\Lib\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>EnableAllWarnings</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <AdditionalIncludeDirectories>$(SolutionDir)3rdparty\;$(ProjectDir);$(SolutionDir);$(VULKAN_SDK)\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(SolutionDir)3rdparty\lib\$(Configuration)\;$(SolutionDir)..\_lib\$(Configuration)\;$(VULKAN_SDK)\Lib\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="02_PipelinesApp.cpp" />
+    <ClCompile Include="03_DescriptorSets.cpp" />
+    <ClCompile Include="04_DynamicUniformBuffer.cpp" />
+    <ClCompile Include="05_PushConstants.cpp" />
+    <ClCompile Include="06_SpecializationConstants.cpp" />
+    <ClCompile Include="07_Texture.cpp" />
+    <ClCompile Include="08_TextureArrays.cpp" />
+    <ClCompile Include="09_TextureCubeMap.cpp" />
+    <ClCompile Include="100_texturesparseresidency.cpp" />
+    <ClCompile Include="101_dynamicstate.cpp" />
+    <ClCompile Include="64_computeraytracing.cpp" />
+    <ClCompile Include="99_dynamicrendering.cpp" />
+    <ClCompile Include="10_TextureCubemapArray.cpp" />
+    <ClCompile Include="11_Texture3D.cpp" />
+    <ClCompile Include="12_InputAttachments.cpp" />
+    <ClCompile Include="13_Subpasses.cpp" />
+    <ClCompile Include="14_Offscreen.cpp" />
+    <ClCompile Include="15_ParticleSystem.cpp" />
+    <ClCompile Include="16_Stencilbuffer.cpp" />
+    <ClCompile Include="17_VertexAttributes.cpp" />
+    <ClCompile Include="20_gltfloading.cpp" />
+    <ClCompile Include="21_gltfskinning.cpp" />
+    <ClCompile Include="22_gltfscenerendering.cpp" />
+    <ClCompile Include="30_multisampling.cpp" />
+    <ClCompile Include="31_hdr.cpp" />
+    <ClCompile Include="32_shadowmapping.cpp" />
+    <ClCompile Include="33_shadowmappingcascade.cpp" />
+    <ClCompile Include="34_shadowmappingomni.cpp" />
+    <ClCompile Include="35_texturemipmapgen.cpp" />
+    <ClCompile Include="36_screenshot.cpp" />
+    <ClCompile Include="37_oit.cpp" />
+    <ClCompile Include="40_multithreading.cpp" />
+    <ClCompile Include="41_Instancing.cpp" />
+    <ClCompile Include="42_indirectdraw.cpp" />
+    <ClCompile Include="43_occlusionquery.cpp" />
+    <ClCompile Include="44_pipelinestatistics.cpp" />
+    <ClCompile Include="50_pbrbasic.cpp" />
+    <ClCompile Include="51_pbribl.cpp" />
+    <ClCompile Include="52_pbrtexture.cpp" />
+    <ClCompile Include="53_deferred.cpp" />
+    <ClCompile Include="54_deferredmultisampling.cpp" />
+    <ClCompile Include="55_deferredshadows.cpp" />
+    <ClCompile Include="56_ssao.cpp" />
+    <ClCompile Include="60_computeshader.cpp" />
+    <ClCompile Include="61_computeparticles.cpp" />
+    <ClCompile Include="62_computenbody.cpp" />
+    <ClCompile Include="63_computecullandlod.cpp" />
+    <ClCompile Include="65_geometryshader.cpp" />
+    <ClCompile Include="66_viewportarray.cpp" />
+    <ClCompile Include="67_displacement.cpp" />
+    <ClCompile Include="68_terraintessellation.cpp" />
+    <ClCompile Include="69_tessellation.cpp" />
+    <ClCompile Include="70_textoverlay.cpp" />
+    <ClCompile Include="71_distancefieldfonts.cpp" />
+    <ClCompile Include="80_radialblur.cpp" />
+    <ClCompile Include="81_bloom.cpp" />
+    <ClCompile Include="82_parallaxmapping.cpp" />
+    <ClCompile Include="83_sphericalenvmapping.cpp" />
+    <ClCompile Include="90_conservativeraster.cpp" />
+    <ClCompile Include="91_pushdescriptors.cpp" />
+    <ClCompile Include="92_inlineuniformblocks.cpp" />
+    <ClCompile Include="93_multiview.cpp" />
+    <ClCompile Include="94_conditionalrender.cpp" />
+    <ClCompile Include="95_debugprintf.cpp" />
+    <ClCompile Include="96_debugutils.cpp" />
+    <ClCompile Include="97_negativeviewportheight.cpp" />
+    <ClCompile Include="98_descriptorindexing.cpp" />
+    <ClCompile Include="GameApp.cpp" />
+    <ClCompile Include="IPTAssetManager.cpp" />
+    <ClCompile Include="IPTHeightMapSettings.cpp" />
+    <ClCompile Include="IPTInfiniteTerrain.cpp" />
+    <ClCompile Include="IPTNoise.cpp" />
+    <ClCompile Include="IPTTerrainChunk.cpp" />
+    <ClCompile Include="IPTVulkanContext.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="01_TriangleApp.cpp" />
+    <ClCompile Include="VulkanInfiniteProceduralTerrain.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="02_PipelinesApp.h" />
+    <ClInclude Include="03_DescriptorSets.h" />
+    <ClInclude Include="04_DynamicUniformBuffer.h" />
+    <ClInclude Include="05_PushConstants.h" />
+    <ClInclude Include="06_SpecializationConstants.h" />
+    <ClInclude Include="07_Texture.h" />
+    <ClInclude Include="08_TextureArrays.h" />
+    <ClInclude Include="09_TextureCubeMap.h" />
+    <ClInclude Include="100_texturesparseresidency.h" />
+    <ClInclude Include="101_dynamicstate.h" />
+    <ClInclude Include="64_computeraytracing.h" />
+    <ClInclude Include="99_dynamicrendering.h" />
+    <ClInclude Include="10_TextureCubemapArray.h" />
+    <ClInclude Include="11_Texture3D.h" />
+    <ClInclude Include="12_InputAttachments.h" />
+    <ClInclude Include="13_Subpasses.h" />
+    <ClInclude Include="14_Offscreen.h" />
+    <ClInclude Include="15_ParticleSystem.h" />
+    <ClInclude Include="16_Stencilbuffer.h" />
+    <ClInclude Include="17_VertexAttributes.h" />
+    <ClInclude Include="20_gltfloading.h" />
+    <ClInclude Include="21_gltfskinning.h" />
+    <ClInclude Include="22_gltfscenerendering.h" />
+    <ClInclude Include="30_multisampling.h" />
+    <ClInclude Include="31_hdr.h" />
+    <ClInclude Include="32_shadowmapping.h" />
+    <ClInclude Include="33_shadowmappingcascade.h" />
+    <ClInclude Include="34_shadowmappingomni.h" />
+    <ClInclude Include="35_texturemipmapgen.h" />
+    <ClInclude Include="36_screenshot.h" />
+    <ClInclude Include="37_oit.h" />
+    <ClInclude Include="40_multithreading.h" />
+    <ClInclude Include="41_Instancing.h" />
+    <ClInclude Include="42_indirectdraw.h" />
+    <ClInclude Include="43_occlusionquery.h" />
+    <ClInclude Include="44_pipelinestatistics.h" />
+    <ClInclude Include="50_pbrbasic.h" />
+    <ClInclude Include="51_pbribl.h" />
+    <ClInclude Include="52_pbrtexture.h" />
+    <ClInclude Include="53_deferred.h" />
+    <ClInclude Include="54_deferredmultisampling.h" />
+    <ClInclude Include="55_deferredshadows.h" />
+    <ClInclude Include="56_ssao.h" />
+    <ClInclude Include="60_computeshader.h" />
+    <ClInclude Include="61_computeparticles.h" />
+    <ClInclude Include="62_computenbody.h" />
+    <ClInclude Include="63_computecullandlod.h" />
+    <ClInclude Include="65_geometryshader.h" />
+    <ClInclude Include="66_viewportarray.h" />
+    <ClInclude Include="67_displacement.h" />
+    <ClInclude Include="68_terraintessellation.h" />
+    <ClInclude Include="69_tessellation.h" />
+    <ClInclude Include="70_textoverlay.h" />
+    <ClInclude Include="71_distancefieldfonts.h" />
+    <ClInclude Include="80_radialblur.h" />
+    <ClInclude Include="81_bloom.h" />
+    <ClInclude Include="82_parallaxmapping.h" />
+    <ClInclude Include="83_sphericalenvmapping.h" />
+    <ClInclude Include="90_conservativeraster.h" />
+    <ClInclude Include="91_pushdescriptors.h" />
+    <ClInclude Include="92_inlineuniformblocks.h" />
+    <ClInclude Include="93_multiview.h" />
+    <ClInclude Include="94_conditionalrender.h" />
+    <ClInclude Include="95_debugprintf.h" />
+    <ClInclude Include="96_debugutils.h" />
+    <ClInclude Include="97_negativeviewportheight.h" />
+    <ClInclude Include="98_descriptorindexing.h" />
+    <ClInclude Include="GameApp.h" />
+    <ClInclude Include="IPTAssetManager.h" />
+    <ClInclude Include="IPTCommandBuffer.h" />
+    <ClInclude Include="IPTCommandPool.h" />
+    <ClInclude Include="IPTDescriptorPool.h" />
+    <ClInclude Include="IPTDescriptorSet.h" />
+    <ClInclude Include="IPTDescriptorSetLayout.h" />
+    <ClInclude Include="IPTHeightMapSettings.h" />
+    <ClInclude Include="IPTImage.h" />
+    <ClInclude Include="IPTImageView.h" />
+    <ClInclude Include="IPTInfiniteTerrain.h" />
+    <ClInclude Include="IPTNoise.h" />
+    <ClInclude Include="IPTPipeline.h" />
+    <ClInclude Include="IPTPipelineLayout.h" />
+    <ClInclude Include="IPTTerrainChunk.h" />
+    <ClInclude Include="IPTVulkanContext.h" />
+    <ClInclude Include="IPTVulkanHeightmap.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="01_TriangleApp.h" />
+    <ClInclude Include="VulkanInfiniteProceduralTerrain.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

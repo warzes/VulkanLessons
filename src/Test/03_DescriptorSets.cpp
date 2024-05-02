@@ -381,7 +381,8 @@ void DescriptorSets::preparePipelines()
 void DescriptorSets::prepareUniformBuffers()
 {
 	// Vertex shader matrix uniform buffer block
-	for (auto& cube : cubes) {
+	for (auto& cube : cubes) 
+	{
 		VK_CHECK_RESULT(m_vulkanDevice->createBuffer(
 			VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
 			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
@@ -411,10 +412,10 @@ void DescriptorSets::updateUniformBuffers()
 //-----------------------------------------------------------------------------
 void DescriptorSets::draw()
 {
-	EngineApp::prepareFrame();
+	prepareFrame();
 	submitInfo.commandBufferCount = 1;
 	submitInfo.pCommandBuffers = &drawCommandBuffers[currentBuffer];
 	VK_CHECK_RESULT(vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE));
-	EngineApp::submitFrame();
+	submitFrame();
 }
 //-----------------------------------------------------------------------------

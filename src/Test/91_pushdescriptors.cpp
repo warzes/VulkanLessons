@@ -9,19 +9,19 @@ bool PushDescriptorsApp::OnCreate()
 	camera.setTranslation(glm::vec3(0.0f, 0.0f, -5.0f));
 
 	/*
-			Extension specific functions
-		*/
+		Extension specific functions
+	*/
 
-		// The push descriptor update function is part of an extension so it has to be manually loaded
+	// The push descriptor update function is part of an extension so it has to be manually loaded
 	vkCmdPushDescriptorSetKHR = (PFN_vkCmdPushDescriptorSetKHR)vkGetDeviceProcAddr(device, "vkCmdPushDescriptorSetKHR");
 	if (!vkCmdPushDescriptorSetKHR) {
-		vks::tools::exitFatal("Could not get a valid function pointer for vkCmdPushDescriptorSetKHR", -1);
+		Fatal("Could not get a valid function pointer for vkCmdPushDescriptorSetKHR");
 	}
 
 	// Get device push descriptor properties (to display them)
 	PFN_vkGetPhysicalDeviceProperties2KHR vkGetPhysicalDeviceProperties2KHR = reinterpret_cast<PFN_vkGetPhysicalDeviceProperties2KHR>(m_instance.GetInstanceProcAddr("vkGetPhysicalDeviceProperties2KHR"));
 	if (!vkGetPhysicalDeviceProperties2KHR) {
-		vks::tools::exitFatal("Could not get a valid function pointer for vkGetPhysicalDeviceProperties2KHR", -1);
+		Fatal("Could not get a valid function pointer for vkGetPhysicalDeviceProperties2KHR");
 	}
 	VkPhysicalDeviceProperties2KHR deviceProps2{};
 	pushDescriptorProps.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PUSH_DESCRIPTOR_PROPERTIES_KHR;

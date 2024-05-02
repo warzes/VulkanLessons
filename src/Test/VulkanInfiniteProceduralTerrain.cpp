@@ -3,6 +3,7 @@
 //-----------------------------------------------------------------------------
 bool VulkanInfiniteProceduralTerrainApp::OnCreate()
 {
+#if 0
 	camera.type = Camera::CameraType::firstperson;
 	camera.setPerspective(45.0f, (float)destWidth / (float)destHeight, zNear, zFar);
 	camera.movementSpeed = 7.5f * 5.0f;
@@ -48,30 +49,34 @@ bool VulkanInfiniteProceduralTerrainApp::OnCreate()
 	createPipelines();
 	setupDescriptorSet();
 	loadHeightMapSettings("coastline");
-
+#endif
 	return true;
 }
 //-----------------------------------------------------------------------------
 void VulkanInfiniteProceduralTerrainApp::OnDestroy()
 {
+#if 0
 	vkDestroySampler(device, offscreenPass.sampler, nullptr);
 	// @todo: wait for detachted threads to finish (maybe use atomic active thread counter)
+#endif
 }
 //-----------------------------------------------------------------------------
 void VulkanInfiniteProceduralTerrainApp::OnUpdate(float deltaTime)
 {
 	camera.update(deltaTime);
-
+#if 0
 	if (!fixFrustum) {
 		frustum.update(camera.matrices.perspective * camera.matrices.view);
 	}
 	// @todo
 	infiniteTerrain.viewerPosition = glm::vec2(camera.position.x, camera.position.z);
 	infiniteTerrain.updateVisibleChunks(frustum);
+#endif
 }
 //-----------------------------------------------------------------------------
 void VulkanInfiniteProceduralTerrainApp::OnFrame()
 {
+#if 0
 	FrameObjects currentFrame = frameObjects[getCurrentFrameIndex()];
 
 	prepareFrame(currentFrame);
@@ -99,15 +104,16 @@ void VulkanInfiniteProceduralTerrainApp::OnFrame()
 	updateMemoryBudgets();
 
 	updateHeightmap();
+#endif
 }
 //-----------------------------------------------------------------------------
 void VulkanInfiniteProceduralTerrainApp::OnUpdateUIOverlay(vks::UIOverlay* overlay)
 {
+#if 0
 	ImGui::SetNextWindowPos(ImVec2(10, 10), ImGuiSetCond_FirstUseEver);
 	ImGui::SetNextWindowSize(ImVec2(0, 0), ImGuiSetCond_FirstUseEver);
 	ImGui::Begin("Info", nullptr, ImGuiWindowFlags_None);
 	ImGui::TextUnformatted("Vulkan infinite terrain");
-	ImGui::TextUnformatted("2022 by Sascha Willems");
 	ImGui::TextUnformatted(deviceProperties.deviceName);
 	ImGui::End();
 
@@ -227,6 +233,7 @@ void VulkanInfiniteProceduralTerrainApp::OnUpdateUIOverlay(vks::UIOverlay* overl
 	overlay->sliderInt("Patch dimension", &heightMapSettings.grassDim, 1, 512);
 	overlay->sliderFloat("Patch scale", &heightMapSettings.grassScale, 0.25f, 2.5f);
 	ImGui::End();
+#endif
 }
 //-----------------------------------------------------------------------------
 void VulkanInfiniteProceduralTerrainApp::OnWindowResize(uint32_t destWidth, uint32_t destHeight)
@@ -268,6 +275,7 @@ void VulkanInfiniteProceduralTerrainApp::OnKeyPressed(uint32_t key)
 		}
 	}
 
+#if 0
 	if (key == KEY_F) {
 		fixFrustum = !fixFrustum;
 	}
@@ -296,6 +304,7 @@ void VulkanInfiniteProceduralTerrainApp::OnKeyPressed(uint32_t key)
 		std::cout << camera.position.x << " " << camera.position.y << " " << camera.position.z << "\n";
 		std::cout << camera.pitch << " " << camera.yaw << "\n";
 	}
+#endif
 }
 //-----------------------------------------------------------------------------
 void VulkanInfiniteProceduralTerrainApp::OnKeyUp(uint32_t key)

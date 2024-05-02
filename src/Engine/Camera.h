@@ -238,4 +238,14 @@ public:
 		return retVal;
 	}
 
+	// TODO: возможно нерабочая, взята из старого кода
+	glm::vec3 frontVector()
+	{
+		glm::vec3 camFront;
+		camFront.x = -cos(glm::radians(rotation.x)) * sin(glm::radians(rotation.y));
+		camFront.y = sin(glm::radians(rotation.x));
+		camFront.z = cos(glm::radians(rotation.x)) * cos(glm::radians(rotation.y));
+		return glm::normalize(camFront);
+	}
+
 };

@@ -250,11 +250,11 @@ void PipelinesApp::updateUniformBuffers()
 //-----------------------------------------------------------------------------
 void PipelinesApp::draw()
 {
-	EngineApp::prepareFrame();
+	prepareFrame();
 	submitInfo.commandBufferCount = 1;
 	submitInfo.pCommandBuffers = &drawCommandBuffers[currentBuffer];
 	VK_CHECK_RESULT(vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE));
-	EngineApp::submitFrame();
+	submitFrame();
 }
 //-----------------------------------------------------------------------------
 void PipelinesApp::OnUpdateUIOverlay(vks::UIOverlay* overlay)

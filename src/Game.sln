@@ -18,6 +18,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DOC", "DOC", "{59ACAFA0-9DF
 		REF.MD = REF.MD
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Test", "Test\Test.vcxproj", "{3F535F0A-328D-4F25-9AE2-4AF9BC4CF453}"
+	ProjectSection(ProjectDependencies) = postProject
+		{0BE7A963-3EBC-4BC9-A158-B83C77AB6D96} = {0BE7A963-3EBC-4BC9-A158-B83C77AB6D96}
+		{9214BAEA-73B9-4C43-8198-5294124A4372} = {9214BAEA-73B9-4C43-8198-5294124A4372}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -36,6 +42,10 @@ Global
 		{9214BAEA-73B9-4C43-8198-5294124A4372}.Debug|x64.Build.0 = Debug|x64
 		{9214BAEA-73B9-4C43-8198-5294124A4372}.Release|x64.ActiveCfg = Release|x64
 		{9214BAEA-73B9-4C43-8198-5294124A4372}.Release|x64.Build.0 = Release|x64
+		{3F535F0A-328D-4F25-9AE2-4AF9BC4CF453}.Debug|x64.ActiveCfg = Debug|x64
+		{3F535F0A-328D-4F25-9AE2-4AF9BC4CF453}.Debug|x64.Build.0 = Debug|x64
+		{3F535F0A-328D-4F25-9AE2-4AF9BC4CF453}.Release|x64.ActiveCfg = Release|x64
+		{3F535F0A-328D-4F25-9AE2-4AF9BC4CF453}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

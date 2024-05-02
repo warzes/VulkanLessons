@@ -1,6 +1,15 @@
 #pragma once
 
 #include "IPTInfiniteTerrain.h"
+#include "IPTImageView.h"
+
+struct VulkanFrameObjects
+{
+	CommandBuffer* commandBuffer;
+	VkFence renderCompleteFence;
+	VkSemaphore renderCompleteSemaphore;
+	VkSemaphore presentCompleteSemaphore;
+};
 
 class VulkanInfiniteProceduralTerrainApp final : public EngineApp
 {
@@ -20,6 +29,7 @@ public:
 private:
 	Camera camera;
 
+#if 0
 #define ENABLE_VALIDATION false
 #define FB_DIM 768
 #define SHADOWMAP_DIM 2048
@@ -447,7 +457,8 @@ private:
 
 		const uint32_t currentFrameIndex = getCurrentFrameIndex();
 
-		if (idTrees) {
+		if (idTrees)
+		{
 			// Trees at full detail
 			if ((countFull > 0) && ((countFull > drawBatches.trees.instanceBuffers[currentFrameIndex].elements) || (drawBatches.trees.instanceBuffers[currentFrameIndex].buffer == VK_NULL_HANDLE))) {
 				VkDeviceSize bufferSize = countFull * sizeof(InstanceData);
@@ -591,14 +602,14 @@ private:
 			aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
 			break;
 		case ImageType::DepthStencil:
-			VkBool32 validDepthFormat = vks::tools::getSupportedDepthFormat(physicalDevice, &format);
+			VkBool32 validDepthFormat = vks::tools::getSupportedDepthFormat(m_adapter.physicalDevice, &format);
 			usageFlags = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
 			aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;// | VK_IMAGE_ASPECT_STENCIL_BIT;
 			break;
 		}
 		assert(format != VK_FORMAT_UNDEFINED);
 
-		target.image = new Image(vulkanDevice);
+		target.image = new Image(m_vulkanDevice);
 		target.image->setType(VK_IMAGE_TYPE_2D);
 		target.image->setFormat(format);
 		target.image->setExtent({ (uint32_t)offscreenPass.width, (uint32_t)offscreenPass.height, 1 });
@@ -606,7 +617,7 @@ private:
 		target.image->setUsage(usageFlags);
 		target.image->create();
 
-		target.view = new ImageView(vulkanDevice);
+		target.view = new ImageView(m_vulkanDevice);
 		target.view->setType(VK_IMAGE_VIEW_TYPE_2D);
 		target.view->setFormat(format);
 		target.view->setSubResourceRange({ aspectMask, 0, 1, 0, 1 });
@@ -641,7 +652,7 @@ private:
 
 		// Find a suitable depth format
 		VkFormat fbDepthFormat;
-		VkBool32 validDepthFormat = vks::tools::getSupportedDepthFormat(physicalDevice, &fbDepthFormat);
+		VkBool32 validDepthFormat = vks::tools::getSupportedDepthFormat(m_adapter.physicalDevice, &fbDepthFormat);
 		assert(validDepthFormat);
 
 		VkSamplerCreateInfo samplerInfo = vks::initializers::samplerCreateInfo();
@@ -2025,4 +2036,5 @@ private:
 			memcpy(memoryBudget.heapUsage, physicalDeviceMemoryBudgetPropertiesEXT.heapUsage, sizeof(VkDeviceSize) * VK_MAX_MEMORY_HEAPS);
 		}
 	}
+#endif
 };
