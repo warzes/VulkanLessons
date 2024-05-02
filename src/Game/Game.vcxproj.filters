@@ -6,16 +6,25 @@
     <ClCompile Include="GameApp.cpp">
       <Filter>App</Filter>
     </ClCompile>
+    <ClCompile Include="gCamera.cpp">
+      <Filter>Framework</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="GameApp.h">
       <Filter>App</Filter>
     </ClInclude>
+    <ClInclude Include="gCamera.h">
+      <Filter>Framework</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="App">
       <UniqueIdentifier>{742a5fa7-921d-46f5-961f-0165aa9ee3e0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Framework">
+      <UniqueIdentifier>{4f5a0c81-b4c3-422d-bb22-6812ac0e0a94}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
